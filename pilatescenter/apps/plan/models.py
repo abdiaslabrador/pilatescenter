@@ -1,0 +1,26 @@
+from django.db import models
+from apps.exercise.models import Exercise
+
+
+class pilatesManager(models.Manager):
+	def pilates(self):
+		return Plan.objects.filter(id_exercise_fk__name__icontains='pilates').exclude(id_exercise_fk__name__icontains='pilates ')
+
+	def yoga(self):
+		return Plan.objects.filter(id_exercise_fk__name__icontains='yoga').exclude(id_exercise_fk__name__icontains='pilates')
+
+	def pilates_especial(self):
+		return Plan.objects.filter(id_exercise_fk__name__icontains='pilates especial')
+
+# Create your models here.
+class Plan(models.Model):
+	name 			= models.CharField(null=False, blank=False, max_length=64)
+	total_days		= models.IntegerField(null=False, blank=False, default=0)
+	oportunities	= models.IntegerField(null=False, blank=False, default=0)
+
+	id_exercise_fk = models.ForeignKey(Exercise, null=True, blank=False, on_delete=models.CASCADE, db_column='id_exercise_fk')
+
+	objects=pilatesManager()
+
+	def __str__(self):
+		return str("Plan: " + self.name + " - Dias: " + str(self.total_days)+ " - Id asociado:" + str(self.id_exercise_fk))

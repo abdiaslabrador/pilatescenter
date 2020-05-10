@@ -1,0 +1,50 @@
+<!doctype html>
+{% extends "base_template/base_tamplate.html" %}
+
+{% load static %}
+
+  {% block title %}Actualización de plan{% endblock %}
+
+
+      {% block content %}
+      <div class="container mt-4 p-3 my-3 bg-dark  border-0">
+      <div class="card">
+        <div class="card-header" >
+          <h5 class="card-title">Actualizar plan</h5>
+        </div>
+
+        <div class="card-body">
+        <form method="POST">
+          {% csrf_token %}
+
+          {{form.non_field_errors}}
+
+            {{form.primarykey}}
+
+            <div class="row">
+              <label for="{{form.name.id_for_label}}">Nombre:</label>
+              <input type="text" class="col-6 col-md-4" name="{{form.name.name}}" id="{{form.name.id_for_label}}" value="{{form.name.value}}"placeholder="nombre del plan" size="28" maxlength="20" required>
+            </div>
+
+            <div class="row">
+              <label for="{{form.total_days.id_for_label}}">Tolta de dias:</label>
+              <input type="number" name="{{form.total_days.name}}"  min=1 max=28 value="1" id="{{form.total_days.id_for_label}}" required> 
+            </div>
+
+            <div class="row">
+              <label for="{{form.oportunities.id_for_label}}">Oportunidades:</label>
+              <input type="number" name="{{form.oportunities.name}}"  min=1 max=28 value="1" id="
+              {{form.oportunities.id_for_label}}" required> 
+            </div>
+
+            <div class="row">
+                <p>Este plan pertenece al ejercicio <strong>{{name_exercise}}</strong></p>
+                {{form.id_exercise_fk}}
+            </div>
+            <br>            
+          <button class='btn btn-primary' type="submit">actualizar plan</button> 
+        </form>
+      </div>
+    </div>
+    </div>
+    {% endblock %}

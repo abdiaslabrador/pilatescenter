@@ -1,0 +1,52 @@
+<!doctype html>
+{% extends "base_template/base_tamplate.html" %}
+
+{% load static %}
+
+  {% block title %}Registro de usuario{% endblock %}
+
+
+      {% block content %}
+      <div class="container mt-4 p-3 my-3 bg-dark  border-0">
+        <div class="card ">
+          <div class="card-header">
+              <h5 class="card-title">Crear usuario</h5>
+          </div>
+          <div class="card-body"> 
+        <form method="POST">
+          {% csrf_token %}
+            <div class="row">
+              <input type="text" class="col-6 col-md-4 align-center" name="username" id="username" placeholder="username" size="28" maxlength="20" required >
+              {{form.username.errors}}
+            </div>
+
+            <div class="row">
+              <input type="text" class="col-6 col-md-4" name="first_name" id="name" placeholder="nombre" size="28" maxlength="20" pattern="[a-zA-Z]+" >
+            </div>
+
+            <div class="row">
+              <input type="text" class="col-6 col-md-4" name="last_name" id="lastname" placeholder="apellido" size="28" maxlength="20" pattern="[a-zA-Z]+" required>
+            </div>
+
+            <div class="row">
+              <input type="text" class="col-6 col-md-4" name="ci" id="ci" placeholder="c.i" pattern="[0-9]{0,9}" maxlength="9" required>
+            </div>
+            
+            <div class="row">
+                      <input type="text" class="col-6 col-md-4" pattern="[0-9]{0,11}" name="phone_number" placeholder="teléfono 04141234567" minlength="11" maxlength="11" required>
+            </div>
+
+            <div class="row">
+              <input type="password" class="col-6 col-md-4" name="password" id="password" placeholder="contraseña" size="20" maxlength="20" required>
+            </div>
+
+            <div class="row">
+              <input type="password" class="col-6 col-md-4" name="password2" id="password2" placeholder="repita contraseña" size="20" maxlength="20" required>
+            </div>
+          <br>
+            <button class='btn btn-success' type="submit">crear usuario</button>
+      </form>
+      </div>
+    </div>
+    </div>
+    {% endblock %}

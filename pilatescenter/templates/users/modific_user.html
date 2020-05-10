@@ -1,0 +1,69 @@
+<!doctype html>
+{% extends "base_template/base_tamplate.html" %}
+
+{% load static %}
+
+  {% block title %}Modificación de usuario{% endblock %}
+
+
+      {% block content %}
+      <div class="container mt-4 p-3 my-3 bg-dark  border-0">
+        <div class="card">
+        <div class="card-header" >
+          <h5 class="card-title">Modificar usuario</h5>
+        </div>
+
+        <div class="card-body">
+        <form method="POST">
+          {% csrf_token %}
+            {{form.primarykey}}
+            <div class="row">
+              <input type="text" class="col-6 col-md-4 align-center" name="username" id="username" placeholder="username" size="28" maxlength="20" required value="{{form.username.value}}">
+              {{form.non_field_errors}}
+              {{form.username.errors}}
+           </div>
+            
+            <div class="row">
+              <input type="text" class="col-6 col-md-4" name="first_name" id="name" placeholder="nombre" size="28" maxlength="20" pattern="[a-zA-Z]+" required value="{{form.first_name.value}}">
+            </div>
+
+            <div class="row">
+              <input type="text" class="col-6 col-md-4" name="last_name" id="lastname" placeholder="apellido" size="28" maxlength="20" pattern="[a-zA-Z]+" required value="{{form.last_name.value}}">
+            </div>
+
+            <div class="row">
+              <input type="text" class="col-6 col-md-4" name="ci" id="ci" placeholder="c.i" pattern="[0-9]{0,9}" maxlength="9" required value="{{form.ci.value}}">
+            </div>
+
+            <div class="row">
+                      <input type="text" class="col-6 col-md-4" pattern="[0-9]{0,11}" name="phone_number" placeholder="teléfono" minlength="11" maxlength="11" required value="{{form.phone_number.value}}">
+            </div>
+          <br>
+            <button class='btn btn-primary' type="submit">actualizar usuario</button>
+        
+      </form>
+      <a  href="{% url 'content_user:change_password_form' 1  %}">Cambiar contraseña</a>
+    </div>
+    </div>
+    </div>
+<div class="container"> 
+  <div class="row"> 
+  <div  class="text-center col-md-12"> 
+    <table border="3" >
+      <thead>
+        <th colspan="2">EJERCICIOS</th>
+      </thead>
+      <tbody>
+        {% for exercises in exercises_list %}
+                
+          <tr>
+            <td>{{exercises.name}}</td>
+            <td><a class="btn btn-success" href="#">Ver</a></td>
+          </tr>
+          {%endfor%}
+      </tbody>
+    </table>
+    </div>
+    </div>
+</div>  
+    {% endblock %}

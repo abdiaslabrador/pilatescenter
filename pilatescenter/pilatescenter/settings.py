@@ -14,6 +14,15 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
+
+#nuestro modelo de usuario personalizado
+AUTH_USER_MODEL = 'create_user.CustomUser'
+
+ #aqí colocamos todas las rutas donde queremos que django busque todos archivos
+STATICFILES_DIRS = [
+                        os.path.join(BASE_DIR, "static"),
+                    ]
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,7 +46,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'apps.login',
+    'apps.create_user',
+    'apps.plan',
+    'apps.exercise',
 ]
+
+# 'apps.exercise_det',
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -54,7 +70,7 @@ ROOT_URLCONF = 'pilatescenter.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -108,9 +124,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-ve'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE =     'America/Caracas' #'UTC'
 
 USE_I18N = True
 
@@ -119,7 +135,11 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+# Static files (CSS, JavaScript, Images)
+#
+
+#/static/ es el directorio de principal para archivos css y javascript, que trabaja con
+#STATICFILES_DIRS para pasarle los archivos a static_root
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'trans_static_al_servidor')

@@ -1,0 +1,106 @@
+<!doctype html>
+{% extends "base_template/base_tamplate.html" %}
+
+{% load static %}
+
+  {% block title %}Lista de planes{% endblock %}
+
+  {% block content %}  
+  <div class="container mt-4">
+    <a class="btn btn-warning" href="{% url 'Plan:create_plan_form' %}">Crear plan</a></td>
+  </div>
+    <div class="container mt-4">
+    <table class="table">  
+      <thead class="thead-light">
+        <tr>
+            <th colspan="5">Planes de pilates</th> 
+        </tr>
+        <tr>
+            <!--<th>Id</th>-->
+            <th>Nombre</th>
+            <th>Dias al mes</th>
+            <th>Oportunidades de cambio</th>
+            <th colspan="2">Acción</th>
+        </tr>
+        
+      </thead>
+      <tbody>
+        {% for plan in list_plan_pilates%}
+            <tr>
+              <!--<td>{{plan.pk}}</td>-->
+              <td>{{plan.name}}</td>
+              <td>{{plan.total_days}}</td>
+              <td>{{plan.oportunities}}</td>
+              <td><a class="btn btn-primary" href="{% url 'Plan:update_plan_form' plan.id %}">Actualizar</a></td>
+              <td><a class="btn btn-danger" href="{% url 'Plan:delete_plan_form' plan.id %}">Eliminar</a></td>
+            </tr>
+        {% endfor %}
+      </tbody>
+      </table>
+    </div>
+    <br>
+
+    <div class="container mt-4">
+      <table class="table">  
+        <thead class="thead-light">
+          <tr>
+              <th colspan="5">Planes de yoga</th> 
+          </tr>
+
+          <tr>
+              <!--<th>Id</th>-->
+              <th>Nombre</th>
+              <th>Dias al mes</th>
+              <th>Oportunidades de cambio</th>
+              <th colspan="2">Acción</th>
+
+          </tr>
+          
+        </thead>
+        <tbody>
+          {% for plan in list_plan_yoga%}
+              <tr>
+                <!--<td>{{plan.pk}}</td>-->
+                <td>{{plan.name}}</td>
+                <td>{{plan.total_days}}</td>
+                <td>{{plan.oportunities}}</td>
+                <td><a class="btn btn-primary" href="{% url 'Plan:update_plan_form' plan.id %}">Actualizar</a></td>
+                <td><a class="btn btn-danger" href="{% url 'Plan:delete_plan_form' plan.id %}">Eliminar</a></td>
+              </tr>
+          {% endfor %}
+        </tbody>
+        </table>
+    </div>
+    <br>
+
+    <div class="container mt-4">
+        <table class="table">  
+        <thead class="thead-light">
+          <tr>
+              <th colspan="5">Planes de pilates especial</th> 
+          </tr>
+          <tr>
+              <!--<th>Id</th>-->
+              <th>Nombre</th>
+              <th>Dias al mes</th>
+              <th>Oportunidades de cambio</th>
+              <th colspan="2">Acción</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for plan in list_plan_pilates_especial%}
+              <tr>
+                <!--<td>{{plan.pk}}</td>-->
+                <td>{{plan.name}}</td>
+                <td>{{plan.total_days}}</td>
+                <td>{{plan.oportunities}}</td>
+                <td><a class="btn btn-primary" href="{% url 'Plan:update_plan_form' plan.id %}">Actualizar</a></td>
+                <td><a class="btn btn-danger" href="{% url 'Plan:delete_plan_form' plan.id %}">Eliminar</a></td>
+              </tr>
+          {% endfor %}
+        </tbody>
+        </table>
+    </div>
+    <br>      
+  {% endblock %}

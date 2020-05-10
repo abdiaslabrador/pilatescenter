@@ -1,0 +1,80 @@
+<!doctype html>
+{% load static %}
+<html lang="es">
+    <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href={% static "css/bootstrap.min.css" %}>
+
+      <title>{% block title %}Título{% endblock %}</title>
+    </head>
+
+
+    <div id="content">
+
+      <nav class="navbar navbar-expand-sm navbar-dark bg-dark container-fluid">
+      <a class="navbar-brand" href="#"><strong>PilatesCenter</strong>
+        <!--<img src="face.jpg" width="30" height="30" alt="PilatesCenter">-->
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse"
+      data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+      aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+
+              <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Usuarios
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{% url 'content_user:create_user_form' %}">Crear</a>
+                        <a class="dropdown-item" href="{% url 'content_user:modific_user_form'  1 %}">Modificar</a>
+                    </div>
+
+              </li>
+              <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Clases
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Crear</a>
+                        <a class="dropdown-item" href="#">Acciones</a>
+                        <a class="dropdown-item" href="#">Historial</a>
+                    </div>
+              </li>
+              <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Configuraciones
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a  class="dropdown-item" href="{% url 'Plan:list_plan' %}">Plan</a>
+                    </div>
+              </li>
+                <li class="nav-item">
+                <a  class="nav-link"  href="/logout/">Salir</a>
+              </li>
+            </ul>
+      </nav>
+
+            {% block content %}{% endblock %}
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+    <script src={% static "js/jquery-3.4.1.min.js" %}></script>
+    <script src={% static "js/jquery-migrate-1.4.1.min.js" %}></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/ .js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>-->
+    <script src={% static "js/bootstrap.min.js" %}></script>
+
+  </body>
+</html>
