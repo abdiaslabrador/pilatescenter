@@ -15,6 +15,7 @@ from apps.plan.models import Plan
 from apps.exercise.models import Exercise
 from .models import CustomUser, Exercise_det
 
+
 #Creating a user
 def create_user(request):
 	if request.method == 'POST':
