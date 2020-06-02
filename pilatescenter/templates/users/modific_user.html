@@ -16,6 +16,7 @@
         <div class="card-body">
         <form method="POST">
           {% csrf_token %}
+            <!-- this attribute is declared as "hidden", check form to see -->
             {{form.primarykey}}
             <div class="row">
               <input type="text" class="col-6 col-md-4 align-center" name="username" id="username" placeholder="username" size="28" maxlength="20" required value="{{form.username.value}}">

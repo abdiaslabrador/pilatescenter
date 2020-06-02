@@ -51,6 +51,7 @@ class UserCreationForm(forms.ModelForm):
 
 # I used this form to update the user
 class UserUpdateForm(forms.ModelForm):
+	#This variable is used to get the user to later check his information
 	primarykey = forms.IntegerField(widget=forms.HiddenInput())
 	class Meta:
 		model = CustomUser
@@ -61,10 +62,10 @@ class UserUpdateForm(forms.ModelForm):
 					"ci",
 					"phone_number",
 				  )
-	#thi is the validation to check if exist another user with the username wheter in lower case
+	#this validation check if exist another user with the username wheter in lower case
 	#or in upper case
 	def clean(self):
-		#here we have the username
+		#here we have the username and the id
 		clean = super().clean()
 		username 	= self.cleaned_data.get("username")
 		primarykey 	= self.cleaned_data.get("primarykey")
@@ -74,11 +75,13 @@ class UserUpdateForm(forms.ModelForm):
 
 		username = username.lower()
 
+		#this part compare if the username written is the same that was already
 		user = CustomUser.objects.get(pk=primarykey)
 		if username == user.username.lower():
 			self.cleaned_data['username']=username
 			return clean
 
+		#if it wasn't i compare the username with other usernames
 		users = CustomUser.objects.exclude(pk=primarykey)
 
 		for user in users:
