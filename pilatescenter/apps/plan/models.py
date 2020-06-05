@@ -4,13 +4,12 @@ from apps.exercise.models import Exercise
 
 class pilatesManager(models.Manager):
 	def pilates(self):
-		return Plan.objects.filter(id_exercise_fk__name__icontains='pilates').exclude(id_exercise_fk__name__icontains='pilates ')
-
+		return Plan.objects.filter(id_exercise_fk__name__iexact='pilates')
 	def yoga(self):
-		return Plan.objects.filter(id_exercise_fk__name__icontains='yoga').exclude(id_exercise_fk__name__icontains='pilates')
+		return Plan.objects.filter(id_exercise_fk__name__iexact='yoga')
 
-	def pilates_especial(self):
-		return Plan.objects.filter(id_exercise_fk__name__icontains='pilates especial')
+	def hot_pilates(self):
+		return Plan.objects.filter(id_exercise_fk__name__iexact='hot pilates')
 
 # Create your models here.
 class Plan(models.Model):

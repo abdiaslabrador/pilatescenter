@@ -5,15 +5,15 @@
 
   {% block title %}Lista de planes{% endblock %}
 
-  {% block content %}  
+  {% block content %}
   <div class="container mt-4">
     <a class="btn btn-warning" href="{% url 'Plan:create_plan_form' %}">Crear plan</a></td>
   </div>
     <div class="container mt-4">
-    <table class="table">  
+    <table class="table">
       <thead class="thead-light">
         <tr>
-            <th colspan="5">Planes de pilates</th> 
+            <th colspan="5">Planes de pilates</th>
         </tr>
         <tr>
             <!--<th>Id</th>-->
@@ -22,7 +22,7 @@
             <th>Oportunidades de cambio</th>
             <th colspan="2">Acción</th>
         </tr>
-        
+
       </thead>
       <tbody>
         {% for plan in list_plan_pilates%}
@@ -41,10 +41,10 @@
     <br>
 
     <div class="container mt-4">
-      <table class="table">  
+      <table class="table">
         <thead class="thead-light">
           <tr>
-              <th colspan="5">Planes de yoga</th> 
+              <th colspan="5">Planes de yoga</th>
           </tr>
 
           <tr>
@@ -55,7 +55,7 @@
               <th colspan="2">Acción</th>
 
           </tr>
-          
+
         </thead>
         <tbody>
           {% for plan in list_plan_yoga%}
@@ -74,10 +74,10 @@
     <br>
 
     <div class="container mt-4">
-        <table class="table">  
+        <table class="table">
         <thead class="thead-light">
           <tr>
-              <th colspan="5">Planes de pilates especial</th> 
+              <th colspan="5">Planes de pilates hot pilates</th>
           </tr>
           <tr>
               <!--<th>Id</th>-->
@@ -89,7 +89,7 @@
         </thead>
 
         <tbody>
-          {% for plan in list_plan_pilates_especial%}
+          {% for plan in list_plan_hot_pilates%}
               <tr>
                 <!--<td>{{plan.pk}}</td>-->
                 <td>{{plan.name}}</td>
@@ -102,5 +102,5 @@
         </tbody>
         </table>
     </div>
-    <br>      
+    <br>
   {% endblock %}

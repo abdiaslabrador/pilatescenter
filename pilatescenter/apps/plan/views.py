@@ -20,11 +20,11 @@ from .forms import CreatePlanForm, UpdatePlanForm
 
 class CreatePlanView(View):
 	template_name= 'plan/create_plan.html'
-	
+
 	def post(self, request, *args, **kwargs):
 		form =  CreatePlanForm(request.POST)
 		if form.is_valid():
-			# if (form.cleaned_data['total_days'] % 2) == 0 :				
+			# if (form.cleaned_data['total_days'] % 2) == 0 :
 			# 	form.cleaned_data["oportunities"]=int((form.cleaned_data['total_days']/2)-1)
 			#   print(form.cleaned_data)
 			# print(form.is_bound)
@@ -33,12 +33,12 @@ class CreatePlanView(View):
 		else:
 			print(form.errors.as_data)
 			print("something happened")
-		return render(request, self.template_name, {'form':form})	
+		return render(request, self.template_name, {'form':form})
 
 	def get(self, request, *args, **kwargs):
 		# form =  CreatePlanForm(initial={'name': 'Pepe'})
 		form =  CreatePlanForm()
-		# (form.errors.as_data) 
+		# (form.errors.as_data)
 		return render(request, self.template_name, {'form':form})
 
 class ListPlanView(ListView):
@@ -46,7 +46,7 @@ class ListPlanView(ListView):
 	template_name='plan/list_plan.html'
 	object_list={}
 
-	# def get_queryset(self):		
+	# def get_queryset(self):
 	# 	return Plan.objects.pilates().order_by('name')
 
 	# def get_queryset(self, **kwargs):
@@ -58,9 +58,9 @@ class ListPlanView(ListView):
 		context = super().get_context_data(**kwargs)
 		# context={}
 		# context['list_plan'] = self.get_queryset()
-		context['list_plan_pilates'] = Plan.objects.pilates().order_by('name')			
-		context['list_plan_yoga'] = Plan.objects.yoga().order_by('name')		
-		context['list_plan_pilates_especial'] = Plan.objects.pilates_especial().order_by('name')		
+		context['list_plan_pilates'] = Plan.objects.pilates().order_by('name')
+		context['list_plan_yoga'] = Plan.objects.yoga().order_by('name')
+		context['list_plan_hot_pilates'] = Plan.objects.hot_pilates().order_by('name')
 		return context
 
 class UpdatePlanView(View):

@@ -21,42 +21,38 @@ def create_user(request):
 	if request.method == 'POST':
 		form = UserCreationForm(request.POST)
 		if form.is_valid():
-			print("ES VALIDO!")			
-			form.save()
+			print("ES VALIDO!")
 
 			#This not work if i create a user in the admin page, it means, y i create a user
 			#in the admin page, the user won't have the relation between users and exercise_det
-			user=CustomUser.objects.get(username=form.cleaned_data['username'])
-			plan=Plan.objects.get(name__icontains="ninguno")
+			exercises=Exercise.objects.all()
+			if exercises.count() > 0:
+				form.save()
+				user=CustomUser.objects.get(username=form.cleaned_data['username'])
+				plan=Plan.objects.get(name__icontains="ninguno")
 
-			exercise=Exercise.objects.get(name__iexact='pilates')
-			x=Exercise_det.objects.create(name=exercise.name, id_plan_fk=plan, id_exercise_fk=exercise, id_user_fk=user)
-			x.save()
+				x = None
+				for i in exercises:
+					Exercise_det.objects.create(name=i.name, id_plan_fk=plan, id_exercise_fk=i, id_user_fk=user)
+			else:
+				print("\n No hay ejercicios creados. No se le asignò ejercicios a este usuario.")
 
-			exercise=Exercise.objects.get(name__icontains='yoga')
-			y=Exercise_det.objects.create(name=exercise.name, id_plan_fk=plan, id_exercise_fk=exercise, id_user_fk=user)
-			y.save()
-
-			exercise=Exercise.objects.get(name__icontains='pilates especial')
-			z=Exercise_det.objects.create(name=exercise.name, id_plan_fk=plan, id_exercise_fk=exercise, id_user_fk=user)
-			z.save()
-
-			redirect('login')
+			return redirect('login')
 		else:
 			print("es invalido chao!")
 	else:
-		
+
 		form = UserCreationForm()
 
 	return render(request,'users/create_user.html', {'form':form})
 
-#Updating a user		
+#Updating a user
 def modific_user(request, pk):
 
 	exercises = Exercise.objects.all()
 	user=CustomUser.objects.get(pk=pk)
 	if request.method == 'GET':
-		form = UserUpdateForm(instance=user, initial={'primarykey': user.pk})	
+		form = UserUpdateForm(instance=user, initial={'primarykey': user.pk})
 	else:
 		form = UserUpdateForm(request.POST, instance=user)
 		if form.is_valid():
@@ -69,11 +65,11 @@ def modific_user(request, pk):
 	contexto={
 				'form':form,
 				'exercises_list': exercises,
-			 }			
+			 }
 	return render(request,'users/modific_user.html', contexto)
-	
 
-#Changing the user password		
+
+#Changing the user password
 def change_password_user(request, pk):
 
 	user=CustomUser.objects.get(pk=pk)
@@ -86,7 +82,7 @@ def change_password_user(request, pk):
 			return redirect('login:login')
 		# else:
 			# print("NO es invalido chao!")
-	else:	
+	else:
 		form = ChangePasswordForm()
 	return render(request,'users/change_password_user.html', {'form':form})
 
