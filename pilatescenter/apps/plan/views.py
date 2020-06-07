@@ -11,7 +11,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 #models
 from .models import Plan
-from apps.create_user.models import Exercise_det
+from apps.exercise_det.models import Exercise_det
 from apps.exercise.models import Exercise
 #forms that will be used
 from .forms import CreatePlanForm, UpdatePlanForm
@@ -41,27 +41,18 @@ class CreatePlanView(View):
 		# (form.errors.as_data)
 		return render(request, self.template_name, {'form':form})
 
-class ListPlanView(ListView):
-	model=Plan
-	template_name='plan/list_plan.html'
-	object_list={}
+class ListPlanView(View):
+	def get(self, request, *args, **kwargs):
+		contexto= {}
+		diccionario_planes={}
+		exercises = Exercise.objects.all()
 
-	# def get_queryset(self):
-	# 	return Plan.objects.pilates().order_by('name')
-
-	# def get_queryset(self, **kwargs):
-	# 	# object_list toma el valor de get_queryset y si este metodo no es definido object_list toma el valor del nombre-demodelo.objects.all()
-	#   # y context_object_name toma el valor de object_list.
-	# 	return Plan.objects.yoga().order_by('name')
-
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		# context={}
-		# context['list_plan'] = self.get_queryset()
-		context['list_plan_pilates'] = Plan.objects.pilates().order_by('name')
-		context['list_plan_yoga'] = Plan.objects.yoga().order_by('name')
-		context['list_plan_hot_pilates'] = Plan.objects.hot_pilates().order_by('name')
-		return context
+		for exercise in exercises:
+			diccionario_planes[exercise.name] = Plan.objects.filter(id_exercise_fk__name__iexact=exercise.name).order_by('name')
+		context = {
+					'diccionario_planes' : diccionario_planes
+		}
+		return render(request,'plan/list_plan.html', context)
 
 class UpdatePlanView(View):
 	def post(self, request, *args, **kwargs):
@@ -90,12 +81,12 @@ class UpdatePlanView(View):
 class DeletePlanView(View):
 	def get(self, request, *args, **kwargs):
 		plan = Plan.objects.get(pk=self.kwargs['pk'])
-		exercise_dets = Exercise_det.objects.filter(id_plan_fk = self.kwargs['pk'])
+		"""exercise_dets = Exercise_det.objects.filter(id_plan_fk = self.kwargs['pk'])
 		not_one_plan  = Plan.objects.get(name__iexact= "ninguno")
 
 		if exercise_dets.count() > 0:
 			for exercise_det in exercise_dets:
 				exercise_det.id_plan_fk = not_one_plan
-				exercise_det.save()
+				exercise_det.save()"""
 		plan.delete()
 		return redirect('Plan:list_plan')

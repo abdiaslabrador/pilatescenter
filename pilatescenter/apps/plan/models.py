@@ -13,6 +13,10 @@ class pilatesManager(models.Manager):
 
 # Create your models here.
 class Plan(models.Model):
+
+	"""hay un signal pre_delete en el modelo Exercise_det, que hace que al ser eliminado un plan
+	le asigna el plan "ninguno" a la relaciòn id_exercise_fk"""
+
 	name 			= models.CharField(null=False, blank=False, max_length=64)
 	total_days		= models.IntegerField(null=False, blank=False, default=0)
 	oportunities	= models.IntegerField(null=False, blank=False, default=0)

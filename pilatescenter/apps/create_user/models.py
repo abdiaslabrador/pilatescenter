@@ -51,7 +51,7 @@ class UserManager(BaseUserManager):
 
 		#This not work if i create a user in the admin page, it means, y i create a user
 		#in the admin page, the user won't have the relation between users and exercise_det
-		try:
+		"""try:
 			plan=Plan.objects.get(name__icontains="ninguno")
 		except Plan.DoesNotExist:
 			Plan.objects.create(name="ninguno", total_days=0, oportunities=0)
@@ -77,7 +77,7 @@ class UserManager(BaseUserManager):
 			z.save()
 		except Exercise.DoesNotExist as e:
 			raise ValueError('\n---* APP: create_user  Modelo: CustomUser *---\nDebe crear primero el ejercicio de hot pilates')
-
+		"""
 
 
 		return user
@@ -136,7 +136,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 		return True
 
 
-class Exercise_det(models.Model):
+"""class Exercise_det(models.Model):
 	name  =	models.CharField(max_length=64)
 
 	total_days	 = models.IntegerField(default=0)
@@ -152,4 +152,4 @@ class Exercise_det(models.Model):
 	id_user_fk 	   = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.CASCADE, db_column='id_customuser_fk')
 
 	def __str__(self):
-		return "name: " + str(self.id_user_fk) + " - " + "ejericicio: "+ str(self.id_exercise_fk)
+		return "name: " + str(self.id_user_fk) + " - " + "ejericicio: "+ str(self.id_exercise_fk)"""

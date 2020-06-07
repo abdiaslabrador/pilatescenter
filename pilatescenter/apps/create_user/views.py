@@ -13,7 +13,9 @@ import json
 #this is necesary to make the relations between Exercise_det and customuser
 from apps.plan.models import Plan
 from apps.exercise.models import Exercise
-from .models import CustomUser, Exercise_det
+from apps.exercise_det.models import Exercise_det
+from .models import CustomUser
+
 
 
 #Creating a user

@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'apps.create_user',
     'apps.plan',
     'apps.exercise',
+    'apps.exercise_det'
 ]
 
 # 'apps.exercise_det',

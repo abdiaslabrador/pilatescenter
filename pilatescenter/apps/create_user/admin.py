@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField, UserChangeForm, UserCreationForm
-from .models import CustomUser, Exercise_det
+from .models import CustomUser
 
 class BaseUserAdmin(UserAdmin):
 
@@ -24,7 +24,7 @@ class BaseUserAdmin(UserAdmin):
 	(None, {
 	'classes': ('wide',),
 	'fields': ( 'username','first_name',  'last_name','email','phone_number',  'password1', 'password2',
-				 
+
 				'is_staff','is_superuser')}
 	),
 	)
@@ -35,4 +35,3 @@ class BaseUserAdmin(UserAdmin):
 
 
 admin.site.register(CustomUser, BaseUserAdmin)
-admin.site.register(Exercise_det)
