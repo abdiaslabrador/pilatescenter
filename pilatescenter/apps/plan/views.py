@@ -43,6 +43,7 @@ class CreatePlanView(View):
 
 class ListPlanView(View):
 	def get(self, request, *args, **kwargs):
+		print(request.auth )
 		contexto= {}
 		diccionario_planes={}
 		exercises = Exercise.objects.all()

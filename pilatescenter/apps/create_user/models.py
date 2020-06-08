@@ -1,12 +1,20 @@
+#These imports are to CustomUser models
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.password_validation  import validate_password
-from rest_framework.views import APIView
+from .validators  import name_space
 
-from apps.plan.models import Plan
+#these import are to get a token for each user just have been created
+from rest_framework.views import APIView
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+
+#En veremos
+"""from apps.plan.models import Plan
 from apps.exercise.models import Exercise
-from .validators import name_space
+from .validators import name_space"""
 
 
 class UserManager(BaseUserManager):
@@ -135,6 +143,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 	def has_perm(self, perm, obj=None):
 		return True
 
+
+
+"""@receiver(post_save, sender=CustomUser)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)"""
 
 """class Exercise_det(models.Model):
 	name  =	models.CharField(max_length=64)

@@ -9,6 +9,9 @@ from .serializers import CustomUserSeliazer
 from rest_framework.serializers import  ModelSerializer
 from rest_framework.views import  APIView
 import json
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+
 
 #this is necesary to make the relations between Exercise_det and customuser
 from apps.plan.models import Plan
@@ -94,6 +97,9 @@ def listado(request):
 
 class UserAPI(APIView):
 	serializer= CustomUserSeliazer
+	authentication_classes = [TokenAuthentication]
+	permission_classes = [IsAuthenticated]
+
 
 	def get(self, request, format=None):
 		lista 		= CustomUser.objects.all()

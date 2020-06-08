@@ -1,6 +1,7 @@
 from django.urls import include, path
 from django.contrib import admin
 from apps.login.views import LoginView, LogoutView
+from rest_framework.authtoken import views
 
 
 """pilatescenter URL Configuration
@@ -24,5 +25,6 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view()),
     path('plan/', include('apps.plan.urls')),
-    path('users/', include('apps.create_user.urls'))
+    path('users/', include('apps.create_user.urls')),
+    path('api-token-auth/', views.obtain_auth_token)
 ]
