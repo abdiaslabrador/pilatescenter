@@ -1,0 +1,34 @@
+<!doctype html>
+{% extends "base_template/base_tamplate.html" %}
+
+  {% block title %}Actualización de plan{% endblock %}
+
+
+      {% block content %}
+
+      <div class="container">
+      <div class="card panding">
+        <div class="card-header" >
+          <h5 class="card-title">Detalles  del plan</h5>
+        </div>
+
+        <div class="card-body">
+        
+          {% csrf_token %}
+
+          <!-- <p>{{plan.pk}}</p> -->
+          <p><strong>Nombre:</strong> {{plan.name}}</p>
+          <p><strong>Dias:</strong>  {{plan.total_days}}</p>
+          <p><strong>Oportunidades de cambio:</strong>  {{plan.oportunities}}</p>
+          {% if plan.description == ''%}
+              <p><strong>Descripcion:</strong> no hay descripción</p>
+          {% else%}
+              <p><strong>Descripcion:</strong> {{ plan.description | linebreaks }}</p>
+          {% endif %}
+          
+          <p><strong>Ejercicio asociado:</strong> {{plan.id_exercise_fk}}</p>
+            
+      </div>
+    </div>
+    </div>
+    {% endblock %}

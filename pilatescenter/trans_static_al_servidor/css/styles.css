@@ -20,6 +20,21 @@
 	  border-color: #7D3C98;
 	}
 
+.btn-ver /*Boton que se utiliza para bloquer a los usuarios*/
+	{
+		color: white;
+	  	background-color: black;
+		border-color: black;
+
+	}	
+	/*este estilo va con el de arriba*/
+.btn-ver:hover, .btn-ver:focus, .btn-ver:active, .btn-ver.active, .open .dropdown-toggle.btn-ver
+{
+	  color: white;
+	  background-color: black;
+	  border-color: black;
+	}
+
 .panding
 {
 		margin:  30px 30px 1em;

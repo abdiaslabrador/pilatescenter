@@ -89,3 +89,8 @@ class DeletePlanView(View):
 				exercise_det.save()"""
 		plan.delete()
 		return redirect('Plan:list_plan')
+
+class See(View):
+	def get(self, request, *args, **kwargs):
+		plan = Plan.objects.get(pk=self.kwargs['pk'])
+		return render(request, "plan/see_plan.html", {"plan":plan})

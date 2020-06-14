@@ -1,0 +1,42 @@
+._footer /*en el base_template.html al final*/
+	{
+		color: white;
+		text-align: center;
+		background-color: #212529;
+	}
+
+.btn-bloquear /*Boton que se utiliza para bloquer a los usuarios*/
+	{
+		color: white;
+	  	background-color: #8E44AD;
+		border-color: #8E44AD;
+
+	}	
+	/*este estilo va con el de arriba*/
+.btn-bloquear:hover, .btn-bloquear:focus, .btn-bloquear:active, .btn-bloquear.active, .open .dropdown-toggle.btn-bloquear
+{
+	  color: white;
+	  background-color: #7D3C98;
+	  border-color: #7D3C98;
+	}
+
+.btn-ver /*Boton que se utiliza para bloquer a los usuarios*/
+	{
+		color: white;
+	  	background-color: #566573;
+		border-color: #566573;
+
+	}	
+	/*este estilo va con el de arriba*/
+.btn-ver:hover, .btn-ver:focus, .btn-ver:active, .btn-ver.active, .open .dropdown-toggle.btn-ver
+{
+	  color: white;
+	  background-color: #2C3E50;
+	  border-color: #2C3E50;
+	}
+
+.panding
+{
+		margin:  30px 30px 1em;
+		box-shadow: 2px 2px 20px 0px rgba(0,0,0,0.4);
+}

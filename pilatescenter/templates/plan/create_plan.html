@@ -12,34 +12,40 @@
         </div>
 
         <div class="card-body">
-        <form method="POST" autocomplete="off">
-          {% csrf_token %}
+          <div class="container">
+                <form method="POST" autocomplete="off">
+                  {% csrf_token %}
+                  {{form.non_field_errors}}
+                    <div class="row">
+                      <label for="{{form.name.id_for_label}}">Nombre:</label>
+                      <input type="text" class="col-6 col-md-4" name="{{form.name.name}}" id="{{form.name.id_for_label}}" placeholder="nombre del plan" size="28" maxlength="20" required>
+                    </div>
 
-          {{form.non_field_errors}}
-            <div class="row">
-              <label for="{{form.name.id_for_label}}">Nombre:</label>
-              <input type="text" class="col-6 col-md-4" name="{{form.name.name}}" id="{{form.name.id_for_label}}" placeholder="nombre del plan" size="28" maxlength="20" required>
-            </div>
+                    <div class="row">
+                      <label for="{{form.total_days.id_for_label}}">Tolta de dias:</label>
+                      <input type="number" name="{{form.total_days.name}}"  min=1 max=28 value="1" id="{{form.total_days.id_for_label}}" required>
+                    </div>
 
-            <div class="row">
-              <label for="{{form.total_days.id_for_label}}">Tolta de dias:</label>
-              <input type="number" name="{{form.total_days.name}}"  min=1 max=28 value="1" id="{{form.total_days.id_for_label}}" required>
-            </div>
+                    <div class="row">
+                      <label for="{{form.oportunities.id_for_label}}">Oportunidades:</label>
+                      <input type="number" name="{{form.oportunities.name}}"  min=0 max=28 value="0" id="
+                      {{form.oportunities.id_for_label}}" required>
+                    </div>
 
-            <div class="row">
-              <label for="{{form.oportunities.id_for_label}}">Oportunidades:</label>
-              <input type="number" name="{{form.oportunities.name}}"  min=0 max=28 value="0" id="
-              {{form.oportunities.id_for_label}}" required>
-            </div>
+                    <div class="row">
+                      <label for="{{form.description.id_for_label}}">Description:</label>
+                      <textarea  rows="3" name="{{form.description.name}}" id="{{form.oportunities.id_for_label}}" value=""></textarea>
+                    </div>
 
-            <div class="row">
-                <label for="{{form.id_exercise_fk.id_for_label}}">Tipo de ejercicio:</label>
-                {{form.id_exercise_fk}}
-            </div>
-            <br>
-          <button class='btn btn-success' type="submit">crear plan</button>
-        </form>
-      </div>
+                    <div class="row">
+                        <label for="{{form.id_exercise_fk.id_for_label}}">Tipo de ejercicio:</label>
+                        {{form.id_exercise_fk}}
+                    </div>
+                    <br>
+                  <button class='btn btn-success' type="submit">crear plan</button>
+                </form>
+          </div>
+        </div>
     </div>
     </div>
     {% endblock %}

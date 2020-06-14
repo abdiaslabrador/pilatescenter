@@ -35,6 +35,14 @@
               {{form.oportunities.id_for_label}}" required>
             </div>
 
+            
+                <div class="row">
+                  <label for="{{form.description.id_for_label}}">Description:</label>
+                  <textarea  rows="3" cols="25" name="{{form.description.name}}" id="{{form.oportunities.id_for_label}}">{{form.description.value}}</textarea>
+                </div> 
+              
+            
+
             <div class="row">
                 <p>Este plan pertenece al ejercicio <strong>{{name_exercise}}</strong></p>
                 {{form.id_exercise_fk}}

@@ -4,18 +4,22 @@ from apps.exercise.models import Exercise
 from django.core.exceptions import ValidationError
 
 class CreatePlanForm(forms.ModelForm):
+	oportunities = forms.CharField(widget=forms.Textarea())
 	
 	class Meta:
 		model= Plan
 		fields= (
-				"name",
-				"total_days",
-				"oportunities",
-				"id_exercise_fk",
+					"name",
+					"total_days",
+					"id_exercise_fk",
+					"description"
 				)
+
+		
 
 	def clean(self):
 		cleaned_data = super(CreatePlanForm, self).clean()
+
 
 		name = cleaned_data.get('name')
 		id_exercise_fk = cleaned_data.get('id_exercise_fk')
@@ -41,10 +45,11 @@ class UpdatePlanForm(forms.ModelForm):
 	class Meta:
 		model= Plan
 		fields= (
-				"name",
-				"total_days",
-				"oportunities",
-				"id_exercise_fk",
+					"name",
+					"total_days",
+					"oportunities",
+					"id_exercise_fk",
+					"description"
 				)
 
 	def clean(self):
