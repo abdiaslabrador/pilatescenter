@@ -1,18 +1,14 @@
 <!doctype html>
 {% extends "base_template/base_tamplate.html" %}
 
-{% load static %}
 
   {% block title %}Modificación de usuario{% endblock %}
-
-
       {% block content %}
-      <div class="container mt-4 p-3 my-3 bg-dark  border-0">
-        <div class="card">
+      <div class="container ">
+        <div class="card panding">
         <div class="card-header" >
           <h5 class="card-title">Modificar usuario</h5>
         </div>
-
         <div class="card-body">
         <form method="POST" autocomplete="off">
           {% csrf_token %}
@@ -46,17 +42,16 @@
       <a  href="{% url 'content_user:change_password_form' 1  %}">Cambiar contraseña</a>
     </div>
     </div>
-    </div>
-<div class="container">
+
+
   <div class="row">
-  <div  class="text-center col-md-12">
+  <div  class="text-center panding" style="box-shadow: 2px 2px 20px 0px rgba(0,0,0,0.4);">
     <table border="3" >
       <thead>
         <th colspan="2">EJERCICIOS</th>
       </thead>
       <tbody>
         {% for exercises in exercises_list %}
-
           <tr>
             <td>{{exercises.name}}</td>
             <td><a class="btn btn-success" href="#">Ver</a></td>

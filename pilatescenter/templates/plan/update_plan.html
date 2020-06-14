@@ -1,14 +1,12 @@
 <!doctype html>
 {% extends "base_template/base_tamplate.html" %}
 
-{% load static %}
-
   {% block title %}Actualización de plan{% endblock %}
 
 
       {% block content %}
-      <div class="container mt-4 p-3 my-3 bg-dark  border-0">
-      <div class="card">
+      <div class="container">
+      <div class="card panding">
         <div class="card-header" >
           <h5 class="card-title">Actualizar plan</h5>
         </div>
@@ -28,21 +26,21 @@
 
             <div class="row">
               <label for="{{form.total_days.id_for_label}}">Tolta de dias:</label>
-              <input type="number" name="{{form.total_days.name}}"  min=1 max=28 value="1" id="{{form.total_days.id_for_label}}" required> 
+              <input type="number" name="{{form.total_days.name}}"  min=1 max=28 value="1" id="{{form.total_days.id_for_label}}" required>
             </div>
 
             <div class="row">
               <label for="{{form.oportunities.id_for_label}}">Oportunidades:</label>
               <input type="number" name="{{form.oportunities.name}}"  min=1 max=28 value="1" id="
-              {{form.oportunities.id_for_label}}" required> 
+              {{form.oportunities.id_for_label}}" required>
             </div>
 
             <div class="row">
                 <p>Este plan pertenece al ejercicio <strong>{{name_exercise}}</strong></p>
                 {{form.id_exercise_fk}}
             </div>
-            <br>            
-          <button class='btn btn-primary' type="submit">actualizar plan</button> 
+            <br>
+          <button class='btn btn-primary' type="submit">actualizar plan</button>
         </form>
       </div>
     </div>

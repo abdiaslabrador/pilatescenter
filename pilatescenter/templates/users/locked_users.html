@@ -1,0 +1,47 @@
+<!doctype html>
+
+{% extends "base_template/base_tamplate.html" %}s
+{% load static %}
+
+  {% block title %}Lista de usuarios{% endblock %}
+
+  {% block content %}
+  <button id="boolean" hidden>deactive</button>
+  <div class="container">
+        <table class="table panding" style="margin: 30px 0px;">
+          <thead class="thead-light">
+            <tr>
+                <th colspan="5" onkeyup="buscar()">Lista de usuarios</th>
+                <th colspan="1"><input type="text" id="caja" onkeyup="buscar()"></th>
+            </tr>
+            <tr>
+                <!--<th>Id</th>-->
+                <th>Username</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>c.i</th>
+                <th colspan="2" class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="contenido">
+              {% for user in users%}
+                <tr>
+                  <td hidden>{{user.id}}</td>
+                  <td>{{user.username}}</td>
+                  <td>{{user.first_name}}</td>
+                  <td>{{user.last_name}}</td>
+                  <td>{{user.ci}}</td>
+                  <td><a class="btn btn-success" href="{% url 'content_user:unlock_user' user.id %}">Desbloquear</a></td>
+                  <td><a class="btn btn-danger"   href="{% url 'content_user:delete_user' user.id %}">Eliminar</a></td>
+                </tr>
+                {% endfor %}
+          </tbody>
+          </table>
+        </div>
+        <br>
+
+  {% endblock %}
+
+{% block custom_js %}
+  <script src="{% static 'js/users/usuarios_activos_api_fetch.js' %}"></script>
+{% endblock %}

@@ -1,8 +1,6 @@
 <!doctype html>
 {% extends "base_template/base_tamplate.html" %}
 
-{% load static %}
-
   {% block title %}Lista de planes{% endblock %}
 
   {% block content %}
@@ -12,7 +10,7 @@
 
         {% for k , v in diccionario_planes.items%}
         <div class="container mt-4">
-        <table class="table">
+        <table class="table" style="box-shadow: 2px 2px 20px 0px rgba(0,0,0,0.4);">
           <thead class="thead-light">
             <tr>
                 <th colspan="5">Planes de {{k}}</th>
@@ -24,7 +22,6 @@
                 <th>Oportunidades de cambio</th>
                 <th colspan="2">Acción</th>
             </tr>
-
           </thead>
           <tbody>
               {% for plan in v %}
@@ -34,7 +31,7 @@
                     <td>{{plan.total_days}}</td>
                     <td>{{plan.oportunities}}</td>
                     <td><a class="btn btn-primary" href="{% url 'Plan:update_plan_form' plan.id %}">Actualizar</a></td>
-                    <td><a class="btn btn-danger" href="{% url 'Plan:delete_plan_form' plan.id %}">Eliminar</a></td>
+                    <td><a class="btn btn-danger" href="{% url 'Plan:delete_plan' plan.id %}">Eliminar</a></td>
                   </tr>
               {% endfor %}
             </tbody>

@@ -1,0 +1,60 @@
+{% extends "base_template/base_tamplate.html" %}
+{% load static %}
+
+  {% block title %}Lista de usuarios{% endblock %}
+
+  {% block custom_css %}
+  <style type="text/css">
+    .create_boton{
+      margin:  10px 0px 0px;
+      }
+  </style>
+  {% endblock %}
+
+{% block content %}
+        <button id="boolean" hidden>active</button>
+        <div class="container" >
+        <div class="create_boton">
+        <a  class="btn btn-warning create_boton"  href="{% url 'content_user:create_user_form' %}">Crear usuario</a></td>
+        </div>
+
+        <table  class="table panding" style="margin: 30px 0px;">
+          <thead class="thead-light">
+            <tr>
+                <th colspan="5">Lista de usuarios</th>
+                <th colspan="2"><input type="text" id="caja" onkeyup="buscar()"></th>
+            </tr>
+            <tr>
+                <!--<th>Id</th>-->
+                <th>Username</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>c.i</th>
+                <th colspan="3" class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="contenido">
+                {% for user in users%}
+                <tr>
+                  <td hidden>{{user.id}}</td>
+                  <td>{{user.username}}</td>
+                  <td>{{user.first_name}}</td>
+                  <td>{{user.last_name}}</td>
+                  <td>{{user.ci}}</td>
+                  <td><a class="btn btn-primary"  href="{% url 'content_user:modific_user_form' user.id %}">Actualizar</a></td>
+                  <td><a class="btn btn-bloquear" style="color: white;" href="{% url 'content_user:lock_user' user.id %}">Bloquear</a></td>
+                  <td><a class="btn btn-danger"   href="{% url 'content_user:delete_user' user.id %}">Eliminar</a></td>
+                </tr>
+                {% endfor %}
+          </tbody>
+          </table>
+         <!--  {% if is_paginated %}
+              {% include "tables/_pagination.html" %}
+          {% endif %} -->
+</div>
+{% endblock %}
+
+
+{% block custom_js %}
+  <script src="{% static 'js/users/usuarios_activos_api_fetch.js' %}"></script>
+{% endblock %}

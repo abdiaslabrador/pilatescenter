@@ -6,15 +6,20 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
       <!-- Bootstrap CSS -->
-      <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-      <link  rel = "stylesheet" type="text/css" href="{% static 'css/styles.css' %}" ></style>
+      <link   rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+      <link   rel = "stylesheet" type="text/css" href="{% static 'css/styles.css' %}" ></style>
       <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
-      <title>{% block title %}Título{% endblock %}</title>
+
+      <title>{% block title %}{% endblock %}</title>
+
+
+      {% block custom_css %}
+      {% endblock %}
+
+
     </head>
 
-
-    <div id="content">
-
+    <body >
       <nav class="navbar navbar-expand-sm navbar-dark bg-dark container-fluid">
       <a class="navbar-brand" href="#"><strong>PilatesCenter</strong>
         <!--<img src="face.jpg" width="30" height="30" alt="PilatesCenter">-->
@@ -34,8 +39,8 @@
                     Usuarios
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{% url 'content_user:create_user_form' %}">Crear</a>
-                        <a class="dropdown-item" href="{% url 'content_user:modific_user_form'  1 %}">Modificar</a>
+                        <a class="dropdown-item" href="{% url 'content_user:list_user' %}">Usuarios</a>
+                        <a class="dropdown-item" href="{% url 'content_user:list_locked_user' %}">Bloqueados</a>
                     </div>
 
               </li>
@@ -63,23 +68,24 @@
                 <a  class="nav-link"  href="/logout/">Salir</a>
               </li>
             </ul>
+        </div>
       </nav>
 
-            {% block content %}{% endblock %}
-            <hr>
-            <footer class = "_footer">
-              &copy 2020 <a href="https://ve.linkedin.com/in/abdias-daniel-labrador-pe%C3%B1a-193b80b3">Abdias Labrador</a> email:	<cite > abdiaslabrador@gmail.com </cite>
-            </footer>
-    </div>
+        {% block content %}{% endblock %}
+
+      <footer class="container-fluid _footer">
+        &copy; 2020 <a href="https://ve.linkedin.com/in/abdias-daniel-labrador-pe%C3%B1a-193b80b3">Abdias Labrador</a> email:	<cite > abdiaslabrador@gmail.com </cite>
+      </footer>
 
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-
-
     <script src="{% static 'js/jquery-migrate-1.4.1.min.js' %}"></script>
     <!--<script src="https://cdn.jsdelivr.net/npm/ .js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>-->
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/js_code.js' %}"> </script>
+
+    {% block custom_js %}
+    {% endblock %}
+
   </body>
 </html>

@@ -11,4 +11,5 @@ class CustomUserSeliazer(ModelSerializer):
 							'username',
 							'first_name',
 							'last_name',
+							'ci'
 						)

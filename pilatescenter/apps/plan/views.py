@@ -5,7 +5,6 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic.list import ListView
 from django.views.generic.edit import UpdateView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 

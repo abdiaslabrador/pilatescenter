@@ -7,7 +7,7 @@ class LoginForm(forms.Form):
 	username = forms.CharField(label='username', max_length=64)
 	password = forms.CharField(label='Password', widget=forms.PasswordInput)
 
-	
+
 	def clean(self):
 		# Check that the username and password will be correct
 		cleaned_data=super().clean()
@@ -15,6 +15,8 @@ class LoginForm(forms.Form):
 		username = cleaned_data.get("username")
 		password = cleaned_data.get("password")
 
+		if username is None:
+			raise forms.ValidationError("Escriba un username")
 		username = username.lower()
 
 		try:

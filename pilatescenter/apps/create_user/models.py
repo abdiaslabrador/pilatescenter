@@ -113,7 +113,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 	is_active		= models.BooleanField(default=True)
 	is_staff		= models.BooleanField(default=False)
-
+	is_visible		= models.BooleanField(default=True)
 
 	date_joined		= models.DateTimeField(default=timezone.now)
 

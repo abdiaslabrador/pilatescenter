@@ -1,4 +1,27 @@
-._footer
+._footer /*en el base_template.html al final*/
 	{
+		color: white;
 		text-align: center;
+		background-color: #212529;
 	}
+
+.btn-bloquear /*Boton que se utiliza para bloquer a los usuarios*/
+	{
+		color: white;
+	  	background-color: #8E44AD;
+		border-color: #8E44AD;
+
+	}	
+	/*este estilo va con el de arriba*/
+.btn-bloquear:hover, .btn-bloquear:focus, .btn-bloquear:active, .btn-bloquear.active, .open .dropdown-toggle.btn-bloquear
+{
+	  color: white;
+	  background-color: #7D3C98;
+	  border-color: #7D3C98;
+	}
+
+.panding
+{
+		margin:  30px 30px 1em;
+		box-shadow: 2px 2px 20px 0px rgba(0,0,0,0.4);
+}
