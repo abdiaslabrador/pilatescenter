@@ -8,6 +8,9 @@
   {% block content %}
   <button id="boolean" hidden>deactive</button>
   <div class="container">
+    <div class="table-responsive">
+
+
         <table class="table panding" style="margin: 30px 0px;">
           <thead class="thead-light">
             <tr>
@@ -37,11 +40,12 @@
                 {% endfor %}
           </tbody>
           </table>
+          </div>
         </div>
         <br>
 
   {% endblock %}
 
 {% block custom_js %}
-  <script src="{% static 'js/users/usuarios_activos_api_fetch.js' %}"></script>
+  <script src="{% static 'js/users/usuarios_activos_bloqueados.js' %}"></script>
 {% endblock %}

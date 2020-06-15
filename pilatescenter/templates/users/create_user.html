@@ -15,7 +15,7 @@
         <form method="POST" autocomplete="off">
           {% csrf_token %}
             <div class="row">
-              <input type="text" class="col-6 col-md-4 align-center" name="username" id="username" placeholder="username" size="28" maxlength="20" required >
+              <input type="text" class="col-6 col-md-4 align-center" name="username" id="username" placeholder="username" size="28" maxlength="20" required>
               {{form.username.errors}}
             </div>
 

@@ -25,6 +25,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view()),
     path('plan/', include('apps.plan.urls')),
+    path('exercise/', include('apps.exercise.urls')),
     path('users/', include('apps.create_user.urls')),
     path('api-token-auth/', views.obtain_auth_token)
 ]

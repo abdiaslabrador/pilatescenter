@@ -14,9 +14,13 @@
 {% block content %}
         <button id="boolean" hidden>active</button>
         <div class="container" >
-        <a  class="btn btn-warning create_boton"  href="{% url 'content_user:create_user_form' %}">Crear usuario</a></td>
+        <a  class="btn btn-warning create_boton"  href="{% url 'content_user:create_user_form' %}">Crear usuario</a>
         </div>
+
         <div class="container" >
+          <div class="table-responsive">
+
+
         <table  class="table panding" style="margin: 30px 0px;">
           <thead class="thead-light">
             <tr>
@@ -33,27 +37,29 @@
             </tr>
           </thead>
           <tbody id="contenido">
-                {% for user in users%}
+                {% for x in users%}
                 <tr>
-                  <td hidden>{{user.id}}</td>
-                  <td>{{user.username}}</td>
-                  <td>{{user.first_name}}</td>
-                  <td>{{user.last_name}}</td>
-                  <td>{{user.ci}}</td>
-                  <td><a class="btn btn-primary"  href="{% url 'content_user:modific_user_form' user.id %}">Actualizar</a></td>
-                  <td><a class="btn btn-bloquear"  href="{% url 'content_user:lock_user' user.id %}">Bloquear</a></td>
-                  <td><a class="btn btn-danger"   href="{% url 'content_user:delete_user' user.id %}">Eliminar</a></td>
+                  <td hidden>{{x.id}}</td>
+                  <td>{{x.username}}</td>
+                  <td>{{x.first_name}}</td>
+                  <td>{{x.last_name}}</td>
+                  <td>{{x.ci}}</td>
+
+                    <td><a class="btn btn-primary"  href="{% url 'content_user:modific_user_form' x.id %}">Actualizar</a></td>
+                    {% if x != user %}
+                      <td><a class="btn btn-bloquear"  href="{% url 'content_user:lock_user' x.id %}">Bloquear</a></td>
+                      <td><a class="btn btn-danger"   href="{% url 'content_user:delete_user' x.id %}">Eliminar</a></td>
+                    {%endif%}
+
                 </tr>
                 {% endfor %}
           </tbody>
           </table>
-         <!--  {% if is_paginated %}
-              {% include "tables/_pagination.html" %}
-          {% endif %} -->
+          </div>
           </div>
 {% endblock %}
 
 
 {% block custom_js %}
-  <script src="{% static 'js/users/usuarios_activos_api_fetch.js' %}"></script>
+  <script src="{% static 'js/users/usuarios_activos_bloqueados.js' %}"></script>
 {% endblock %}

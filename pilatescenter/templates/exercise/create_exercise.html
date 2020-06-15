@@ -1,0 +1,40 @@
+<!doctype html>
+{% extends "base_template/base_tamplate.html" %}
+
+{% block title %}Creación de planes{% endblock %}
+
+
+      {% block content %}
+      <div class="container ">
+      <div class="card panding">
+        <div class="card-header" >
+          <h5 class="card-title">Crear ejercicio</h5>
+        </div>
+
+        <div class="card-body">
+          <div class="container">
+                <form method="POST" autocomplete="off">
+                  {% csrf_token %}
+                  <div class="row">
+                  {{form.non_field_errors}}
+                  {{form.name.errors}}
+                </div>
+                    <div class="row">
+                      <label for="{{form.name.id_for_label}}">Nombre:
+                      <input type="text" name="{{form.name.name}}" id="{{form.name.id_for_label}}">
+                      </label>
+                    </div>
+
+                    <div class="row">
+                      <label for="{{form.description.id_for_label}}">Description:
+                      <textarea  rows="3" name="{{form.description.name}}" id="{{form.description.id_for_label}}" value=""></textarea>
+                      </label>
+                    </div>
+                    <br>
+                  <button class='btn btn-success' type="submit">crear ejercicio</button>
+                </form>
+          </div>
+        </div>
+    </div>
+    </div>
+    {% endblock %}

@@ -70,9 +70,9 @@ class UpdatePlanView(View):
 		plan= Plan.objects.get(id=self.kwargs['pk'])
 		form = UpdatePlanForm(instance=plan, initial={'primarykey': plan.pk})
 		exercise_obj = Exercise.objects.get(plan__pk=self.kwargs['pk'])
-		name_exercise = exercise_obj.name
+		
 		context={
-					'name_exercise': name_exercise,
+					'name_exercise': exercise_obj.name,
 					'form':form
 				}
 		return render(request,'plan/update_plan.html', context)

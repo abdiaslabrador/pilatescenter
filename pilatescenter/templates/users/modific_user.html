@@ -51,12 +51,12 @@
         <th colspan="2">EJERCICIOS</th>
       </thead>
       <tbody>
-        {% for exercises in exercises_list %}
+        {% for exercises_det in exercises_det_list %}
           <tr>
-            <td>{{exercises.name}}</td>
-            <td><a class="btn btn-success" href="#">Ver</a></td>
+            <td>{{exercises_det.name}}</td>
+            <td><a class="btn btn-success" href='{% url "content_user:exercise_configuration" exercises_det.id %}'>Ver</a></td>
           </tr>
-          {%endfor%}
+        {%endfor%}
       </tbody>
     </table>
     </div>

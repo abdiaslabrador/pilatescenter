@@ -17,7 +17,7 @@
 
           {{form.non_field_errors}}
 
-            {{form.primarykey}}
+            {{form.primarykey}} <!--plan's pk, i declared this variable hidden, i used this in the form.py to do a query -->
 
             <div class="row">
               <label for="{{form.name.id_for_label}}">Nombre:</label>
@@ -37,15 +37,16 @@
 
             
                 <div class="row">
-                  <label for="{{form.description.id_for_label}}">Description:</label>
-                  <textarea  rows="3" cols="25" name="{{form.description.name}}" id="{{form.oportunities.id_for_label}}">{{form.description.value}}</textarea>
+                  <label for="{{form.description.id_for_label}}">Description:
+                  <textarea  rows="3" cols="25" name="{{form.description.name}}" id="{{form.description.id_for_label}}">{{form.description.value}}</textarea>
+                  </label>
                 </div> 
               
             
 
             <div class="row">
                 <p>Este plan pertenece al ejercicio <strong>{{name_exercise}}</strong></p>
-                {{form.id_exercise_fk}}
+                {{form.id_exercise_fk}}<!-- i declared this variable hidden, i used this in the form.py to do a query -->
             </div>
             <br>
           <button class='btn btn-primary' type="submit">actualizar plan</button>

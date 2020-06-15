@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.http import  HttpResponse
 
 #views
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from .forms import UserCreationForm, ChangePasswordForm, UserUpdateForm
 from django.views.generic.list import ListView
 from django.views import View
@@ -26,7 +25,7 @@ from .models import CustomUser
 class ListUserView(ListView):
 	model = CustomUser
 	template_name = 'users/list_users.html'
-	paginate_by = 5
+
 
 	def get_queryset(self):
 		queryset = CustomUser.objects.filter(is_active=True, is_visible=True).order_by("username")
@@ -35,17 +34,7 @@ class ListUserView(ListView):
 	def get_context_data(self, **kwargs):
 		context = super(ListUserView, self).get_context_data(**kwargs)
 		users = self.get_queryset()
-		page = self.request.GET.get('page')
-		paginator = Paginator(users, self.paginate_by)
-
-		try:
-			users = paginator.page(page)
-		except PageNotAnInteger:
-		    users = paginator.page(1)
-		except EmptyPage:
-		    users = paginator.page(paginator.num_pages)
 		context['users'] = users
-
 		return context
 
 
@@ -82,8 +71,9 @@ def create_user(request):
 #Updating a user
 def modific_user(request, pk):
 
-	exercises = Exercise.objects.all()
+
 	user=CustomUser.objects.get(pk=pk)
+	exercises = Exercise_det.objects.filter(id_user_fk = user)
 	if request.method == 'GET':
 		form = UserUpdateForm(instance=user, initial={'primarykey': user.pk})
 	else:
@@ -97,7 +87,7 @@ def modific_user(request, pk):
 		# 	return render(request,'users/modific_user.html', {'form':form})
 	contexto={
 				'form':form,
-				'exercises_list': exercises,
+				'exercises_det_list': exercises,
 			 }
 	return render(request,'users/modific_user.html', contexto)
 
@@ -157,6 +147,17 @@ class  UnlockUserView(View):
 			user.is_active=True
 			user.save()
 			return redirect('content_user:list_locked_user')
+
+class ExerciseConfigurationView(View):
+	def get(self, request, *args, **kwargs):
+		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
+		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+
+		context = {
+						user_to_modific: "user_to_modific",
+						exercise_det : "exercise_det"
+				   }
+		return render(request,'users/exercise_configuration/classes.html', context)
 
 def listado(request):
 	lista = serializers.serialize("json", CustomUser.objects.all(), fields=['username', 'first_name', 'last_name'])

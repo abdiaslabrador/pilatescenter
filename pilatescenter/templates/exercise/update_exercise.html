@@ -1,0 +1,40 @@
+<!doctype html>
+{% extends "base_template/base_tamplate.html" %}
+
+  {% block title %}Actualización de plan{% endblock %}
+
+
+      {% block content %}
+      <div class="container">
+      <div class="card panding">
+        <div class="card-header" >
+          <h5 class="card-title">Actualizar exercise</h5>
+        </div>
+
+          <div class="card-body">
+            <form method="POST">
+              {% csrf_token %}
+
+              {{form.non_field_errors}}
+
+                {{form.primarykey}} <!--plan's pk, i declared this variable hidden, i used this in the form.py to do a query -->
+
+                  <div class="row">
+                    <label for="{{form.name.id_for_label}}">Nombre:</label>
+                    <input type="text" class="col-6 col-md-4" name="{{form.name.name}}" id="{{form.name.id_for_label}}" value="{{form.name.value}}"placeholder="nombre del ejercicio" size="28" maxlength="20" >
+                  </div>
+
+                
+                   <div class="row">
+                      <label for="{{form.description.id_for_label}}">Description:
+                      <textarea  rows="3" cols="25" name="{{form.description.name}}" id="{{form.description.id_for_label}}">{{form.description.value}}</textarea>
+                      </label>
+                    </div> 
+           
+                <br>
+              <button class='btn btn-primary' type="submit">actualizar plan</button>
+            </form>
+          </div>
+    </div>
+    </div>
+    {% endblock %}

@@ -5,16 +5,54 @@
   {% block title %}Lista de planes{% endblock %}
 
   {% block content %}
-  <div class="container mt-4">
-    <a class="btn btn-warning" href="{% url 'Plan:create_plan_form' %}">Crear plan</a></td>
-  </div>
 
-        {% for k , v in diccionario_planes.items%}
+        {%  if diccionario_planes  %}
+        <div class="container mt-4">
+          <a class="btn btn-warning" href="{% url 'Plan:create_plan_form' %}">Crear plan</a>
+        </div>
+
+            <!-- the diccionari contains the exercices and the plans asociated. i do a for to print each exercise with his plans -->
+            {% for k , v in diccionario_planes.items%}
+            <div class="container mt-4">
+              <div class="table-responsive">
+
+
+            <table class="table" style="box-shadow: 2px 2px 20px 0px rgba(0,0,0,0.4);">
+              <thead class="thead-light">
+                <tr>
+                    <th colspan="6">Planes de {{k}}</th>
+                </tr>
+                <tr>
+                    <!-- <th>Id</th> -->
+                    <th>Nombre</th>
+                    <th>Dias al mes</th>
+                    <th>Oportunidades de cambio</th>
+                    <th colspan="3" class="text-center">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {% for plan in v %}
+                      <tr>
+                        <!-- <td>{{plan.pk}}</td> -->
+                        <td>{{plan.name}}</td>
+                        <td>{{plan.total_days}}</td>
+                        <td>{{plan.oportunities}}</td>
+                        <td><a class="btn btn-ver"     href="{% url 'Plan:see_plan' plan.id %}">Ver</a></td>
+                        <td><a class="btn btn-primary" href="{% url 'Plan:update_plan_form' plan.id %}">Actualizar</a></td>
+                        <td><a class="btn btn-danger"  href="{% url 'Plan:delete_plan' plan.id %}">Eliminar</a></td>
+                      </tr>
+                  {% endfor %}
+                </tbody>
+                </table>
+              </div>
+              <br>
+            {% endfor %}
+        {%else%}
         <div class="container mt-4">
         <table class="table" style="box-shadow: 2px 2px 20px 0px rgba(0,0,0,0.4);">
           <thead class="thead-light">
             <tr>
-                <th colspan="6">Planes de {{k}}</th>
+                <th colspan="6">Planes</th>
             </tr>
             <tr>
                 <!-- <th>Id</th> -->
@@ -24,22 +62,13 @@
                 <th colspan="3" class="text-center">Acción</th>
             </tr>
           </thead>
-          <tbody>
-              {% for plan in v %}
-                  <tr>
-                    <!-- <td>{{plan.pk}}</td> -->
-                    <td>{{plan.name}}</td>
-                    <td>{{plan.total_days}}</td>
-                    <td>{{plan.oportunities}}</td>
-                    <td><a class="btn btn-ver"  href="{% url 'Plan:see_plan' plan.id %}">Ver</a></td>
-                    <td><a class="btn btn-primary" href="{% url 'Plan:update_plan_form' plan.id %}">Actualizar</a></td>
-                    <td><a class="btn btn-danger" href="{% url 'Plan:delete_plan' plan.id %}">Eliminar</a></td>
-                  </tr>
-              {% endfor %}
-            </tbody>
-            </table>
-          </div>
-          <br>
-        {% endfor %}
-
+          <body>
+            <tr>
+              <td>No hay ejercicios creados, para poder asociar los planes</td>
+            </tr>
+          </body>
+        </table>
+        </div>
+        </div>
+        {% endif %}
   {% endblock %}

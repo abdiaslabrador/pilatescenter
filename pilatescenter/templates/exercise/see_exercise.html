@@ -13,21 +13,17 @@
         </div>
 
         <div class="card-body">
-        
+
           {% csrf_token %}
 
           <!-- <p>{{plan.pk}}</p> -->
-          <p><strong>Nombre:</strong> {{plan.name}}</p>
-          <p><strong>Dias:</strong>  {{plan.total_days}}</p>
-          <p><strong>Oportunidades de cambio:</strong>  {{plan.oportunities}}</p>
-          {% if plan.description == ''%}
+          <p><strong>Nombre:</strong> {{exercise.name}}</p>
+          {% if exercise.description == ''%}
               <p><strong>Descripcion:</strong> no hay descripción</p>
           {% else%}
-              <p><strong>Descripcion:</strong> {{ plan.description | linebreaks }}</p> <!-- i print all content written in the textarea with break lines(salto de lineas) -->
+              <p><strong>Descripcion:</strong> {{ exercise.description | linebreaks }}</p> <!-- i print all content written in the textarea with break lines(salto de lineas) -->
           {% endif %}
-          
-          <p><strong>Ejercicio asociado:</strong> {{plan.id_exercise_fk}}</p>
-            
+
       </div>
     </div>
     </div>

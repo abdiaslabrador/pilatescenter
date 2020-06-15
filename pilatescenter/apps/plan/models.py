@@ -25,7 +25,7 @@ class Plan(models.Model):
 	name 			= models.CharField(null=False, blank=False, max_length=64)
 	total_days		= models.IntegerField(null=False, blank=False, default=0)
 	oportunities	= models.IntegerField(null=False, blank=False, default=0)
-	description 	= models.TextField(null=True, blank=True, default='')
+	description 	= models.TextField(null=True, blank=True)
 
 
 	id_exercise_fk = models.ForeignKey(Exercise, null=True, blank=False, on_delete=models.CASCADE, db_column='id_exercise_fk')
@@ -34,3 +34,7 @@ class Plan(models.Model):
 
 	def __str__(self):
 		return str("Plan: " + self.name + " - Dias: " + str(self.total_days)+ " - Id asociado:" + str(self.id_exercise_fk))
+
+	def save(self, *args, **kwargs):
+		self.name = self.name.upper()
+		super(Plan, self).save(*args, **kwargs)

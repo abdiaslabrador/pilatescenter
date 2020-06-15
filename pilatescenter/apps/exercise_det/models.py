@@ -38,3 +38,16 @@ def set_null(sender, instance, *args, **kwargs):
             exercise_det.save()
 
 signals.pre_delete.connect(set_null, sender=Plan)
+
+"""
+ 	The function of this signal is asign a exercise to all users whe the exercise have been created
+"""
+def asign_exercise(sender, instance, created, *args, **kwargs):
+	users=CustomUser.objects.all()
+	plan=Plan.objects.get(name__icontains="ninguno")
+
+	for user in users:
+		Exercise_det.objects.create(name=instance.name, id_plan_fk=plan, id_exercise_fk=instance, id_user_fk=user)
+
+
+signals.post_save.connect(asign_exercise, sender=Exercise)
