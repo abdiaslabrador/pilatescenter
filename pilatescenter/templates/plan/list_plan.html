@@ -10,13 +10,11 @@
         <div class="container mt-4">
           <a class="btn btn-warning" href="{% url 'Plan:create_plan_form' %}">Crear plan</a>
         </div>
-
+            <div class="container mt-4">
             <!-- the diccionari contains the exercices and the plans asociated. i do a for to print each exercise with his plans -->
             {% for k , v in diccionario_planes.items%}
-            <div class="container mt-4">
-              <div class="table-responsive">
 
-
+            <div class="table-responsive">
             <table class="table" style="box-shadow: 2px 2px 20px 0px rgba(0,0,0,0.4);">
               <thead class="thead-light">
                 <tr>

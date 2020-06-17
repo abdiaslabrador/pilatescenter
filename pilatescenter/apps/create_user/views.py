@@ -73,7 +73,7 @@ def modific_user(request, pk):
 
 
 	user=CustomUser.objects.get(pk=pk)
-	exercises = Exercise_det.objects.filter(id_user_fk = user)
+	exercises_det = Exercise_det.objects.filter(id_user_fk = user)
 	if request.method == 'GET':
 		form = UserUpdateForm(instance=user, initial={'primarykey': user.pk})
 	else:
@@ -87,7 +87,7 @@ def modific_user(request, pk):
 		# 	return render(request,'users/modific_user.html', {'form':form})
 	contexto={
 				'form':form,
-				'exercises_det_list': exercises,
+				'exercises_det_list': exercises_det,
 			 }
 	return render(request,'users/modific_user.html', contexto)
 
@@ -148,16 +148,52 @@ class  UnlockUserView(View):
 			user.save()
 			return redirect('content_user:list_locked_user')
 
-class ExerciseConfigurationView(View):
+
+
+class ExerciseConfigurationClassView(View):
 	def get(self, request, *args, **kwargs):
 		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
 
 		context = {
-						user_to_modific: "user_to_modific",
-						exercise_det : "exercise_det"
+						'user_to_modific': user_to_modific,
+						'exercise_det' : exercise_det
 				   }
-		return render(request,'users/exercise_configuration/classes.html', context)
+		return render(request,'users/exercise_configuration/class.html', context)
+
+class ExerciseConfigurationPlanView(View):
+	def get(self, request, *args, **kwargs):
+		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
+		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+
+		context = {
+						'user_to_modific': user_to_modific,
+						'exercise_det': exercise_det
+				   }
+		return render(request,'users/exercise_configuration/plan.html', context)
+
+class ExerciseConfigurationHistoryView(View):
+	def get(self, request, *args, **kwargs):
+		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
+		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+
+		context = {
+						'user_to_modific': user_to_modific,
+						'exercise_det': exercise_det
+				   }
+		return render(request,'users/exercise_configuration/history.html', context)
+
+class ExerciseConfigurationResetView(View):
+	def get(self, request, *args, **kwargs):
+		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
+		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+
+		context = {
+						'user_to_modific': user_to_modific,
+						'exercise_det': exercise_det
+				   }
+		return render(request,'users/exercise_configuration/reset.html', context)
+
 
 def listado(request):
 	lista = serializers.serialize("json", CustomUser.objects.all(), fields=['username', 'first_name', 'last_name'])

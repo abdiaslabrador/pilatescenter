@@ -1,0 +1,36 @@
+{% extends "base_template/base_tamplate.html" %}
+{% load static %}
+
+{% block custom_css %}
+<link   rel = "stylesheet" type="text/css" href="{% static 'css/users/Exercise_Configuration.css' %}">
+<style>
+  h2 {
+    font-family: verdana, sans-serif;
+    font-Size: 30px;
+    font-Weight: ligther;
+    font-Style: normal;
+    pandding: 30px;
+    margin: 30px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="sidebar">
+  <h4 class="text-center"><strong>Actualizando</strong></h4>
+  <a  href="{% url 'content_user:exercise_configuration_class' exercise_det.id %}">Clases</a>
+  <a href="{% url 'content_user:exercise_configuration_plan' exercise_det.id %}">Plan</a>
+  <a href="{% url 'content_user:exercise_configuration_history' exercise_det.id %}">Historial</a>
+  <a class="active" href="{% url 'content_user:exercise_configuration_reset' exercise_det.id %}">Reiniciar</a>
+
+</div>
+
+<div class="content">
+  <div class="container mt-4">
+
+  </div>
+      <br>
+</div>
+
+{%endblock%}

@@ -1,4 +1,3 @@
-<!doctype html>
 {% extends "base_template/base_tamplate.html" %}
 
   {% block title %}Actualización de plan{% endblock %}
@@ -13,7 +12,7 @@
         </div>
 
         <div class="card-body">
-        
+
           {% csrf_token %}
 
           <!-- <p>{{plan.pk}}</p> -->
@@ -25,9 +24,9 @@
           {% else%}
               <p><strong>Descripcion:</strong> {{ plan.description | linebreaks }}</p> <!-- i print all content written in the textarea with break lines(salto de lineas) -->
           {% endif %}
-          
+
           <p><strong>Ejercicio asociado:</strong> {{plan.id_exercise_fk}}</p>
-            
+
       </div>
     </div>
     </div>
