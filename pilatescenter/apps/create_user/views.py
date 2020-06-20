@@ -3,6 +3,7 @@ from django.http import  HttpResponse
 
 #views
 from .forms import UserCreationForm, ChangePasswordForm, UserUpdateForm
+from apps.exercise_det.forms import ConfigurationUserExerciseForm, ConfigurationUserChangePlanForm, ConfigurationUserResetForm
 from django.views.generic.list import ListView
 from django.views import View
 
@@ -28,7 +29,7 @@ class ListUserView(ListView):
 
 
 	def get_queryset(self):
-		queryset = CustomUser.objects.filter(is_active=True, is_visible=True).order_by("username")
+		queryset = CustomUser.objects.filter(is_active=True).order_by("username")
 		return queryset
 
 	def get_context_data(self, **kwargs):
@@ -43,9 +44,10 @@ def create_user(request):
 	if request.method == 'POST':
 		form = UserCreationForm(request.POST)
 		if form.is_valid():
+			form.save()
 			print("ES VALIDO!")
 
-			#This not work if i create a user in the admin page, it means, y i create a user
+			"""#This not work if i create a user in the admin page, it means, y i create a user
 			#in the admin page, the user won't have the relation between users and exercise_det
 			exercises=Exercise.objects.all()
 			if exercises.count() > 0:
@@ -57,7 +59,7 @@ def create_user(request):
 				for i in exercises:
 					Exercise_det.objects.create(name=i.name, id_plan_fk=plan, id_exercise_fk=i, id_user_fk=user)
 			else:
-				print("\n No hay ejercicios creados. No se le asignò ejercicios a este usuario.")
+				print("\n No hay ejercicios creados. No se le asignò ejercicios a este usuario.")"""
 
 			return redirect('content_user:list_user')
 		else:
@@ -73,7 +75,7 @@ def modific_user(request, pk):
 
 
 	user=CustomUser.objects.get(pk=pk)
-	exercises_det = Exercise_det.objects.filter(id_user_fk = user)
+	exercises_det = Exercise_det.objects.filter(id_user_fk = user).order_by('name')
 	if request.method == 'GET':
 		form = UserUpdateForm(instance=user, initial={'primarykey': user.pk})
 	else:
@@ -97,10 +99,8 @@ class DeleteUserView(View):
  	"""
 	def get(self, request, *args, **kwargs):
 		user = CustomUser.objects.get(pk=self.kwargs['pk'])
-		user.is_active=False
-		user.is_visible=False
-		user.save()
-		return redirect('content_user:list_locked_user')
+		user.delete()
+		return redirect('content_user:list_user')
 
 #Changing the user password
 def change_password_user(request, pk):
@@ -127,7 +127,7 @@ class ListLockedUserView(ListView):
 
 	def get_context_data(self, **kwargs):
 		context = super(ListLockedUserView, self).get_context_data(**kwargs)
-		context['users'] = CustomUser.objects.filter(is_active=False, is_visible=True).order_by("username")
+		context['users'] = CustomUser.objects.filter(is_active=False).order_by("username")
 		return context
 
 class LockUserView(View):
@@ -142,12 +142,28 @@ class LockUserView(View):
 
 class  UnlockUserView(View):
 
-		def get(self, request, *args, **kwargs):
-			user = CustomUser.objects.get(pk=self.kwargs['pk'])
-			user.is_active=True
-			user.save()
-			return redirect('content_user:list_locked_user')
+	def get(self, request, *args, **kwargs):
+		user = CustomUser.objects.get(pk=self.kwargs['pk'])
+		user.is_active=True
+		user.save()
+		return redirect('content_user:list_locked_user')
 
+class ResetUsersView(View):
+	def get(self, request, *args, **kwargs):
+		exercise = Exercise.objects.get(pk=self.kwargs['pk'])
+		exercises_det = Exercise_det.objects.filter(id_exercise_fk=exercise).filter(reset=True)
+
+		if exercises_det.count() > 0:
+			for i in exercises_det:
+				i.total_days = i.id_plan_fk.total_days
+				i.enable_lessons = i.id_plan_fk.total_days
+				i.saw_lessons = 0
+				i.bag = 0
+				i.scheduled_lessons = 0
+				i.oportunities = i.id_plan_fk.oportunities
+				i.save()
+
+		return redirect('content_user:list_user')
 
 
 class ExerciseConfigurationClassView(View):
@@ -162,15 +178,73 @@ class ExerciseConfigurationClassView(View):
 		return render(request,'users/exercise_configuration/class.html', context)
 
 class ExerciseConfigurationPlanView(View):
+
+	def post(self, request, *args, **kwargs):
+		exercise_det= Exercise_det.objects.get(id=self.kwargs['pk'])
+		form = ConfigurationUserExerciseForm(request.POST, instance=exercise_det)
+		if form.is_valid():
+			form.save()
+			print("Este es la data" + str(form.cleaned_data))
+			# print("ES VALIDO!")
+			return redirect('content_user:exercise_configuration_class', pk=self.kwargs['pk'])
+		# else:
+		# 	print("no es válido")
+
+		return render(request,'users/exercise_configuration/plan.html', {'form':form})
+
+
 	def get(self, request, *args, **kwargs):
 		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
+		form 			= ConfigurationUserExerciseForm(instance=exercise_det)
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
 
 		context = {
 						'user_to_modific': user_to_modific,
-						'exercise_det': exercise_det
+						'exercise_det': exercise_det,
+						'form':form
 				   }
 		return render(request,'users/exercise_configuration/plan.html', context)
+
+class ExerciseConfigurationChangePlanView(View):
+	def post(self, request, *args, **kwargs):
+		exercise_det= Exercise_det.objects.get(id=self.kwargs['pk'])
+		form = ConfigurationUserChangePlanForm(request.POST, instance=exercise_det)
+		if form.is_valid():
+			form.save()
+			exercise_det.total_days = exercise_det.id_plan_fk.total_days
+
+			exercise_det.enable_lessons = exercise_det.id_plan_fk.total_days
+			exercise_det.saw_lessons = 0
+			exercise_det.bag = 0
+
+			exercise_det.oportunities = exercise_det.id_plan_fk.oportunities
+			exercise_det.scheduled_lessons = 0
+			exercise_det.save()
+
+
+			# print("ES VALIDO!")
+			return redirect('content_user:exercise_configuration_plan', pk=self.kwargs['pk'])
+		#else:
+			#print("no es válido")
+
+		return render(request,'users/exercise_configuration/change_plan.html', {'form':form})
+
+
+	def get(self, request, *args, **kwargs):
+		exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
+		form = ConfigurationUserChangePlanForm(instance=exercise_det)
+		plan_ninguno = Plan.objects.filter(name__iexact="ninguno")
+		plan_actual_exercise = Plan.objects.filter(id_exercise_fk__name__iexact=exercise_det.name)
+		plan_actual_exercise = plan_actual_exercise.union(plan_ninguno)
+		form.fields['id_plan_fk'].queryset = plan_actual_exercise
+		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+
+		context = {
+						'user_to_modific': user_to_modific,
+						'exercise_det': exercise_det,
+						'form':form
+				   }
+		return render(request,'users/exercise_configuration/change_plan.html', context)
 
 class ExerciseConfigurationHistoryView(View):
 	def get(self, request, *args, **kwargs):
@@ -184,16 +258,30 @@ class ExerciseConfigurationHistoryView(View):
 		return render(request,'users/exercise_configuration/history.html', context)
 
 class ExerciseConfigurationResetView(View):
+	def post(self, request, *args, **kwargs):
+		exercise_det= Exercise_det.objects.get(id=self.kwargs['pk'])
+		form = ConfigurationUserResetForm(request.POST, instance=exercise_det)
+		if form.is_valid():
+			form.save()
+			print(form.cleaned_data)
+			# print("ES VALIDO!")
+			return redirect('content_user:exercise_configuration_class', pk=self.kwargs['pk'])
+		#else:
+			#print("no es válido")
+
+		return render(request,'users/exercise_configuration/reset.html', {'form':form})
+
 	def get(self, request, *args, **kwargs):
 		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		form = ConfigurationUserResetForm(instance=exercise_det)
 
 		context = {
 						'user_to_modific': user_to_modific,
-						'exercise_det': exercise_det
+						'exercise_det': exercise_det,
+						'form':form
 				   }
 		return render(request,'users/exercise_configuration/reset.html', context)
-
 
 def listado(request):
 	lista = serializers.serialize("json", CustomUser.objects.all(), fields=['username', 'first_name', 'last_name'])
@@ -203,9 +291,7 @@ class UserAPI(APIView):
 	serializer= CustomUserSeliazer
 #	authentication_classes = [TokenAuthentication]
 	#permission_classes = [IsAuthenticated]
-
-
 	def get(self, request, format=None):
-		lista 		= CustomUser.objects.filter(is_active=True, is_visible=True).order_by("username")
+		lista 		= CustomUser.objects.filter(is_active=True).order_by("username")
 		response  	= self.serializer(lista, many=True)
 		return HttpResponse(json.dumps(response.data), content_type='application/json')

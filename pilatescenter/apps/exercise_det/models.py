@@ -17,6 +17,8 @@ class Exercise_det(models.Model):
 	saw_lessons = models.IntegerField(default=0)
 	bag 		= models.IntegerField(default=0)
 
+	reset = models.BooleanField(default=True)
+
 	id_plan_fk 	   = models.ForeignKey(Plan, null=True, blank=True, on_delete=models.CASCADE, db_column='id_plan_fk')
 	id_exercise_fk = models.ForeignKey(Exercise, null=True, blank=True, on_delete=models.CASCADE, db_column='id_exercise_fk')
 	id_user_fk 	   = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.CASCADE, db_column='id_customuser_fk')
@@ -40,14 +42,28 @@ def set_null(sender, instance, *args, **kwargs):
 signals.pre_delete.connect(set_null, sender=Plan)
 
 """
- 	The function of this signal is asign a exercise to all users whe the exercise have been created
+ 	The function of this signal is asign a exercise to all users when the exercise have been created
 """
-def asign_exercise(sender, instance, created, *args, **kwargs):
-	users=CustomUser.objects.all()
-	plan=Plan.objects.get(name__icontains="ninguno")
+def asign_exercise_det(sender, instance, created, *args, **kwargs):
+	if created:
+		users=CustomUser.objects.all()
+		plan=Plan.objects.get(name__icontains="ninguno")
 
-	for user in users:
-		Exercise_det.objects.create(name=instance.name, id_plan_fk=plan, id_exercise_fk=instance, id_user_fk=user)
+		for user in users:
+			Exercise_det.objects.create(name=instance.name, id_plan_fk=plan, id_exercise_fk=instance, id_user_fk=user)
 
 
-signals.post_save.connect(asign_exercise, sender=Exercise)
+signals.post_save.connect(asign_exercise_det, sender=Exercise)
+
+
+def asign_exercise_after_user_created(sender, instance, created, *args, **kwargs):
+	if created:
+		exercises=Exercise.objects.all()
+		if exercises.count() > 0:
+			plan=Plan.objects.get(name__iexact="ninguno")
+
+			for i in exercises:
+				Exercise_det.objects.create(name=i.name, id_plan_fk=plan, id_exercise_fk=i, id_user_fk=instance)
+
+
+signals.post_save.connect(asign_exercise_after_user_created, sender=CustomUser)

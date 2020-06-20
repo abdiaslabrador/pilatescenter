@@ -4,7 +4,7 @@ from .models import CustomUser
 
 # I used this form to create a user
 class UserCreationForm(forms.ModelForm):
-	
+
 	password = forms.CharField(label='Password', widget=forms.PasswordInput)
 	password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
 
@@ -17,7 +17,7 @@ class UserCreationForm(forms.ModelForm):
 					"ci",
 					"phone_number",
 				  )
-	
+
 	def clean_username(self):
 		username = self.cleaned_data.get("username")
 		if username is None:
@@ -30,7 +30,7 @@ class UserCreationForm(forms.ModelForm):
 			return username
 
 		raise forms.ValidationError("El username ya existe")
-		
+
 
 	def clean_password2(self):
 		# Check that the two password entries match
@@ -101,7 +101,7 @@ class ChangePasswordForm(forms.ModelForm):
 		fields = (
 					"password",
 				  )
-	
+
 	def clean_password2(self):
 		# Check that the two password entries match
 		password = self.cleaned_data.get("password")

@@ -26,23 +26,23 @@
 
             <div class="row">
               <label for="{{form.total_days.id_for_label}}">Tolta de dias:</label>
-              <input type="number" name="{{form.total_days.name}}"  min=1 max=28 value="1" id="{{form.total_days.id_for_label}}" required>
+              <input type="number" name="{{form.total_days.name}}"  min=1 max=28 value="{{form.total_days.value}}" id="{{form.total_days.id_for_label}}" required>
             </div>
 
             <div class="row">
               <label for="{{form.oportunities.id_for_label}}">Oportunidades:</label>
-              <input type="number" name="{{form.oportunities.name}}"  min=1 max=28 value="1" id="
+              <input type="number" name="{{form.oportunities.name}}"  min=1 max=28 value="{{form.oportunities.value}}" id="
               {{form.oportunities.id_for_label}}" required>
             </div>
 
-            
+
                 <div class="row">
                   <label for="{{form.description.id_for_label}}">Description:
                   <textarea  rows="3" cols="25" name="{{form.description.name}}" id="{{form.description.id_for_label}}">{{form.description.value}}</textarea>
                   </label>
-                </div> 
-              
-            
+                </div>
+
+
 
             <div class="row">
                 <p>Este plan pertenece al ejercicio <strong>{{name_exercise}}</strong></p>

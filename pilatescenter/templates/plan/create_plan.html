@@ -11,7 +11,7 @@
         </div>
 
         <div class="card-body">
-          <div class="container">
+          
                 <form method="POST" autocomplete="off">
                   {% csrf_token %}
                   {{form.non_field_errors}}
@@ -32,8 +32,9 @@
                     </div>
 
                     <div class="row">
-                      <label for="{{form.description.id_for_label}}">Descripción:</label>
+                      <label for="{{form.description.id_for_label}}">Descripción:
                       <textarea  rows="3" name="{{form.description.name}}" id="{{form.oportunities.id_for_label}}" value=""></textarea>
+                      </label>
                     </div>
 
                     <div class="row">
@@ -43,7 +44,7 @@
                     <br>
                   <button class='btn btn-success' type="submit">crear plan</button>
                 </form>
-          </div>
+
         </div>
     </div>
     </div>

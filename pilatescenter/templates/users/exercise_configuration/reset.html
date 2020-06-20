@@ -28,9 +28,27 @@
 
 <div class="content">
   <div class="container mt-4">
+    <h2 class="text-center">Reiniciar el usuario</h2>
+    <h5>Username: {{user_to_modific.username}}</h5>
+    <h5>Nombre: {{user_to_modific.first_name}}</h5>
+    <h5>Apellido: {{user_to_modific.last_name}}</h5>
+    <br/>
+
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="raw">
+        Reiniciar al apretar el botòn reiniciar
+        {{form.reset}}
+
+      </div>
+
+
+      <input type="submit" value="Guardar" class="btn btn-primary">
+    </form>
+
 
   </div>
-      <br>
 </div>
 
 {%endblock%}

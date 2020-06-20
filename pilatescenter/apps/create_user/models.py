@@ -11,11 +11,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
-#En veremos
-"""from apps.plan.models import Plan
-from apps.exercise.models import Exercise
-from .validators import name_space"""
-
 
 class UserManager(BaseUserManager):
 	#Change the password for any user
@@ -56,37 +51,6 @@ class UserManager(BaseUserManager):
 						  )
 		user.set_password(password)
 		user.save(using=self._db)
-
-		#This not work if i create a user in the admin page, it means, y i create a user
-		#in the admin page, the user won't have the relation between users and exercise_det
-		"""try:
-			plan=Plan.objects.get(name__icontains="ninguno")
-		except Plan.DoesNotExist:
-			Plan.objects.create(name="ninguno", total_days=0, oportunities=0)
-
-		try:
-			exercise=Exercise.objects.get(name__iexact='pilates')
-			x=Exercise_det.objects.create(name=exercise.name, id_plan_fk=plan, id_exercise_fk=exercise, id_user_fk=user)
-			x.save()
-		except Exercise.DoesNotExist as e:
-			raise ValueError('\n---* APP: create_user  Modelo: CustomUser *---\nDebe crear primero el ejercicio de pilates')
-
-		try:
-			exercise=Exercise.objects.get(name__iexact='yoga')
-			y=Exercise_det.objects.create(name=exercise.name, id_plan_fk=plan, id_exercise_fk=exercise, id_user_fk=user)
-			y.save()
-		except Exercise.DoesNotExist as e:
-			raise ValueError('\n---* APP: create_user  Modelo: CustomUser *---\nDebe crear primero el ejercicio de yoga')
-
-
-		try:
-			exercise=Exercise.objects.get(name__iexact='hot pilates')
-			z=Exercise_det.objects.create(name=exercise.name, id_plan_fk=plan, id_exercise_fk=exercise, id_user_fk=user)
-			z.save()
-		except Exercise.DoesNotExist as e:
-			raise ValueError('\n---* APP: create_user  Modelo: CustomUser *---\nDebe crear primero el ejercicio de hot pilates')
-		"""
-
 
 		return user
 

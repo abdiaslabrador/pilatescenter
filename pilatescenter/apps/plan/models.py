@@ -18,7 +18,7 @@ class Plan(models.Model):
 	le asigna el plan "ninguno" a la relaciòn id_exercise_fk"""
 
 	"""default attribute of 'description' not works with textfield(),
-	but that attribute asign to it a not null value in the database, 
+	but that attribute asign to it a not null value in the database,
 	because of that i can manipulate it to asign a default value later in the see_plan.html
 	"""
 
@@ -33,8 +33,12 @@ class Plan(models.Model):
 	objects=pilatesManager()
 
 	def __str__(self):
-		return str("Plan: " + self.name + " - Dias: " + str(self.total_days)+ " - Id asociado:" + str(self.id_exercise_fk))
+		return str("Plan: " + self.name)
 
+	"""
+	def __str__(self):
+		return str("Plan: " + self.name + " - Dias: " + str(self.total_days)+ " - Id asociado:" + str(self.id_exercise_fk))
+	"""
 	def save(self, *args, **kwargs):
 		self.name = self.name.upper()
 		super(Plan, self).save(*args, **kwargs)

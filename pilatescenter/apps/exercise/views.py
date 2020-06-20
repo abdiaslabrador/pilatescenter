@@ -2,6 +2,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render
 from django.views.generic.list import ListView
 from .models import Exercise
+from apps.exercise_det.models import Exercise_det
 from django.views import View
 from .forms import CreateExerciseForm, UpdateExerciseForm
 from django.shortcuts import render, redirect
@@ -58,6 +59,13 @@ class UpdateExerciseView(View):
 		form = UpdateExerciseForm(request.POST, instance=exercise)
 		if form.is_valid():
 			form.save()
+			exercises_det = Exercise_det.objects.filter(id_exercise_fk=exercise)
+
+			if exercises_det.count() > 0:
+				for exercise_det in exercises_det:
+					exercise_det.name = exercise.name
+					exercise_det.save()
+
 			# print("ES VALIDO!")
 			return redirect('exercise:list_exercise')
 		# else:

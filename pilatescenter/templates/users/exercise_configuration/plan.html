@@ -27,18 +27,53 @@
 </div>
 
 <div class="content">
+  <div class="container mt-4">
+
+
   <h2 class="text-center">Configurando el plan del ejercicio <strong>{{exercise_det.name|title }}</strong></h2>
   <h5>Username: {{user_to_modific.username}}</h5>
   <h5>Nombre: {{user_to_modific.first_name}}</h5>
   <h5>Apellido: {{user_to_modific.last_name}}</h5>
   <br/>
-  <p><strong>Plan actual: </strong>{{exercise_det.id_plan_fk.name}}</p>
-  <p><strong>Total: </strong>{{exercise_det.total_days}}</p>
-  <p><strong>Disponiples: </strong>{{exercise_det.enable_lessons}}</p>
-  <p><strong>Vistas: </strong>{{exercise_det.saw_lessons}}</p>
-  <p><strong>Bolsa: </strong>{{exercise_det.bag}}</p>
-  <p><strong>Programadas: </strong>{{exercise_det.scheduled_lessons}}</p>
-  <p><strong>Oportunidades para reprogramar: </strong>{{exercise_det.oportunities}}</p>
+  <p><strong>Plan actual: </strong>{{exercise_det.id_plan_fk.name}} <a href="{% url 'content_user:exercise_configuration_change_plan' exercise_det.id %}">CAMBIAR PLAN</a></p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="row">
+      <label for="{{form.total_days.id_for_label}}">Tolta de dias:
+      <input type="number" name="{{form.total_days.name}}"  min=1 max=28 value="{{form.total_days.value}}" id="{{form.total_days.id_for_label}}" required>
+      </label>
+    </div>
+    <div class="row">
+      <label for="{{form.enable_lessons.id_for_label}}">Disponibles:
+      <input type="number" name="{{form.enable_lessons.name}}"  min=1 max=28 value="{{form.enable_lessons.value}}" id="{{form.enable_lessons.id_for_label}}" required>
+       </label>
+    </div>
+    <div class="row">
+      <label for="{{form.saw_lessons.id_for_label}}">Vistas:
+      <input type="number" name="{{form.saw_lessons.name}}"  min=1 max=28 value="{{form.saw_lessons.value}}" id="{{form.saw_lessons.id_for_label}}" required>
+      </label>
+    </div>
+    <div class="row">
+      <label for="{{form.bag.id_for_label}}">Bolsa:
+      <input type="number" name="{{form.bag.name}}"  min=1 max=28 value="{{form.bag.value}}" id="{{form.bag.id_for_label}}" required>
+      </label>
+    </div>
+    <div class="row">
+      <label for="{{form.scheduled_lessons.id_for_label}}">Programadas:
+      <input type="number" name="{{form.scheduled_lessons.name}}"  min=1 max=28 value="{{form.scheduled_lessons.value}}" id="{{form.scheduled_lessons.id_for_label}}" required>
+      </label>
+    </div>
+    <div class="row">
+      <label for="{{form.oportunities.id_for_label}}">Oportunidades:
+      <input type="number" name="{{form.oportunities.name}}"  min=1 max=28 value="{{form.oportunities.value}}" id="{{form.oportunities.id_for_label}}" required>
+      </label>
+    </div>
+    <input class="btn btn-warning panding" type="reset" value="Cancelar">
+    <input class="btn btn-primary panding"type="submit" value="Guardar">
+  </form>
+
+  </div>
 </div>
 
 {%endblock%}

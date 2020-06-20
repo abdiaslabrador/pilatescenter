@@ -44,13 +44,14 @@ class ListPlanView(View):
 	def get(self, request, *args, **kwargs):
 		contexto= {}
 		diccionario_planes={}
-		exercises = Exercise.objects.all()
-
-		for exercise in exercises:
-			diccionario_planes[exercise.name] = Plan.objects.filter(id_exercise_fk__name__iexact=exercise.name).order_by('name')
-		context = {
-					'diccionario_planes' : diccionario_planes
-		}
+		exercises = Exercise.objects.all().order_by("name")
+		
+		if exercises.count() > 0:
+			for exercise in exercises:
+				diccionario_planes[exercise.name] = Plan.objects.filter(id_exercise_fk__name__iexact=exercise.name).order_by('name')
+			context = {	
+						'diccionario_planes' : diccionario_planes
+			}
 		return render(request,'plan/list_plan.html', context)
 
 class UpdatePlanView(View):
@@ -70,7 +71,7 @@ class UpdatePlanView(View):
 		plan= Plan.objects.get(id=self.kwargs['pk'])
 		form = UpdatePlanForm(instance=plan, initial={'primarykey': plan.pk})
 		exercise_obj = Exercise.objects.get(plan__pk=self.kwargs['pk'])
-		
+
 		context={
 					'name_exercise': exercise_obj.name,
 					'form':form
