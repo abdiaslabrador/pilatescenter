@@ -28,7 +28,7 @@
                   <tr>
                   <!-- <td hidden>{{exercise.id}}</td> -->
                       <td>{{exercise.name}}</td>
-                      <td><a class="btn btn-bloquear"     href="{% url 'content_user:reset_users' exercise.id %}">Reiniciar</a></td>
+                      <td><a class="btn btn-bloquear" href="{% url 'content_user:reset_users' exercise.id %}">Reiniciar</a></td>
                       <td><a class="btn btn-ver"     href="{% url 'exercise:see_exercise' exercise.id %}">Ver</a></td>
                       <td><a class="btn btn-primary" href="{% url 'exercise:update_exercise_form' exercise.id %}">Actualizar</a></td>
                       <td><a class="btn btn-danger"  href="{% url 'exercise:delete_exercise' exercise.id %}">Eliminar</a></td>
@@ -38,8 +38,5 @@
           </table>
           </div>
         <br>
-         {% if is_paginated %}
-              {% include "tables/_pagination.html" %}
-          {% endif %}
           </div>
   {% endblock %}

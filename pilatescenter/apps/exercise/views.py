@@ -77,7 +77,8 @@ class UpdateExerciseView(View):
 		exercise= Exercise.objects.get(id=self.kwargs['pk'])
 		form = UpdateExerciseForm(instance=exercise, initial={'primarykey': exercise.pk})
 
-		context={
+		context={	
+					'exercise':exercise,
 					'form':form
 				}
 		return render(request,'exercise/update_exercise.html', context)

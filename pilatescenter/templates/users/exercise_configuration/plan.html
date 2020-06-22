@@ -23,7 +23,7 @@
   <a class="active" href="{% url 'content_user:exercise_configuration_plan' exercise_det.id %}">Plan</a>
   <a  href="{% url 'content_user:exercise_configuration_history' exercise_det.id %}">Historial</a>
   <a  href="{% url 'content_user:exercise_configuration_reset' exercise_det.id %}">Reiniciar</a>
-
+  <a  href="{% url 'content_user:modific_user_form' user_to_modific.id %}">Volver</a>
 </div>
 
 <div class="content">
@@ -41,32 +41,32 @@
     {% csrf_token %}
     <div class="row">
       <label for="{{form.total_days.id_for_label}}">Tolta de dias:
-      <input type="number" name="{{form.total_days.name}}"  min=1 max=28 value="{{form.total_days.value}}" id="{{form.total_days.id_for_label}}" required>
+      <input type="number" name="{{form.total_days.name}}"  min=0 max=28 value="{{form.total_days.value}}" id="{{form.total_days.id_for_label}}" required>
       </label>
     </div>
     <div class="row">
       <label for="{{form.enable_lessons.id_for_label}}">Disponibles:
-      <input type="number" name="{{form.enable_lessons.name}}"  min=1 max=28 value="{{form.enable_lessons.value}}" id="{{form.enable_lessons.id_for_label}}" required>
+      <input type="number" name="{{form.enable_lessons.name}}"  min=0 max=28 value="{{form.enable_lessons.value}}" id="{{form.enable_lessons.id_for_label}}" required>
        </label>
     </div>
     <div class="row">
       <label for="{{form.saw_lessons.id_for_label}}">Vistas:
-      <input type="number" name="{{form.saw_lessons.name}}"  min=1 max=28 value="{{form.saw_lessons.value}}" id="{{form.saw_lessons.id_for_label}}" required>
+      <input type="number" name="{{form.saw_lessons.name}}"  min=0 max=28 value="{{form.saw_lessons.value}}" id="{{form.saw_lessons.id_for_label}}" required>
       </label>
     </div>
     <div class="row">
       <label for="{{form.bag.id_for_label}}">Bolsa:
-      <input type="number" name="{{form.bag.name}}"  min=1 max=28 value="{{form.bag.value}}" id="{{form.bag.id_for_label}}" required>
+      <input type="number" name="{{form.bag.name}}"  min=0 max=28 value="{{form.bag.value}}" id="{{form.bag.id_for_label}}" required>
       </label>
     </div>
     <div class="row">
       <label for="{{form.scheduled_lessons.id_for_label}}">Programadas:
-      <input type="number" name="{{form.scheduled_lessons.name}}"  min=1 max=28 value="{{form.scheduled_lessons.value}}" id="{{form.scheduled_lessons.id_for_label}}" required>
+      <input type="number" name="{{form.scheduled_lessons.name}}"  min=0 max=28 value="{{form.scheduled_lessons.value}}" id="{{form.scheduled_lessons.id_for_label}}" required>
       </label>
     </div>
     <div class="row">
       <label for="{{form.oportunities.id_for_label}}">Oportunidades:
-      <input type="number" name="{{form.oportunities.name}}"  min=1 max=28 value="{{form.oportunities.value}}" id="{{form.oportunities.id_for_label}}" required>
+      <input type="number" name="{{form.oportunities.name}}"  min=0 max=28 value="{{form.oportunities.value}}" id="{{form.oportunities.id_for_label}}" required>
       </label>
     </div>
     <input class="btn btn-warning panding" type="reset" value="Cancelar">

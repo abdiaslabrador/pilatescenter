@@ -25,6 +25,8 @@ STATICFILES_DIRS = [
                     ]
 
 
+TIME_INPUT_FORMATS= ['%I:%M:%p']
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -53,7 +55,7 @@ INSTALLED_APPS = [
     'apps.plan',
     'apps.exercise',
     'apps.exercise_det',
-    'apps.class'
+    'apps.lesson_det',
 ]
 # 'apps.exercise_det',
 
@@ -138,7 +140,7 @@ TIME_ZONE =     'America/Caracas' #'UTC'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False
 
 USE_TZ = True
 

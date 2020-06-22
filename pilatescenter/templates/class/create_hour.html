@@ -1,0 +1,30 @@
+{% extends "base_template/base_tamplate.html" %}
+{% load static %}
+
+  {% block title %}Crear clase{% endblock %}
+
+  {% block custom_css %}
+  {% endblock %}
+
+{% block content %}
+<div class="container">
+      <div class="card panding">
+        <div class="card-header" >
+          <h5 class="card-title">Creación de horario</h5>
+        </div>
+
+<div class="card-body">
+<form method="post">
+	{% csrf_token %}
+	{{form.non_field_errors}}
+	{{form.as_p}}
+	<input class ="btn btn-success" type="submit" value="Crear horario">	
+</form>
+</div>
+</div>
+</div>
+{% endblock %}
+
+
+{% block custom_js %}
+{% endblock %}
