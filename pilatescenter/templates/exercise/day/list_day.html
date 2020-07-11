@@ -1,0 +1,49 @@
+{% extends "base_template/base_tamplate.html" %}s
+{% load static %}
+
+{% block title %}Lista de días{% endblock %}
+
+  {% block content %}
+
+          <div class="container mt-4">
+            <a class="btn btn-warning" href="{% url 'exercise:create_day'  exercise.id %}"> Añadir día</a>
+          </div>
+
+          <div class="container">
+
+          <table class="table panding" style="margin: 30px 0px;">
+          <thead class="thead-light">
+            <tr>
+                <th colspan="5"><strong>DÍAS</strong> de {{exercise.name}} </th>
+
+            </tr>
+            <tr>
+                <!--<th>Id</th>-->
+                <th>Nombre</th>
+                <th colspan="4" class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if days %}
+              {% for day in days%}
+                  <tr>
+                  <!-- <td hidden>{{exercise.id}}</td> -->
+                      <td>{{day.name}}</td>
+                      <td><a class="btn btn-primary" href="{% url  'exercise:list_hour' exercise.id day.id %}">Ver horas</a></td>
+                      <td><a class="btn btn-danger"  href="{% url  'exercise:delete_day' exercise.id day.id %}">Eliminar</a></td>
+                  </tr>
+              {% endfor %}
+
+            {%else%}
+            <tr>
+                  <!-- <td hidden>{{exercise.id}}</td> -->
+                      <td>No hay días disponibles</td>
+            </tr>
+            
+            {% endif %}
+          </tbody>
+          </table>
+          </div>
+        <br>
+  {% endblock %}
+

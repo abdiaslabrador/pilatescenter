@@ -12,14 +12,7 @@
     pandding: 30px;
     margin: 30px;
   }
-  .box{
-    font-family: verdana, sans-serif;
-    font-Size: 30px;
-    font-Weight: ligther;
-    font-Style: normal;
-    pandding: 30px;
-    margin: 30px;
-  }
+
   fieldset {
     background-color: #eeeeee;
     border: 5px solid red;
@@ -50,7 +43,7 @@
 <div class="sidebar">
   <h4 class="text-center"><strong>Actualizando</strong></h4>
   <a  href='{% url "content_user:exercise_configuration_class" exercise_det.id %}'>Clases</a>
-  <a class="active" href="{% url 'content_user:exercise_configuration_plan' exercise_det.id %}">Plan</a>
+  <a class="active" href="{% url 'content_user:exercise_configuration_plan' exercise_det.id %}">Resumen</a>
   <a  href="{% url 'content_user:exercise_configuration_history' exercise_det.id %}">Historial</a>
   <a  href="{% url 'content_user:exercise_configuration_reset' exercise_det.id %}">Reiniciar</a>
   <a  href="{% url 'content_user:modific_user_form' user_to_modific.id %}">Volver</a>
@@ -61,7 +54,7 @@
 
   <div class="container mt-4">
 
-  <h2 class="text-center">Configurando el plan del ejercicio <strong>{{exercise_det.name|title }}</strong></h2>
+  <h2 class="text-center"><strong>{{exercise_det.name|title }} </strong>-Configurando el plan del ejercicio</h2>
   <h5>Username: {{user_to_modific.username}}</h5>
   <h5>Nombre: {{user_to_modific.first_name}}</h5>
   <h5>Apellido: {{user_to_modific.last_name}}</h5>
@@ -73,10 +66,31 @@
   </fieldset>
   <br/>
   <p><strong>Plan actual: </strong>{{exercise_det.id_plan_fk.name}} </p>
-
+  
   <form  method="post">
     {% csrf_token %}
+      <!-- El mensaje -->
+
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+              <p>{{ message }}</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endfor %}
+      {% endif %}
+
     <p><strong>Seleccione nuevo plan: </strong>{{form.id_plan_fk}} </p>
+
+    <div class="row">
+     {{form.id_user_fk}}
+    </div>
+
+    <div class="row">
+     {{form.id_exercise_fk}}
+    </div>
     <input class="btn btn-primary" type="submit" value="Cambiar">
   </form>
 

@@ -1,0 +1,46 @@
+{% extends "base_template/base_tamplate.html" %}s
+{% load static %}
+
+{% block title %}Lista de horas{% endblock %}
+
+  {% block content %}
+
+        
+        <div class="container mt-4">
+          <a class="btn btn-warning" href="{% url 'exercise:create_hour' exercise.id day.id %}">Añadir hora</a>
+        </div>
+        
+          <div class="container">
+
+          <table class="table panding" style="margin: 30px 0px;">
+          <thead class="thead-light">
+            <tr>
+                <th colspan="5"><strong>HORAS</strong> de {{exercise.name}} </th>
+
+            </tr>
+            <tr>
+                <!--<th>Id</th>-->
+                <th>Nombre</th>
+                <th colspan="4" class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if hours %}
+              {% for hour in hours%}
+                  <tr>
+                  <!-- <td hidden>{{exercise.id}}</td> -->
+                      <td>{{hour.hour_lesson}}</td>
+                      <td><a class="btn btn-primary" href="{% url 'exercise:update_hour' hour.id day.id %}">Actualizar</a></td>
+                      <td><a class="btn btn-danger"  href="{% url 'exercise:delete_hour' hour.id  day.id %}">Eliminar</a></td>
+                  </tr>
+              {% endfor %}
+            {%else%}
+                  <tr>
+                    <td >No hay horas creadas</td>
+                  </tr>
+            {%endif%}
+          </tbody>
+          </table>
+          </div>
+        <br>
+  {% endblock %}

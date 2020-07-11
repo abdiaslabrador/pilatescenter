@@ -1,0 +1,59 @@
+{% extends "base_template/base_tamplate.html" %}s
+{% load static %}
+
+{% block title %}Lista de ejercicios{% endblock %}
+
+  {% block content %}
+      <div class="container mt-4">
+
+        <!-- El mensaje -->
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+              <p>{{ message }}</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endfor %}
+      {% endif %}
+
+        <a class="btn btn-warning" href="{% url 'exercise:create_exercise_form' %}">Crear ejercicio</a>
+
+        <div class="table-responsive">
+          <table class="table panding" style="margin: 30px 0px;">
+          <thead class="thead-light">
+            <tr>
+                <th colspan="5">Lista de ejercicios</th>
+
+            </tr>
+            <tr>
+                <!--<th>Id</th>-->
+                <th>Nombre</th>
+                <th colspan="4" class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if exercises %}
+              {% for exercise in exercises%}
+                  <tr>
+                  <!-- <td hidden>{{exercise.id}}</td> -->
+                      <td>{{exercise.name}}</td>
+                      <td><a class="btn btn-bloquear" href="{% url 'content_user:reset_users' exercise.id %}">Reiniciar</a></td>
+                      <td><a class="btn btn-ver"     href="{% url 'exercise:see_exercise' exercise.id %}">Ver</a></td>
+                      <td><a class="btn btn-primary" href="{% url 'exercise:update_exercise_form' exercise.id %}">Actualizar</a></td>
+                      <td><a class="btn btn-danger"  href="{% url 'exercise:delete_exercise' exercise.id %}">Eliminar</a></td>
+                  </tr>
+              {% endfor %}
+
+            {%else%}
+                  <tr>
+                    <td >No hay ejercicios</td>
+                  </tr>
+            {%endif%}
+          </tbody>
+          </table>
+          </div>
+        <br>
+          </div>
+  {% endblock %}

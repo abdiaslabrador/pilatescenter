@@ -28,6 +28,7 @@ urlpatterns = [
     path('exercise/', include('apps.exercise.urls')),
     path('users/', include('apps.create_user.urls')),
     path('lesson/', include('apps.lesson_det.urls')),
+    path('history/', include('apps.history_det.urls')),
     path('api-token-auth/', views.obtain_auth_token)
 ]
 if settings.DEBUG:

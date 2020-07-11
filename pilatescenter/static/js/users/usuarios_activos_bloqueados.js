@@ -89,8 +89,8 @@ function Main()
 }
 
 main = new Main()
-main.llenar();
 
+main.llenar();
 function buscar(){
   console.log("es:" + boleano.innerHTML)
   main.buscar();

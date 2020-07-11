@@ -1,6 +1,7 @@
 from django.db import models
 from apps.plan.models import Plan
 from apps.exercise.models import Exercise
+from apps.lesson_det.models import Lesson_det
 from apps.create_user.models import CustomUser
 from django.db.models import signals
 
@@ -10,12 +11,13 @@ class Exercise_det(models.Model):
 	name  =	models.CharField(max_length=64)
 
 	total_days	 = models.IntegerField(default=0)
-	oportunities = models.IntegerField(default=0)
 
 	enable_lessons 		= models.IntegerField(default=0)
-	scheduled_lessons 	= models.IntegerField(default=0)
 	saw_lessons = models.IntegerField(default=0)
 	bag 		= models.IntegerField(default=0)
+
+	scheduled_lessons 	= models.IntegerField(default=0)
+	oportunities = models.IntegerField(default=0)
 
 	reset = models.BooleanField(default=True)
 
@@ -26,23 +28,48 @@ class Exercise_det(models.Model):
 	def __str__(self):
 		return "name: " + str(self.id_user_fk) + " - " + "ejericicio: "+ str(self.id_exercise_fk)
 
+	def resetter(self):
+		#Aquí yo obtengo todas las clases que han sido vista por este usuario, luego de obtenerlo lo saco de las clases vistas
+		saw_lessons = Lesson_det.objects.filter(saw= True, id_exercise_fk= self.id_exercise_fk, id_user_fk= self.id_user_fk)
+		for saw_lesson in saw_lessons:
+			saw_lesson.id_user_fk.remove(self.id_user_fk)
+
+		self.total_days = self.id_plan_fk.total_days
+
+		self.enable_lessons = self.id_plan_fk.total_days
+		self.saw_lessons = Lesson_det.objects.filter(saw= True, id_exercise_fk= self.id_exercise_fk, id_user_fk= self.id_user_fk ).count()
+		self.bag = 0
+
+		self.oportunities = self.id_plan_fk.oportunities
+		self.scheduled_lessons = Lesson_det.objects.filter(saw= False, id_exercise_fk= self.id_exercise_fk, id_user_fk= self.id_user_fk).count()
+		self.save()
+
+		saw_lessons = Lesson_det.objects.filter(saw= True, id_exercise_fk= self.id_exercise_fk)
+		for saw_lesson in saw_lessons:
+			if saw_lesson.id_user_fk.all().count() == 0:
+				saw_lesson.delete()
+
+
 
 """ 	Esto hace que al eliminar un plan no elimine el Exercise_det asociado,
 	lo coloca en null. Esto lo hago con la finalidad de al eliminar un plan no elimine el Exercise_det."""
 def set_null(sender, instance, *args, **kwargs):
     """ Aquì se le asigna null a la variable id_plan_fk despuès de ser eliminado"""
-    exercise_dets = Exercise_det.objects.filter(id_plan_fk = instance.id)
+    exercise_dets = Exercise_det.objects.filter(id_plan_fk = instance)
     not_one_plan  = Plan.objects.get(name__iexact= "ninguno")
 
     if exercise_dets.count() > 0:
-        for exercise_det in exercise_dets:
-            exercise_det.id_plan_fk = not_one_plan
-            exercise_det.save()
+	    for exercise_det in exercise_dets:
+	        exercise_det.id_plan_fk = not_one_plan
+	        if exercise_det.reset == True:
+	            exercise_det.resetter()
+	        else:
+	            exercise_det.save()
 
 signals.pre_delete.connect(set_null, sender=Plan)
 
 """
- 	The function of this signal is asign a exercise to all users when the exercise have been created
+ 	The function of this signal  asign a exercise to all users when the exercise have been created
 """
 def asign_exercise_det(sender, instance, created, *args, **kwargs):
 	if created:

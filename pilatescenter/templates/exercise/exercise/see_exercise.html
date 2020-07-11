@@ -1,0 +1,30 @@
+{% extends "base_template/base_tamplate.html" %}
+{% load static %}
+
+  {% block title %}Detalles  del ejercicio{% endblock %}
+
+
+      {% block content %}
+
+      <div class="container">
+      <div class="card panding">
+        <div class="card-header" >
+          <h5 class="card-title">Detalles  del ejercicio</h5>
+        </div>
+
+        <div class="card-body">
+
+          {% csrf_token %}
+
+          <!-- <p>{{plan.pk}}</p> -->
+          <p><strong>Nombre:</strong> {{exercise.name}}</p>
+          {% if exercise.description == ''%}
+              <p><strong>Descripcion:</strong> no hay descripción</p>
+          {% else%}
+              <p><strong>Descripcion:</strong> {{ exercise.description | linebreaks }}</p> <!-- i print all content written in the textarea with break lines(salto de lineas) -->
+          {% endif %}
+
+      </div>
+    </div>
+    </div>
+    {% endblock %}

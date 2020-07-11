@@ -25,7 +25,7 @@ STATICFILES_DIRS = [
                     ]
 
 
-TIME_INPUT_FORMATS= ['%I:%M:%p']
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'apps.exercise',
     'apps.exercise_det',
     'apps.lesson_det',
+    'apps.history_det',
 ]
 # 'apps.exercise_det',
 
@@ -144,7 +145,7 @@ USE_L10N = False
 
 USE_TZ = True
 
-
+TIME_INPUT_FORMATS= ['%I:%M:%p']
 
 # Static files (CSS, JavaScript, Images)
 #

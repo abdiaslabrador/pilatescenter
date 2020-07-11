@@ -1,0 +1,109 @@
+{% extends "base_template/base_tamplate.html" %}
+{% load static %}
+
+{% block custom_css %}
+<link   rel = "stylesheet" type="text/css" href="{% static 'css/users/Exercise_Configuration.css' %}">
+<style>
+  h2 {
+    font-family: verdana, sans-serif;
+    font-Size: 30px;
+    font-Weight: ligther;
+    font-Style: normal;
+    pandding: 30px;
+    margin: 30px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="sidebar">
+  <h4 class="text-center"><strong>Actualizando</strong></h4>
+  <a  href="{% url 'content_user:exercise_configuration_class' exercise_det.id %}">Clases</a>
+  <a href="{% url 'content_user:exercise_configuration_plan' exercise_det.id %}">Resumen</a>
+  <a class="active" href="{% url 'content_user:exercise_configuration_history' exercise_det.id %}">Historial</a>
+  <a  href="{% url 'content_user:exercise_configuration_reset' exercise_det.id %}">Reiniciar</a>
+  <a  href="{% url 'content_user:modific_user_form' user_to_modific.id %}">Volver</a>
+</div>
+
+<div class="content">
+
+  <button id="exercise_id" hidden>{{exercise_det.id}}</button><!-- Esto se usa en el js de este template (abajo)-->
+
+  <div class="container mt-4">
+    <h2 class="text-center"><strong>{{exercise_det.name|title }}</strong> - Historial del usuario</h2>
+    <h5>Username: {{user_to_modific.username}}</h5>
+    <h5>Nombre: {{user_to_modific.first_name}}</h5>
+    <h5>Apellido: {{user_to_modific.last_name}}</h5>
+    <br/>
+    <!-- Buscador de clases -->
+        <form method="post">
+          {% csrf_token %}
+              {{form.since.errors}}
+              <div class="form-group row">
+
+                <label class="col-2 col-form-label" for="{{form.since.id_for_label}}">Desde:</label>
+                <div class="col-1">
+                  <input  type="date" name="{{form.since.name}}" id="form.since.id_for_label">
+                  
+                </div>  
+              </div>  
+
+              {{form.until.errors}}
+              <div class="form-group row">
+                <label class="col-2 col-form-label" for="{{form.since.id_for_label}}">Hasta:</label>
+                <div class="col-1">
+                  <input  type="date" name="{{form.until.name}}" id="form.since.id_for_label">
+                </div> 
+              </div>
+              <input class ="btn btn-primary" type="submit" value="Buscar">
+        </form>
+
+      <div class="table-responsive">
+
+
+        <table class="table panding" style="margin: 30px 0px;">
+        <thead class="thead-light">
+          <tr>
+                <th colspan="5">Lista de clases</th>
+                <th colspan="3">Escriba un id:<input type="text" id="caja" onkeyup="buscar()"></th>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Tipo</th>
+                <th>Cant</th>
+                <th colspan="3" >Acción</th>
+            </tr>
+        </thead>
+        <tbody id="contenido">
+            {% if histories %}
+              {% for history in histories%}
+                  <tr>
+                  <td >{{history.id}}</td>
+                      <td>{{history.day_lesson|date:"l. M d, Y"}}</td>
+                      <td>{{history.hour_lesson}}</td>
+                      <td>{{history.id_exercise_fk.name}}</td>
+                      <td>{{history.cant_in}}/{{history.cant_max}}</td>
+                      <td><a class="btn btn-ver" target="_blank" href="{% url 'history:see_history' history.id %}">Ver</a></td>
+                      <td><a class="btn btn-danger"  href="{% url 'content_user:delete_history' exercise_det.id history.id  %}">Eliminar</a></td>
+                  </tr>
+              {% endfor %}
+            {%else%}
+                  <tr>
+                    <td>No hay historias</td>
+                  </tr>
+            {%endif%}
+        </tbody>
+        </table>
+    </div>
+  </div>
+      <br>
+</div>
+
+{%endblock%}
+
+{% block custom_js %}
+  <script src="{% static 'js/users/exercise_configuration/histories.js' %}"></script>
+{% endblock %}

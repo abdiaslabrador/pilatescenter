@@ -14,12 +14,13 @@ urlpatterns = [
     path('lock_user/<int:pk>/', views.LockUserView.as_view(), name="lock_user"),
     path('unlock_user/<int:pk>/', views.UnlockUserView.as_view(), name="unlock_user"),
     path('exercise_configuration_class/<int:pk>/', views.ExerciseConfigurationClassView.as_view(), name='exercise_configuration_class'),
+    path('delete_lesson/<int:id_exercise_det>/<int:id_lesson>/', views.DeleteLessonView.as_view(), name='delete_lesson'),
     path('exercise_configuration_plan/<int:pk>/', views.ExerciseConfigurationPlanView.as_view(), name='exercise_configuration_plan'),
     path('exercise_configuration_plan/change_plan/<int:pk>/', views.ExerciseConfigurationChangePlanView.as_view(), name='exercise_configuration_change_plan'),
     path('exercise_configuration_history/<int:pk>/', views.ExerciseConfigurationHistoryView.as_view(), name='exercise_configuration_history'),
+    path('delete_history/<int:id_exercise_det>/<int:id_history>', views.DeleteHistoryView.as_view(), name='delete_history'),
     path('exercise_configuration_reset/<int:pk>/', views.ExerciseConfigurationResetView.as_view(), name='exercise_configuration_reset'),
     path('reset/<int:pk>/', views.ResetUsersView.as_view(), name='reset_users'),
-
     path('listado/', views.listado, name="list_user_json"),
     path('UserAPI/', views.UserAPI.as_view(), name="list_user_api")
 

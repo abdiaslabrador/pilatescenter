@@ -37,18 +37,18 @@
             </tr>
           </thead>
           <tbody id="contenido">
-                {% for x in users%}
+                {% for usuario in users%}
                 <tr>
-                  <td hidden>{{x.id}}</td>
-                  <td>{{x.username}}</td>
-                  <td>{{x.first_name}}</td>
-                  <td>{{x.last_name}}</td>
-                  <td>{{x.ci}}</td>
+                  <td hidden>{{user.id}}</td>
+                  <td>{{usuario.username}}</td>
+                  <td>{{usuario.first_name}}</td>
+                  <td>{{usuario.last_name}}</td>
+                  <td>{{usuario.ci}}</td>
 
-                    <td><a class="btn btn-primary"  href="{% url 'content_user:modific_user_form' x.id %}">Actualizar</a></td>
-                    {% if x != user %}
-                      <td><a class="btn btn-bloquear"  href="{% url 'content_user:lock_user' x.id %}">Bloquear</a></td>
-                      <td><a class="btn btn-danger"   href="{% url 'content_user:delete_user' x.id %}">Eliminar</a></td>
+                    <td><a class="btn btn-primary"  href="{% url 'content_user:modific_user_form' usuario.id %}">Actualizar</a></td>
+                    {% if usuario != user %}
+                      <td><a class="btn btn-bloquear"  href="{% url 'content_user:lock_user' usuario.id %}">Bloquear</a></td>
+                      <td><a class="btn btn-danger"   href="{% url 'content_user:delete_user' usuario.id %}">Eliminar</a></td>
                     {%endif%}
 
                 </tr>

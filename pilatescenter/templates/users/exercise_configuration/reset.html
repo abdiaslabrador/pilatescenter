@@ -20,7 +20,7 @@
 <div class="sidebar">
   <h4 class="text-center"><strong>Actualizando</strong></h4>
   <a  href="{% url 'content_user:exercise_configuration_class' exercise_det.id %}">Clases</a>
-  <a href="{% url 'content_user:exercise_configuration_plan' exercise_det.id %}">Plan</a>
+  <a href="{% url 'content_user:exercise_configuration_plan' exercise_det.id %}">Resumen</a>
   <a href="{% url 'content_user:exercise_configuration_history' exercise_det.id %}">Historial</a>
   <a class="active" href="{% url 'content_user:exercise_configuration_reset' exercise_det.id %}">Reiniciar</a>
   <a  href="{% url 'content_user:modific_user_form' user_to_modific.id %}">Volver</a>
@@ -37,12 +37,19 @@
 
     <form method="post">
       {% csrf_token %}
+      {{form.non_field_errors}}
       <div class="raw">
         Reiniciar al apretar el botòn reiniciar
         {{form.reset}}
-
       </div>
 
+      <div class="row">
+       {{form.id_user_fk}}
+      </div>
+
+      <div class="row">
+       {{form.id_exercise_fk}}
+      </div>
 
       <input type="submit" value="Guardar" class="btn btn-primary">
     </form>

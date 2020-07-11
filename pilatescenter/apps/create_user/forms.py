@@ -109,3 +109,7 @@ class ChangePasswordForm(forms.ModelForm):
 		if password and password2 and password != password2:
 			raise forms.ValidationError("Contraseñas no coinciden")
 		return password2
+
+class SearchClasses(forms.Form):
+	since = forms.DateField(required=True)
+	until = forms.DateField(required=True)

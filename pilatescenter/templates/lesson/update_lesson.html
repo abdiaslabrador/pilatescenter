@@ -1,0 +1,178 @@
+{% extends "base_template/base_tamplate.html" %}s
+{% load static %}
+
+{% block title %}Actualizando la clase{% endblock %}
+
+{% block custom_css %}   
+<style>
+  h2 {
+    font-family: verdana, sans-serif;
+    font-Size: 30px;
+    font-Weight: ligther;
+    font-Style: normal;
+    pandding: 30px;
+    margin: 30px;
+  }
+  fieldset {
+    background-color: #eeeeee;
+    border: 5px solid red;
+    width: 250px
+
+  }
+  legend{
+    width: 150px;
+    font-Size: 20px;
+    background: yellow;
+    color: black;
+    border: 4px solid black;
+    pandding: 5px;
+
+  }
+  fieldset p{
+
+    pandding: 5px;
+    margin-left: 10px;
+    font-size: 20px;
+  }
+</style>
+{% endblock %}
+
+  {% block content %}
+  	
+  	<button id="lesson_id" hidden>{{lesson.id}}</button><!-- Esto se usa en el js de este template (abajo)-->
+
+        <div class="container" >
+		<h2 class="text-center">Configurando la clase# {{lesson.id}} de {{lesson.id_exercise_fk.name}}</h2>
+		<div class="container mt-4 d-flex justify-content-center" >
+			<div class="col-4" >
+	        <form method="post" >
+	        	{% csrf_token %}
+	        	{{form.day_lesson.errors}}
+
+	        	<div class="row">
+		        	<label for="{{form.day_lesson.id_for_label}}">{{form.day_lesson.label}}
+		             {{form.day_lesson}}		            
+		         </label>
+	            </div>
+	            <div class="row">
+		        	<label for="{{form.hour_chance.id_for_label}}">{{form.hour_chance.label}}
+		             {{form.hour_chance}}
+		            </label>
+	            </div>
+	            <div class="row">
+		        	<label for="{{form.hour_lesson.id_for_label}}">{{form.hour_lesson.label}}
+		             {{form.hour_lesson}}
+		            </label>
+	            </div>
+	            <div class="row">
+		        	<label for="{{form.hour_end.id_for_label}}">{{form.hour_end.label}}
+		        		{{form.hour_end}}
+		             </label>
+	            </div>
+
+	            <fieldset>
+				    <legend>Advertencia</legend>
+				    <p>Si al cambiar el valor de la cantidad máxima de usuarios permitidos en la clase es menor que los usuarios en la clase se <strong>SACARÁN.</strong></p>
+				 </fieldset>
+				 <br/>
+
+	            <div class="row">
+		        	<label for="{{form.cant_max.id_for_label}}">Cant max:
+		             {{form.cant_max}}
+	            </div>
+	            <button class="btn btn-warning panding" type="reset">Cancelar</button>
+	        	<input class="btn btn-primary panding" type="submit" value="actualizar">
+	        </form>
+	        </div>
+         </div>
+         <br>
+         <br>
+		
+        <div class="card panding">
+	        <div class="card-header"> 
+	          <div class="card-title">
+	          	<div class="d-flex justify-content-around">
+	          		<div >
+	          		    Cantidad max:{{lesson.cant_max}}
+	          		</div>
+	          		<div >
+	          			En la clase:{{lesson.cant_in}}
+	          		</div>
+	          		<div>
+	          			Cupos:{{lesson.quota}}
+	          		</div>
+	          		<div>
+	          			<a href="{% url 'lesson:list_lesson' lesson.id_exercise_fk.id %}">Finalizar</a>
+	          		</div>
+	          	</div>
+	           </div>
+	        </div>
+
+
+	        <!-- El mensaje -->
+			{% if messages %}
+				{% for message in messages %}
+				<div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+				  		<p>{{ message }}</p>
+				  	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				    	<span aria-hidden="true">&times;</span>
+				 	</button>
+				</div>
+			  {% endfor %}
+			{% endif %}
+
+	        <div class="card-body">
+
+	        	{% for user in users_in_lesson%}
+	        	 <p><strong>Username:</strong> <a href="{% url 'content_user:modific_user_form' user.id %}">{{user.username}}</a>  <strong>Nombre:</strong> {{user.first_name}}   <strong>Apellido:</strong> {{user.last_name}}   <strong>C.I:</strong> {{user.ci}}<a class="btn btn-danger"   href="{% url 'lesson:takeout_to_lesson' lesson.id user.id %}">Quitar</a></p>
+	        	 
+	        	{% endfor %}
+	      	</div>
+    	</div>
+
+        <div class="table-responsive">
+        <table  class="table panding" style="margin: 30px 0px;">
+          <thead class="thead-light">
+          	<tr>
+          		<th colspan="7"><small class="form-text text-muted">La búsqueda se hace en usuarios con la opción de <strong>"REINICIAR ACTIVA"</strong></small></th>
+          		
+
+          	</tr>
+            <tr>
+                <th colspan="5">Lista de usuarios</th>
+                <th colspan="2"><input type="text" id="caja" onkeyup="buscar()"></th>
+            </tr>
+            <tr>
+                <!--<th>Id</th>-->
+                <th>Username</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>c.i</th>
+                <th colspan="3" class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="contenido">
+                {% for user in all_users%}
+                <tr>
+                  <td hidden>{{user.id}}</td>
+                  <td>{{user.username}}</td>
+                  <td>{{user.first_name}}</td>
+                  <td>{{user.last_name}}</td>
+                  <td>{{user.ci}}</td>
+
+                    <td><a class="btn btn-success"  href="{% url 'lesson:add_to_lesson' lesson.id user.id %}">Añadir</a></td>
+                </tr>
+                {% endfor %}
+          </tbody>
+          </table>
+      
+    		<!-- {% include "tables/_pagination.html" %} -->
+
+          </div>
+          </div>
+
+  {% endblock %}
+
+{% block custom_js %}
+  <script src="{% static 'js/lesson/add_user.js' %}"></script>
+{% endblock %}
