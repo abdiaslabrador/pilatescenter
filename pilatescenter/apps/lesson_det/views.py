@@ -6,13 +6,16 @@ from .forms import (
 				    )
 from django.http import HttpResponse
 from apps.exercise.models import Exercise, Hour
-from apps.exercise_det.models import Exercise_det
+from apps.exercise_det.models import Exercise_det, update_resumen
 from apps.history_det.models import History_det
 from apps.create_user.models import CustomUser
 from .models import Lesson_det
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.contrib import messages
 import datetime
+
+
+
 
 #------------------------------------------------------------------------------------------
 #lesson
@@ -141,32 +144,13 @@ class UpdateLessonView(View):
 			messages.success(request, 'La clase ya fue vista', extra_tags='alert-danger')
 			return redirect('lesson:list_lesson_exercise_action')
 
-		cant_max_before = lesson.cant_max
-
 		form =  UpdateLessonForm(request.POST, instance=lesson)
 
-
 		if form.is_valid():
-			form.save()
+			form.save() #no actualiza el lesson.save()
 			#if the new size of cant_max is less than can_in i delete  all users in the class to re-asign the 'cant_max' of the lesson. 
 			if lesson.cant_max < lesson.cant_in:
-
-				users_in_lesson = lesson.id_user_fk.all() #i get all users that are in the lesson		
-				for user in users_in_lesson:
-					user_exercise_det = Exercise_det.objects.get(id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user)
-
-					user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user, saw= False).exclude(id=lesson.id).count()#here rest to each one in the class -1 before clear the class
-					user_exercise_det.saw_lessons = Lesson_det.objects.filter(id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user, saw= True).count()
-					user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
-					user_exercise_det.save()
-
 				lesson.id_user_fk.clear() # despues de que les reasigno la cantidad de lecciones que tienen programadas sin tomar en cuenta la lección actual. limpio los usuarios que estén dentro
-				lesson.quota = lesson.cant_max
-				lesson.cant_in = 0
-				lesson.save()
-			else:
-				lesson.quota = lesson.cant_max - lesson.cant_in
-				lesson.save()	
 			return redirect('lesson:update_lesson', pk=lesson.id)
 		
 		return render(request, self.template_name, {'form':form})
@@ -184,7 +168,11 @@ class UpdateLessonView(View):
 
 
 		users_in_lesson = CustomUser.objects.filter(is_active=True, lesson_det__id=lesson.id).order_by('username') 
-		all_users = CustomUser.objects.filter(is_active = True, exercise_det__reset=True).order_by('username')
+		all_users = CustomUser.objects.filter(
+			 									is_active = True,
+			 									exercise_det__id_exercise_fk=lesson.id_exercise_fk,
+			 									exercise_det__reset=True
+			 									).order_by('username')
 		form = UpdateLessonForm(instance=lesson)
 
 		context={	
@@ -231,23 +219,14 @@ class AddToLessonView(View):
 			return redirect('lesson:list_lesson_exercise_action')
 
 		user = CustomUser.objects.get(id=self.kwargs['id_user']) #obtengo el usuario a agregar a la clase
-		#con la clase y el usuario objtengo el exercise_det del usuario para editarlo
-		user_exercise_det = Exercise_det.objects.get(id_exercise_fk= lesson.id_exercise_fk.id, id_user_fk= user.id)
+
+		another_user = Exercise_det.objects.get(id_exercise_fk=lesson.id_exercise_fk, id_user_fk=user)
 
 		#me aseguro que el usuario no esté en la clase (si no hago esto cuando le de al botón añadir le quita 1 en programadas)
-		if Lesson_det.objects.filter(id=lesson.id, id_user_fk=user).count() == 0 and user_exercise_det.enable_lessons > 0: 
+		if Lesson_det.objects.filter(id=lesson.id, id_user_fk=user).count() == 0 and another_user.enable_lessons > 0: 
 			#me aseguro que la cantidad de persona en la clase sea menor que la permitida
 			if lesson.cant_in < lesson.cant_max:
 				lesson.id_user_fk.add(user)#añado el usuario a la clase
-				lesson.cant_in = lesson.id_user_fk.count() #asigno a la cantidad de persona que ahora hay
-				lesson.quota = lesson.cant_max - lesson.cant_in #asigno los cupos con una resta
-				lesson.save()
-
-				#Esta el la cantidad de clases programadas del usuario
-				user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(id_exercise_fk= lesson.id_exercise_fk.id, id_user_fk= user.id, saw= False).count()
-				user_exercise_det.saw_lessons = Lesson_det.objects.filter(id_exercise_fk= lesson.id_exercise_fk.id, id_user_fk= user.id, saw= True).count()
-				user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
-				user_exercise_det.save()
 			
 		else:
 			#mensajes que paso en el template
@@ -255,7 +234,7 @@ class AddToLessonView(View):
 				messages.success(request, 'El usuario ""{}"" ya está en la clase'.format(user.username), extra_tags='alert-warning')
 				
 
-			elif user_exercise_det.enable_lessons == 0: #si el usuario no tiene clases disponibles
+			elif another_user.enable_lessons == 0: #si el usuario no tiene clases disponibles
 				messages.success(request, 'El usuario ""{}"" no tiene días disponibles'.format(user.username), extra_tags='alert-warning')
 				
 			
@@ -276,23 +255,12 @@ class TakeOutToLessonView(View):
 			return redirect('lesson:list_lesson_exercise_action')
 
 		user = CustomUser.objects.get(id=self.kwargs['id_user'])
-		user_exercise_det = Exercise_det.objects.get(id_exercise_fk= lesson.id_exercise_fk.id, id_user_fk= user.id)
 		
 		#me aseguro que el usuario esté en la clase (por seguridad) (esta query es m2m)
 		if Lesson_det.objects.filter(id=lesson.id, id_user_fk=user).count() > 0:
-			#me aseguro que hayam usuarios en la clase
+			#me aseguro que hayan usuarios en la clase
 			if lesson.id_user_fk.count() > 0:
 				lesson.id_user_fk.remove(user)#saco al usuario
-				lesson.cant_in = lesson.id_user_fk.count()#asigno a la cantidad de persona que ahora hay
-				lesson.quota = lesson.cant_max - lesson.cant_in #asigno los cupos con una resta
-				lesson.save()
-
-				#Esta el la cantidad de clases programadas del usuario
-				user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(id_exercise_fk= lesson.id_exercise_fk.id, id_user_fk= user.id, saw= False).exclude(id=lesson.id).count()
-				user_exercise_det.saw_lessons = Lesson_det.objects.filter(id_exercise_fk= lesson.id_exercise_fk.id, id_user_fk= user.id, saw= True).count()
-				user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
-				user_exercise_det.save()
-
 		return redirect('lesson:update_lesson', pk=lesson.id)
 
 
@@ -309,9 +277,9 @@ class SawLessonView(View):
 			messages.success(request, 'La clase ya fue vista', extra_tags='alert-danger')
 			return redirect('lesson:list_lesson_exercise_action')
 		
-		exercise_id = lesson.id_exercise_fk.id #hago esto por si en un futuro tengo que eliminar la clase despúes de verla
 		lesson.saw = True
 		lesson.save()
+		update_resumen(lesson)
 
 		#Se crea el historial de las personas
 		history_obj = History_det.objects.create(
@@ -326,23 +294,10 @@ class SawLessonView(View):
 												)
 
 		for users_in_lesson in lesson.id_user_fk.all():
-			history_obj.id_user_fk.add(users_in_lesson) 
+			history_obj.id_user_fk.add(users_in_lesson)
 		
-			
 
-		users_in_lesson = lesson.id_user_fk.all()
-		for user in users_in_lesson:
-			user_exercise_det = Exercise_det.objects.get(id_exercise_fk= lesson.id_exercise_fk.id, id_user_fk= user.id)
-
-			#Esta el la cantidad de clases programadas del usuario
-			user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
-			user_exercise_det.saw_lessons = Lesson_det.objects.filter(id_exercise_fk= lesson.id_exercise_fk.id, id_user_fk= user.id, saw= True).count()
-
-			user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(id_exercise_fk= lesson.id_exercise_fk.id, id_user_fk= user.id, saw= False).exclude(id=lesson.id).count()
-			
-			user_exercise_det.save()
-
-		return redirect('lesson:list_lesson', pk=exercise_id)
+		return redirect('lesson:list_lesson', pk=lesson.id_exercise_fk.id)
 
 class DeleteLessonView(View):
 	def get(self, request, *args, **kwargs):
@@ -357,17 +312,9 @@ class DeleteLessonView(View):
 			messages.success(request, 'La clase ya fue vista', extra_tags='alert-danger')
 			return redirect('lesson:list_lesson_exercise_action')
 
-		exercise_id= lesson.id_exercise_fk.id
-		users_in_lesson = lesson.id_user_fk.all() #i get all users that are in the lesson		
-		for user in users_in_lesson:
-			user_exercise_det = Exercise_det.objects.get(id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user.id)
 
-			#Esta el la cantidad de clases programadas del usuario
-			user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user.id, saw= False).exclude(id=lesson.id).count()#here rest to each one in the class -1 before clear the class
-			user_exercise_det.saw_lessons = Lesson_det.objects.filter(id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user.id, saw= True).count()
-			user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
-			user_exercise_det.save()
-
+		exercise_id=lesson.id_exercise_fk.id
+		lesson.id_user_fk.clear()
 		lesson.delete()
 
 		return redirect('lesson:list_lesson', pk=exercise_id)

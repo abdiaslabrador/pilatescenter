@@ -39,10 +39,62 @@
                   <tr>
                   <!-- <td hidden>{{exercise.id}}</td> -->
                       <td>{{exercise.name}}</td>
-                      <td><a class="btn btn-bloquear" href="{% url 'content_user:reset_users' exercise.id %}">Reiniciar</a></td>
+
+                       <!-- Boton de que permite reiniciar a los usuarios-->
+                      <td> 
+                        <button type="button" class="btn btn-bloquear" data-toggle="modal"data-target="#reiniciar{{history.id}}">Reiniciar
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id=reiniciar{{history.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">¿Está seguro de reiniciar a todos los usuarios?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">                          
+                                 <strong>Recordatorio:</strong> para reiniciar un ejercicio no pueden haber usuarios con clases programadas.
+                              </div> 
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                <a class="btn btn-primary" href="{% url 'content_user:reset_users' exercise.id %}">Aceptar</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
                       <td><a class="btn btn-ver"     href="{% url 'exercise:see_exercise' exercise.id %}">Ver</a></td>
                       <td><a class="btn btn-primary" href="{% url 'exercise:update_exercise_form' exercise.id %}">Actualizar</a></td>
-                      <td><a class="btn btn-danger"  href="{% url 'exercise:delete_exercise' exercise.id %}">Eliminar</a></td>
+
+                      <!-- Boton de que permite eliminar el ejercicio-->
+                      <td> 
+                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar{{history.id}}">Eliminar
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id=eliminar{{history.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">¿Está seguro de eliminar el ejercicio?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">                          
+                                <strong>Recordatorio:</strong> al eliminar un ejercicio se eliminaran los objetos relacionados a este los cuales son: <strong> planes, horas, dias, lecciones y  historiales.</strong>
+                              </div> 
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                <a class="btn btn-primary" href="{% url 'exercise:delete_exercise' exercise.id %}">Aceptar</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
                   </tr>
               {% endfor %}
 

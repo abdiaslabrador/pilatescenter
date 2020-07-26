@@ -36,8 +36,32 @@ function Main()
             <td>${lesson.hour_lesson}</td>
             <td>${lesson.type}</td>
             <td>${lesson.cant_max}</td>
-            <td><a class="btn btn-ver" target="_blank" href="/history/see_history/${lesson.id}/">Ver</a></td>
-            <td><a class="btn btn-danger"   href="/users/delete_history/${exercise_id.innerHTML}/${lesson.id}">Eliminar</a></td>
+            <td><a class="btn btn-ver" target="_blank" href="/history/see_history/${lesson.id}/${exercise_id.innerHTML}">Ver</a></td>
+
+            <td> 
+                <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar${lesson.id}">Eliminar
+                </button>
+                <!-- Modal -->
+                <div class="modal fade" id=eliminar${lesson.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">¿Está seguro?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <!-- <div class="modal-body">                          
+                        
+                      </div>  -->
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <a class="btn btn-primary"  href="/history/delete_history/${lesson.id}/${exercise_id.innerHTML}">Aceptar</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
             </tr>`
           
       }

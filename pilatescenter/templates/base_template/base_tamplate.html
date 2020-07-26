@@ -73,13 +73,16 @@
 
         {% block content %}
 
+        
         {% endblock %}
 
-      <footer class="container-fluid _footer">
-        &copy; 2020 Abdías Labrador
-      </footer>
-
-
+      
+        {% block footer %}
+    
+          <footer class="container-fluid _footer">
+            &copy; 2020 Abdías Labrador
+          </footer>
+        {% endblock %}
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="{% static 'js/jquery-migrate-1.4.1.min.js' %}"></script>

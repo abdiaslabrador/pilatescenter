@@ -1,6 +1,9 @@
 let tecla     = document.querySelector("#caja")
 let contenido = document.querySelector('#contenido')
+let adminuser_id   = document.getElementById("adminuser_id")
 let boleano   = document.getElementById("boolean")
+
+
 
 /*
 function traer(){
@@ -49,16 +52,55 @@ function Main()
       for (let user of usuarios){
           
           if(boleano.innerHTML == "active"){
-            contenido.innerHTML +=`
-            <tr>
-            <td>${user.username}</td>
-            <td>${user.first_name}</td>
-            <td>${user.last_name}</td>
-            <td>${user.ci}</td>
-            <td><a class="btn btn-primary"  href="/users/modific_user/${user.id}/">Actualizar</a></td>
-            <td><a class="btn btn-bloquear" style="color: white;" href="/users/lock_user/${user.id}/">Bloquear</a></td>
-            <td><a class="btn btn-danger"   href="/users/delete_user/${user.id}/">Eliminar</a></td>
-            </tr>`
+            if(user.id != adminuser_id.innerHTML){
+              contenido.innerHTML +=`
+                <tr>
+                <td>${user.username}</td>
+                <td>${user.first_name}</td>
+                <td>${user.last_name}</td>
+                <td>${user.ci}</td>
+                <td><a class="btn btn-primary"  href="/users/modific_user/${user.id}/">Actualizar</a></td>
+                <td><a class="btn btn-bloquear" style="color: white;" href="/users/lock_user/${user.id}/">Bloquear</a></td>
+                <td>
+                    <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar${user.id}">
+                      Eliminar
+                    </button>
+                    <div class="modal fade" id=eliminar${user.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">¿Está seguro que quiere eliminar el usuario?</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                              <p><strong>Recordatorio: </strong>al eliminar un usuario se sacará de los historiales en donde aparece.
+                                </p>
+                                <p>
+                                A continuación va a eliminar al usuario con el username ""${user.username}"".
+                              </p>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            <a class="btn btn-primary"  href="/users/delete_user/${user.id}/">Aceptar</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>`
+            }
+            else{
+              contenido.innerHTML +=`
+                <tr>
+                <td>${user.username}</td>
+                <td>${user.first_name}</td>
+                <td>${user.last_name}</td>
+                <td>${user.ci}</td>
+                <td><a class="btn btn-primary"  href="/users/modific_user/${user.id}/">Actualizar</a></td>
+                </tr>`
+            }
           }
           else if(boleano.innerHTML == "deactive")
           {
@@ -69,7 +111,34 @@ function Main()
             <td>${user.last_name}</td>
             <td>${user.ci}</td>
             <td><a class="btn btn-success"  href="/users/unlock_user/${user.id}/">Desbloquear</a></td>
-            <td><a class="btn btn-danger"   href="/users/delete_user/${user.id}/">Eliminar</a></td>
+            <td>
+                <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar${user.id}">
+                  Eliminar
+                </button>
+                <div class="modal fade" id=eliminar${user.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">¿Está seguro que quiere eliminar el usuario?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                              <p><strong>Recordatorio: </strong>al eliminar un usuario se sacará de los historiales en donde aparece.
+                                </p>
+                                <p>
+                                A continuación va a eliminar al usuario con el username ""${user.username}"".
+                              </p>
+                          </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <a class="btn btn-primary"  href="/users/delete_user/${user.id}/">Aceptar</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
             </tr>` 
           }
       }

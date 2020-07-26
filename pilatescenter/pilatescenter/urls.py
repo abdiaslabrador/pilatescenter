@@ -19,6 +19,10 @@ from django.urls import include, path
 from django.contrib import admin
 from apps.login.views import LoginView, LogoutView
 from rest_framework.authtoken import views
+from django.contrib.auth.views import ( 
+                                        PasswordResetView, PasswordResetDoneView, 
+                                        PasswordResetConfirmView, PasswordResetCompleteView
+                                      )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,6 +33,10 @@ urlpatterns = [
     path('users/', include('apps.create_user.urls')),
     path('lesson/', include('apps.lesson_det.urls')),
     path('history/', include('apps.history_det.urls')),
+    path('password_reset/', PasswordResetView.as_view(template_name='password_reset/password_reset_form.html', email_template_name='password_reset/password_reset_email.html'), name= 'password_reset'),
+    path('password_reset/done', PasswordResetDoneView.as_view(template_name='password_reset/password_reset_done.html'), name= 'password_reset_done'),
+    path('reset/<uidb64>/<token>/', PasswordResetConfirmView.as_view(template_name='password_reset/password_reset_confirm.html'), name= 'password_reset_confirm'),
+    path('reset/done/', PasswordResetCompleteView.as_view(template_name='password_reset/password_reset_complete.html'), name= 'password_reset_complete'),
     path('api-token-auth/', views.obtain_auth_token)
 ]
 if settings.DEBUG:

@@ -37,9 +37,58 @@ function Main()
             <td>${lesson.hour_lesson}</td>
             <td>${lesson.type}</td>
             <td>${lesson.cant_max}</td>
-            <td><a class="btn btn-success"  href="/lesson/sawlesson/${lesson.id}/">Vista</a></td>
+            <td> 
+                <button type="button" class="btn btn-success" data-toggle="modal"data-target="#vista${lesson.id}">Vista
+                </button>
+                <!-- Modal -->
+                <div class="modal fade" id=vista${lesson.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">¿Está seguro que quiere colocarla como vista?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <!-- <div class="modal-body">                          
+                        
+                      </div>  -->
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <a class="btn btn-primary"  href="/lesson/sawlesson/${lesson.id}/">Aceptar</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+
             <td><a class="btn btn-primary"   href="/lesson/update_lesson/${lesson.id}/">Actualizar</a></td>
-            <td><a class="btn btn-danger"   href="/lesson/delete_lesson/${lesson.id}/">Eliminar</a></td>
+
+            <td> 
+                <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar${lesson.id}">Eliminar
+                </button>
+                <!-- Modal -->
+                <div class="modal fade" id=eliminar${lesson.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">¿Está seguro que quiere eliminar esta lección?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">                          
+                        <p><strong>Recordatorio: </strong>al eliminar una lección se sacarán todos los usuarios que está dentro de ella.
+                         </p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <a class="btn btn-primary"   href="/lesson/delete_lesson/${lesson.id}/">Aceptar</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
             </tr>`
           
       }

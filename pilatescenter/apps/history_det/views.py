@@ -4,9 +4,13 @@ from apps.exercise.models import Exercise
 from apps.create_user.models import CustomUser
 from django.views import View
 from .forms import SearchClasses
+from django.contrib import messages
 
-# Create your views here.
+#------------------------------------------------------------------------------------------
+#the general history
+#------------------------------------------------------------------------------------------
 class ListLessonExerciseHistoryView(View):
+	"""Este se muestra en la opcion barra-historial"""
 	template_name= 'history/list_lesson_exercise_history.html'
 	context = {}
 
@@ -18,6 +22,7 @@ class ListLessonExerciseHistoryView(View):
 		return render(request, self.template_name, context)
 
 class ListHistoryView(View):
+	"""Este se muestra en la opcion barra-historial-ejercicio seleccionado"""
 	template_name= 'history/list_history.html'
 	context = {}
 
@@ -25,7 +30,7 @@ class ListHistoryView(View):
 		form =  SearchClasses(request.POST)
 
 		if form.is_valid():
-			exercise=Exercise.objects.get(id = self.kwargs['pk'])
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
 			lessons = History_det.objects.filter(
 												    id_exercise_fk=exercise,
 												    day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
@@ -45,7 +50,7 @@ class ListHistoryView(View):
 
 	def get(self, request, *args, **kwargs):
 		form = SearchClasses()
-		exercise=Exercise.objects.get(id = self.kwargs['pk'])
+		exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
 		histories = History_det.objects.filter(id_exercise_fk=exercise).order_by("day_lesson")	
 		context = {		
 						'exercise':exercise,
@@ -55,10 +60,14 @@ class ListHistoryView(View):
 
 		return render(request, self.template_name, context)
 
-class SeeHistoryView(View):
-	
+class GeneralSeeHistoryView(View):
 	def get(self, request, *args, **kwargs):
-		history_det = History_det.objects.get(pk=self.kwargs['pk'])
+		try:
+			history_det = History_det.objects.get(pk=self.kwargs['id_history'])
+		except History_det.DoesNotExist:
+			messages.success(request, 'Este historial que desea manipular fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('history:list_history', id_exercise=self.kwargs['id_exercise'])
+
 		users = CustomUser.objects.filter(history_det__id = history_det.id)
 
 		context = {
@@ -68,12 +77,48 @@ class SeeHistoryView(View):
 		return render(request,'history/history.html', context)
 
 
-class DeleteHistoryView(View):
+class GeneralDeleteHistoryView(View):
 	def get(self, request, *args, **kwargs):
 
-		history = History_det.objects.get(id=self.kwargs['id_history'])
+		try:
+			history_det = History_det.objects.get(pk=self.kwargs['id_history'])
+		except History_det.DoesNotExist:
+			messages.success(request, 'Este historial que desea manipular fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('history:list_history', id_exercise=self.kwargs['id_exercise'])
 
-		exercise_id= history.id_exercise_fk.id
-		history.delete()
+		history_det.delete()
 
-		return redirect('history:list_history', pk=exercise_id)
+		return redirect('history:list_history', id_exercise=self.kwargs['id_exercise'])
+
+#------------------------------------------------------------------------------------------
+#the user configuration history
+#------------------------------------------------------------------------------------------
+class UserConfigurationSeeHistoryView(View):
+	def get(self, request, *args, **kwargs):
+		try:
+			history_det = History_det.objects.get(pk=self.kwargs['id_history'])
+		except History_det.DoesNotExist:
+			messages.success(request, 'Este historial que desea manipular fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:user_configuration_history', pk=self.kwargs['id_exercise_det'])
+
+		users = CustomUser.objects.filter(history_det__id = history_det.id)
+
+		context = {
+						'history_det': history_det,
+						'users': users,
+				   }
+		return render(request,'history/history.html', context)
+
+
+class UserConfigurationDeleteHistoryView(View):
+	def get(self, request, *args, **kwargs):
+
+		try:
+			history_det = History_det.objects.get(pk=self.kwargs['id_history'])
+		except History_det.DoesNotExist:
+			messages.success(request, 'Este historial que desea manipular fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:user_configuration_history', pk=self.kwargs['id_exercise_det'])
+
+		history_det.delete()
+
+		return redirect('content_user:user_configuration_history', pk=self.kwargs['id_exercise_det'])

@@ -16,6 +16,7 @@ class UserCreationForm(forms.ModelForm):
 					"last_name",
 					"ci",
 					"phone_number",
+					"email",
 				  )
 
 	def clean_username(self):
@@ -61,6 +62,7 @@ class UserUpdateForm(forms.ModelForm):
 					"last_name",
 					"ci",
 					"phone_number",
+					"email",
 				  )
 	#this validation check if exist another user with the username wheter in lower case
 	#or in upper case

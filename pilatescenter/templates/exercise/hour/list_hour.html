@@ -31,7 +31,32 @@
                   <!-- <td hidden>{{exercise.id}}</td> -->
                       <td>{{hour.hour_lesson}}</td>
                       <td><a class="btn btn-primary" href="{% url 'exercise:update_hour' hour.id day.id %}">Actualizar</a></td>
-                      <td><a class="btn btn-danger"  href="{% url 'exercise:delete_hour' hour.id  day.id %}">Eliminar</a></td>
+
+                      <!-- Boton de que permite eliminar el dia-->
+                      <td> 
+                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar{{hour.id}}">Eliminar
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id=eliminar{{hour.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">¿Está seguro de eliminar esta hora?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <!-- <div class="modal-body">                          
+                               
+                              </div>  -->
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                <a class="btn btn-primary" href="{% url 'exercise:delete_hour' hour.id  day.id %}">Aceptar</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
                   </tr>
               {% endfor %}
             {%else%}

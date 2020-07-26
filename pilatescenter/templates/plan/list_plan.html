@@ -54,11 +54,11 @@
                         <td><a class="btn btn-ver"     href="{% url 'Plan:see_plan' plan.id %}">Ver</a></td>
                         <td><a class="btn btn-primary" href="{% url 'Plan:update_plan_form' plan.id %}">Actualizar</a></td>
                         <td><!-- Button trigger modal -->
-                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#{{plan.name}}">
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#{{plan.id}}">
                               Eliminar
                             </button>
                             <!-- Modal -->
-                            <div class="modal fade" id={{plan.name}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal fade" id={{plan.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                               <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                   <div class="modal-header">
@@ -70,8 +70,23 @@
                                   <div class="modal-body">
                                     <p><strong>RECORDATORIO: </strong>Los usuarios que tienen este plan en uso no pueden tener clases programadas para poder realizar la eliminación.</p>
 
-                                    {%if dic_plans_id|get_value_from_dict:plan.id > 0 %}
-                                      <p><strong>ADVERTENCIA: </strong>Este plan tiene {{dic_plans_id|get_value_from_dict:plan.id }} {%if dic_plans_id|get_value_from_dict:plan.id > 1 %} usuarios {%else%} usuario {%endif%} en estado "No reiniciar". Al eliminarlo se le asignará el plan ninguno pero {%if dic_plans_id|get_value_from_dict:plan.id > 1 %}  conservarán  {%else%}  conservará {%endif%} los datos.</p>
+                                    {%if dic_plans_id|get_value_from_dict:plan.id != null %}
+                                      <p><strong>ADVERTENCIA: </strong>Este plan tiene  a:
+                                      <br> 
+
+                                      {%for user in dic_plans_id|get_value_from_dict:plan.id%}
+                                       <ul> 
+                                        <li>
+                                          <a href="{% url 'content_user:modific_user_form' user.id %}">{{user.username}}</a>
+                                          </li>
+                                        </ul>
+                                      {%endfor%}
+                                      <br> 
+                                      en estado "No reiniciar".
+                                        
+                                        
+                                       Al eliminarlo se le asignará el plan ninguno pero {%if dic_plans_id|get_value_from_dict:plan.id > 1 %}  conservarán  {%else%}  conservará {%endif%} los datos.</p>
+                                        
                                     {%endif%}
                                     
                                   </div>

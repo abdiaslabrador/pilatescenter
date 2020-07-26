@@ -1,7 +1,7 @@
 from django.db import models
 from apps.exercise.models import Exercise
 from apps.create_user.models import CustomUser
-
+from django.db.models import signals
 
 
 
@@ -27,3 +27,8 @@ class Lesson_det(models.Model):
 	def __str__(self):
 		return "Clase nº: " + str(self.id) + "  " +  self.id_exercise_fk.name
 
+	def custom_update_lesson(self):
+		self.cant_in = self.id_user_fk.count()
+		self.quota = self.cant_max - self.cant_in
+		print("este es el estado de saw: " + str(self.saw))
+		self.save()

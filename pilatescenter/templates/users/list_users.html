@@ -12,15 +12,25 @@
   {% endblock %}
 
 {% block content %}
-        <button id="boolean" hidden>active</button>
-        <div class="container" >
-        <a  class="btn btn-warning create_boton"  href="{% url 'content_user:create_user_form' %}">Crear usuario</a>
+        <button id="boolean" hidden>active</button> <!-- esto es para js -->
+        <button id="adminuser_id" hidden>{{user.id}}</button> <!-- esto es para js -->
+
+        <div class="container mt-4" >
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+              <p>{{ message }}</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
         </div>
+        {% endfor %}
+        {% endif %}
 
-        <div class="container" >
-          <div class="table-responsive">
-
-
+        
+        <a  class="btn btn-warning create_boton "  href="{% url 'content_user:create_user_form' %}">Crear usuario</a>
+        
+        <div class="table-responsive">
         <table  class="table panding" style="margin: 30px 0px;">
           <thead class="thead-light">
             <tr>
@@ -39,7 +49,7 @@
           <tbody id="contenido">
                 {% for usuario in users%}
                 <tr>
-                  <td hidden>{{user.id}}</td>
+                  <td hidden>{{usuario.id}}</td>
                   <td>{{usuario.username}}</td>
                   <td>{{usuario.first_name}}</td>
                   <td>{{usuario.last_name}}</td>
@@ -48,7 +58,35 @@
                     <td><a class="btn btn-primary"  href="{% url 'content_user:modific_user_form' usuario.id %}">Actualizar</a></td>
                     {% if usuario != user %}
                       <td><a class="btn btn-bloquear"  href="{% url 'content_user:lock_user' usuario.id %}">Bloquear</a></td>
-                      <td><a class="btn btn-danger"   href="{% url 'content_user:delete_user' usuario.id %}">Eliminar</a></td>
+                      <!-- <td><a class="btn btn-danger"   href="{% url 'content_user:delete_user' usuario.id %}">Eliminar</a></td> -->
+                     <td> 
+                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar{{usuario.id}}">Eliminar
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id=eliminar{{usuario.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">¿Está seguro que quiere eliminar el usuario?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                              <p><strong>Recordatorio: </strong>al eliminar un usuario se sacará de los historiales en donde aparece.
+                                </p>
+                                <p>
+                                A continuación va a eliminar al usuario con el username ""{{usuario.username}}"".
+                                </p>
+                              </div> 
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                <a class="btn btn-primary"  href="{% url 'content_user:delete_user' usuario.id %}">Aceptar</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
                     {%endif%}
 
                 </tr>

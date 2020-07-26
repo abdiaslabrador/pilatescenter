@@ -30,7 +30,32 @@
                   <!-- <td hidden>{{exercise.id}}</td> -->
                       <td>{{day.name}}</td>
                       <td><a class="btn btn-primary" href="{% url  'exercise:list_hour' exercise.id day.id %}">Ver horas</a></td>
-                      <td><a class="btn btn-danger"  href="{% url  'exercise:delete_day' exercise.id day.id %}">Eliminar</a></td>
+
+                      <!-- Boton de que permite eliminar el dia-->
+                      <td> 
+                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar{{day.id}}">Eliminar
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id=eliminar{{day.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">¿Está seguro de eliminar este días?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">                          
+                                <strong>Recordatorio:</strong> al eliminar un día se eliminarán  las horas asociadas a este día.
+                              </div> 
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                <a class="btn btn-primary" href="{% url  'exercise:delete_day' exercise.id day.id %}">Aceptar</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
                   </tr>
               {% endfor %}
 

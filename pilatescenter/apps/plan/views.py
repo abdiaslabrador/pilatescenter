@@ -56,7 +56,7 @@ class ListPlanView(View):
 		plans = Plan.objects.filter(id_exercise_fk=exercise).order_by('name')
 
 		for plan in plans:
-			self.dic_plans_id[plan.id] = Exercise_det.objects.filter(id_plan_fk=plan,  reset=False).count()
+			self.dic_plans_id[plan.id] = CustomUser.objects.filter(exercise_det__id_plan_fk=plan,  exercise_det__reset=False)
 
 		print("dfasfd"+ str(self.dic_plans_id))
 
