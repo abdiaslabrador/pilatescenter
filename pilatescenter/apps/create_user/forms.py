@@ -16,6 +16,7 @@ class UserCreationForm(forms.ModelForm):
 					"last_name",
 					"ci",
 					"phone_number",
+					"email",
 				  )
 
 	def clean_username(self):
@@ -61,6 +62,7 @@ class UserUpdateForm(forms.ModelForm):
 					"last_name",
 					"ci",
 					"phone_number",
+					"email",
 				  )
 	#this validation check if exist another user with the username wheter in lower case
 	#or in upper case
@@ -109,3 +111,7 @@ class ChangePasswordForm(forms.ModelForm):
 		if password and password2 and password != password2:
 			raise forms.ValidationError("Contraseñas no coinciden")
 		return password2
+
+class SearchClasses(forms.Form):
+	since = forms.DateField(required=True)
+	until = forms.DateField(required=True)

@@ -19,7 +19,7 @@ class LoginView(View): #class based view
 			#the username is coverted in lowercase in the forms.py
 			user= CustomUser.objects.get(username=form.cleaned_data['username'])
 			login(request, user)
-			return redirect('content_user:create_user_form')
+			return redirect("lesson:list_lesson_exercise_action")
 		else:
 			print(form.errors)
 		return render(request, self.template_name, {'form':form})

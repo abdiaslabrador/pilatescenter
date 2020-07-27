@@ -1,0 +1,92 @@
+{% extends "base_template/base_userconfiguration_template.html" %}
+{% load static %}
+
+{% block custom_css %}
+<style>
+  h2 {
+    font-family: verdana, sans-serif;
+    font-Size: 30px;
+    font-Weight: ligther;
+    font-Style: normal;
+    pandding: 30px;
+    margin: 30px;
+  }
+</style>
+{% endblock %}
+
+<title>{% block title %}Resumen del usuario{% endblock %}</title>
+
+{% block sidebar %}
+<div class="sidebar">
+  <h4 class="text-center"><strong>Actualizando</strong></h4>
+  <a  href='{% url "content_user:user_configuration_class" exercise_det.id %}'>Clases</a>
+  <a class="active" href="{% url 'content_user:user_configuration_plan' exercise_det.id %}">Resumen</a>
+  <a  href="{% url 'content_user:user_configuration_history' exercise_det.id %}">Historial</a>
+  <a  href="{% url 'content_user:user_configuration_reset' exercise_det.id %}">Reiniciar</a>
+  <a  href="{% url 'content_user:modific_user_form' user_to_modific.id %}">Volver</a>
+</div>
+{% endblock %}
+
+{% block content %}
+ <div class="container mt-4">
+  <h2 class="text-center"><strong>{{exercise_det.name|title }}</strong> - Resumen del usuario </h2>
+  <h5>Username: {{user_to_modific.username}}</h5>
+  <h5>Nombre: {{user_to_modific.first_name}}</h5>
+  <h5>Apellido: {{user_to_modific.last_name}}</h5>
+  <br/>
+
+
+  {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+              <p>{{ message }}</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+  <p><strong>Plan actual: </strong>{{exercise_det.id_plan_fk.name}} {%if exercise_det.reset != False %}  <a href="{% url 'content_user:user_configuration_change_plan' exercise_det.id %}">CAMBIAR PLAN</a>{%endif%}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    {{form.non_field_errors}}
+    <div class="row">
+      <label for="{{form.total_days.id_for_label}}">Tolta de dias:
+      <input type="number" name="{{form.total_days.name}}"  min=0 max=28 value="{{form.total_days.value}}" id="{{form.total_days.id_for_label}}" {%if exercise_det.reset == False %} readonly="readonly" {%endif%} required>
+      </label>
+    </div>
+    <div class="row">
+      <label for="{{form.enable_lessons.id_for_label}}">Disponibles:
+      <input type="number" name="{{form.enable_lessons.name}}"  min=0 max=28 value="{{form.enable_lessons.value}}" id="{{form.enable_lessons.id_for_label}}" {%if exercise_det.reset == False %} readonly="readonly" {%endif%}  required>
+       </label>
+    </div>
+    <div class="row">
+      <label for="{{form.saw_lessons.id_for_label}}">Vistas:
+      {{form.saw_lessons}}
+
+      </label>
+    </div>
+    <div class="row"> 
+      <label for="{{form.bag.id_for_label}}">Bolsa:
+     {{form.bag}}
+      </label>
+    </div>
+    <div class="row">
+      <label for="{{form.scheduled_lessons.id_for_label}}">Programadas:
+      {{form.scheduled_lessons}}
+    </div>
+    <div class="row">
+      <label for="{{form.oportunities.id_for_label}}">Oportunidades:
+      <input type="number" name="{{form.oportunities.name}}"  min=0 max=28 value="{{form.oportunities.value}}" id="{{form.oportunities.id_for_label}}" {%if exercise_det.reset == False %} readonly="readonly" {%endif%} required>
+      </label>
+    </div>
+    
+    {%if exercise_det.reset != False %}
+    <button class="btn btn-warning panding" type="reset">Cancelar</button>
+    <input class="btn btn-primary panding"type="submit" value="Guardar">
+    {%endif%}
+  </form>
+  </div>
+{%endblock%}

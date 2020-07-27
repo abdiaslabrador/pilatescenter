@@ -35,7 +35,7 @@ class UserManager(BaseUserManager):
 		user.save(using=self._db)
 		return user
 
-	def create_user(self, username, first_name, last_name, password=None):
+	def create_user(self, username, first_name, last_name, ci, email, password=None):
 
 		if not username:
 			raise ValueError('Los usuarios tienen que tener username')
@@ -48,6 +48,8 @@ class UserManager(BaseUserManager):
 		user = self.model(  username=username,
 							first_name=first_name,
 							last_name=last_name,
+							ci=ci,
+							email=email,
 						  )
 		user.set_password(password)
 		user.save(using=self._db)
@@ -55,12 +57,14 @@ class UserManager(BaseUserManager):
 		return user
 
 
-	def create_superuser(self, username, first_name, last_name, password):
+	def create_superuser(self, username, first_name, last_name, ci, email, password):
 
 		user =self.create_user(username,
 							    password=password,
 							    first_name=first_name,
 							    last_name=last_name,
+							    ci=ci,
+							    email=email,
 							   )
 		user.is_staff=True
 		user.is_superuser=True
@@ -73,7 +77,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 	last_name		= models.CharField(null=False, blank=False, max_length=20)
 	ci 				= models.CharField(null=True, blank=False, max_length=9)
 	phone_number	= models.CharField(null=True, blank=False, max_length=11)
-	email 			= models.EmailField(null=True, blank=True, max_length=255,unique=True)
+	email 			= models.EmailField(null=False, blank=False, max_length=255,unique=True)
 
 	is_active		= models.BooleanField(default=True)
 	is_staff		= models.BooleanField(default=False)
@@ -83,7 +87,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 	EMAIL_FIELD		= 'email'
 	USERNAME_FIELD	= 'username'
-	REQUIRED_FIELDS = ['first_name', 'last_name']
+	REQUIRED_FIELDS = ['first_name', 'last_name', 'ci','email']
 
 	objects = UserManager()
 

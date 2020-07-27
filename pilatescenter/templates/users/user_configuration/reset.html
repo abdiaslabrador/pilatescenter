@@ -1,0 +1,62 @@
+{% extends "base_template/base_userconfiguration_template.html" %}
+{% load static %}
+
+{% block custom_css %}
+<style>
+  h2 {
+    font-family: verdana, sans-serif;
+    font-Size: 30px;
+    font-Weight: ligther;
+    font-Style: normal;
+    pandding: 30px;
+    margin: 30px;
+  }
+</style>
+{% endblock %}
+
+<title>{% block title %}Resetear usuario{% endblock %}</title>
+
+{% block sidebar %}
+  <div class="sidebar">
+      <h4 class="text-center"><strong>Actualizando</strong></h4>
+      <a  href="{% url 'content_user:user_configuration_class' exercise_det.id %}">Clases</a>
+      <a href="{% url 'content_user:user_configuration_plan' exercise_det.id %}">Resumen</a>
+      <a  href="{% url 'content_user:user_configuration_history' exercise_det.id %}">Historial</a>
+      <a  class="active" href="{% url 'content_user:user_configuration_reset' exercise_det.id %}">Reiniciar</a>
+      <a  href="{% url 'content_user:modific_user_form' user_to_modific.id %}">Volver</a>
+  </div>
+{% endblock %}
+
+{% block content %}
+  
+
+  <div class="container mt-4">
+    <h2 class="text-center">Reiniciar el usuario</h2>
+    <h5>Username: {{user_to_modific.username}}</h5>
+    <h5>Nombre: {{user_to_modific.first_name}}</h5>
+    <h5>Apellido: {{user_to_modific.last_name}}</h5>
+    <br/>
+
+
+    <form method="post">
+      {% csrf_token %}
+      {{form.non_field_errors}}
+      <div class="raw">
+        Reiniciar al apretar el botòn reiniciar
+        {{form.reset}}
+      </div>
+
+      <div class="row">
+       {{form.id_user_fk}}
+      </div>
+
+      <div class="row">
+       {{form.id_exercise_fk}}
+      </div>
+
+      <input type="submit" value="Guardar" class="btn btn-primary">
+    </form>
+  </div>
+  <br>
+
+{%endblock%}

@@ -7,13 +7,17 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic.edit import UpdateView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-
+from django.contrib import messages
 #models
 from .models import Plan
 from apps.exercise_det.models import Exercise_det
 from apps.exercise.models import Exercise
+from apps.create_user.models import CustomUser
+
 #forms that will be used
 from .forms import CreatePlanForm, UpdatePlanForm
+
+
 
 
 
@@ -28,44 +32,61 @@ class CreatePlanView(View):
 			#   print(form.cleaned_data)
 			# print(form.is_bound)
 			form.save()
-			return redirect('Plan:list_plan')
+			return redirect('Plan:list_plan', id_exercise= + self.kwargs["id_exercise"])
 		else:
 			print(form.errors.as_data)
 			print("something happened")
 		return render(request, self.template_name, {'form':form})
 
 	def get(self, request, *args, **kwargs):
-		# form =  CreatePlanForm(initial={'name': 'Pepe'})
-		form =  CreatePlanForm()
+		exercise = Exercise.objects.get(id =self.kwargs["id_exercise"])
+		form =  CreatePlanForm(initial = { 'id_exercise_fk': exercise})
 		# (form.errors.as_data)
 		return render(request, self.template_name, {'form':form})
 
+
 class ListPlanView(View):
+	template_name='plan/list_plan.html'
+	contexto= {}
+	dic_plans_id={}
+
 	def get(self, request, *args, **kwargs):
-		contexto= {}
-		diccionario_planes={}
-		exercises = Exercise.objects.all().order_by("name")
-		
-		if exercises.count() > 0:
-			for exercise in exercises:
-				diccionario_planes[exercise.name] = Plan.objects.filter(id_exercise_fk__name__iexact=exercise.name).order_by('name')
-			context = {	
-						'diccionario_planes' : diccionario_planes
-			}
-		return render(request,'plan/list_plan.html', context)
+
+		exercise = Exercise.objects.get(id =self.kwargs["id_exercise"])
+		plans = Plan.objects.filter(id_exercise_fk=exercise).order_by('name')
+
+		for plan in plans:
+			self.dic_plans_id[plan.id] = CustomUser.objects.filter(exercise_det__id_plan_fk=plan,  exercise_det__reset=False)
+
+		print("dfasfd"+ str(self.dic_plans_id))
+
+		self.context = {
+					'exercise': exercise,
+					'plans': plans,
+					'dic_plans_id': self.dic_plans_id,
+					}
+
+		return render(request, self.template_name, self.context)
 
 class UpdatePlanView(View):
+	template_name = 'plan/update_plan.html'
+	
 	def post(self, request, *args, **kwargs):
 		plan= Plan.objects.get(id=self.kwargs['pk'])
+		exercise_obj = Exercise.objects.get(plan__pk=self.kwargs['pk'])
 		form = UpdatePlanForm(request.POST, instance=plan)
+
 		if form.is_valid():
 			form.save()
 			# print("ES VALIDO!")
-			return redirect('Plan:list_plan')
-		# else:
-		# 	print("no es válido")
-
-		return render(request,'plan/update_plan.html', {'form':form})
+			return redirect('Plan:list_plan', id_exercise=plan.id_exercise_fk.id)
+		else:
+			print("no es válido")
+			context={
+						'name_exercise': exercise_obj.name,
+						'form':form
+				}
+		return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
 		plan = Plan.objects.get(id=self.kwargs['pk'])
@@ -76,22 +97,28 @@ class UpdatePlanView(View):
 					'name_exercise': exercise_obj.name,
 					'form':form
 				}
-		return render(request,'plan/update_plan.html', context)
+		return render(request, self.template_name, context)
 
 class DeletePlanView(View):
 	def get(self, request, *args, **kwargs):
 		plan = Plan.objects.get(pk=self.kwargs['pk'])
-		"""exercise_dets = Exercise_det.objects.filter(id_plan_fk = self.kwargs['pk'])
-		not_one_plan  = Plan.objects.get(name__iexact= "ninguno")
+		exercises_det = Exercise_det.objects.filter(id_plan_fk=plan)
 
-		if exercise_dets.count() > 0:
-			for exercise_det in exercise_dets:
-				exercise_det.id_plan_fk = not_one_plan
-				exercise_det.save()"""
+		for exercise_det in exercises_det:
+			if exercise_det.scheduled_lessons > 0:	
+				messages.success(request, 'No se puede eliminar un plan con usuarios con clases programadas usando este plan.', extra_tags='alert-danger')
+				return redirect('Plan:list_plan', id_exercise=plan.id_exercise_fk.id)
+
+
+		print("Se ha eliminado el plan")
 		plan.delete()
-		return redirect('Plan:list_plan')
+
+		return redirect('Plan:list_plan', id_exercise=plan.id_exercise_fk.id)
+
+
 
 class See(View):
 	def get(self, request, *args, **kwargs):
 		plan = Plan.objects.get(pk=self.kwargs['pk'])
 		return render(request, "plan/see_plan.html", {"plan":plan})
+

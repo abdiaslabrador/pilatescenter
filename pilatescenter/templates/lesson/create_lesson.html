@@ -1,0 +1,50 @@
+{% extends "base_template/base_tamplate.html" %}
+{% load static %}
+
+  {% block title %}Crear clase{% endblock %}
+
+  {% block custom_css %}
+  {% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card panding">
+    <div class="card-header" >
+      <h5 class="card-title">Creación de clases</h5>
+    </div>
+
+
+ 
+
+    <div class="card-body">
+          <div class="container">
+                <form method="POST" autocomplete="off">
+                  {% csrf_token %}
+                  <div class="row">
+                  {{form.non_field_errors}}
+                  </div>
+
+                  <div class="row">
+                    <label for="{{form.id_exercise_fk.id_for_label}}">{{form.id_exercise_fk.label}}
+                     {{form.id_exercise_fk}}
+                    </label>
+                    
+                  </div>
+                  <div class="row">
+                    <label for="{{form.day_lesson.id_for_label}}">{{form.day_lesson.label}}
+                     <input type="date" name="{{form.day_lesson.name}}">
+                    </label>
+                    {{form.day_lesson.errors}}
+                  </div>
+                  <br>
+                  <input class='btn btn-primary' type="submit" value="Buscar hora">
+                </form>
+          </div>
+        </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block custom_js %}
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base_template/base_tamplate.html" %}s
+{% load static %}
+
+{% block title %}Clases acciones{% endblock %}
+
+  {% block content %}
+      <div class="container mt-4">
+        <h1 class="text-center">Acciones</h1>
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+              <p>{{ message }}</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        
+        <div class="table-responsive">
+          <table class="table panding" style="margin: 30px 0px;">
+          <thead class="thead-light">
+            <tr>
+                <th colspan="2">Lista de ejercicios</th>
+
+            </tr>
+            <tr>
+                <!--<th>Id</th>-->
+                <th>Nombre</th>
+                <th class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+              {% for exercise in exercises%}
+                  <tr>
+                  <!-- <td hidden>{{exercise.id}}</td> -->
+                      <td>{{exercise.name}}</td>
+                      <td><a class="btn btn-ver" href="{% url 'lesson:list_lesson' exercise.id %}">Ver</a></td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+          </table>
+          </div>
+        <br>
+          </div>
+{% endblock %}

@@ -10,10 +10,15 @@ class CreatePlanForm(forms.ModelForm):
 		fields= (
 					"name",
 					"total_days",
-					"id_exercise_fk",
 					"oportunities",
-					"description"
+					"description",
+					"id_exercise_fk",
+
 				)
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['id_exercise_fk'].widget.attrs.update({'hidden': 'True'})
 
 		
 
@@ -46,7 +51,6 @@ class CreatePlanForm(forms.ModelForm):
 
 class UpdatePlanForm(forms.ModelForm):
 	primarykey 		= forms.IntegerField(widget=forms.HiddenInput())
-	id_exercise_fk	= forms.ModelChoiceField(queryset=Exercise.objects.all(), widget=forms.HiddenInput())
 	
 	class Meta:
 		model= Plan
@@ -57,7 +61,10 @@ class UpdatePlanForm(forms.ModelForm):
 					"description",
 					"id_exercise_fk"
 				)
-
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields['id_exercise_fk'].widget.attrs.update({'hidden': 'True'})
+		
 	def clean(self):
 		clean = super(UpdatePlanForm, self).clean()
 
@@ -85,7 +92,7 @@ class UpdatePlanForm(forms.ModelForm):
 		plans = Plan.objects.filter(id_exercise_fk=exercise_obj.pk).exclude(id=primarykey)
 		
 		for plan in plans:
-			if name == plan.name.lower():
+			if name == plan.name.upper():
 				raise forms.ValidationError("Ya este plan existe este tipo de ejercicio")
 
 		self.cleaned_data['name']=name.upper()

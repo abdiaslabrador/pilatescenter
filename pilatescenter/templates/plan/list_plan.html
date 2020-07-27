@@ -1,25 +1,37 @@
-<!doctype html>
 {% extends "base_template/base_tamplate.html" %}
 {% load static %}
+{% load plan_extras %}  <!-- custom tags filter -->
+
 
   {% block title %}Lista de planes{% endblock %}
 
   {% block content %}
 
-        {%  if diccionario_planes  %}
+
         <div class="container mt-4">
-          <a class="btn btn-warning" href="{% url 'Plan:create_plan_form' %}">Crear plan</a>
+          <a class="btn btn-warning" href="{% url 'Plan:create_plan_form' exercise.id %}">Crear plan</a>
         </div>
 
+
+
             <div class="container mt-4">
-            <!-- the diccionari contains the exercices and the plans asociated. i do a for to print each exercise with his plans -->
-            {% for k , v in diccionario_planes.items%}
+            <!-- El mensaje -->
+            {% if messages %}
+              {% for message in messages %}
+              <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                    <p>{{ message }}</p>
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              {% endfor %}
+            {% endif %}
 
             <div class="table-responsive">
             <table class="table" style="box-shadow: 2px 2px 20px 0px rgba(0,0,0,0.4);"> 
               <thead class="thead-light">
                 <tr>
-                    <th colspan="6">Planes de {{k}}</th>
+                    <th colspan="6">Planes de {{exercise.name}}</th>
                 </tr>
                 <tr>
                     <!-- <th>Id</th> -->
@@ -30,44 +42,75 @@
                 </tr>
               </thead>
               <tbody>
-                  {% for plan in v %}
+                {%if plans %}
+                
+                  {% for plan in plans %}
                       <tr>
                         <!-- <td>{{plan.pk}}</td> -->
+
                         <td>{{plan.name}}</td>
                         <td>{{plan.total_days}}</td>
                         <td>{{plan.oportunities}}</td>
                         <td><a class="btn btn-ver"     href="{% url 'Plan:see_plan' plan.id %}">Ver</a></td>
                         <td><a class="btn btn-primary" href="{% url 'Plan:update_plan_form' plan.id %}">Actualizar</a></td>
-                        <td><a class="btn btn-danger"  href="{% url 'Plan:delete_plan' plan.id %}">Eliminar</a></td>
+                        <td><!-- Button trigger modal -->
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#{{plan.id}}">
+                              Eliminar
+                            </button>
+                            <!-- Modal -->
+                            <div class="modal fade" id={{plan.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">¿Está seguro?</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body">
+                                    <p><strong>RECORDATORIO: </strong>Los usuarios que tienen este plan en uso no pueden tener clases programadas para poder realizar la eliminación.</p>
+
+                                    {%if dic_plans_id|get_value_from_dict:plan.id != null %}
+                                      <p><strong>ADVERTENCIA: </strong>Este plan tiene  a:
+                                      <br> 
+
+                                      {%for user in dic_plans_id|get_value_from_dict:plan.id%}
+                                       <ul> 
+                                        <li>
+                                          <a href="{% url 'content_user:modific_user_form' user.id %}">{{user.username}}</a>
+                                          </li>
+                                        </ul>
+                                      {%endfor%}
+                                      <br> 
+                                      en estado "No reiniciar".
+                                        
+                                        
+                                       Al eliminarlo se le asignará el plan ninguno pero {%if dic_plans_id|get_value_from_dict:plan.id > 1 %}  conservarán  {%else%}  conservará {%endif%} los datos.</p>
+                                        
+                                    {%endif%}
+                                    
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                    <a class="btn btn-primary"  href="{% url 'Plan:delete_plan' plan.id %}">Aceptar</a>
+
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
                       </tr>
+                      <!-- <td><a class="btn btn-danger"  href="{% url 'Plan:delete_plan' plan.id %}">Eliminar</a></td> -->
                   {% endfor %}
+                  {%else%}
+                      <tr>
+                        <td>No hay Planes</td>
+                      </tr>
+                  {%endif%}
                 </tbody>
                 </table>
               </div>
-              <br>
-            {% endfor %}
             </div>
-        {%else%}
-        <div class="container mt-4">
-        <table class="table" style="box-shadow: 2px 2px 20px 0px rgba(0,0,0,0.4);">
-          <thead class="thead-light">
-            <tr>
-                <th colspan="6">Planes</th>
-            </tr>
-            <tr>
-                <!-- <th>Id</th> -->
-                <th>Nombre</th>
-                <th>Dias al mes</th>
-                <th>Oportunidades de cambio</th>
-                <th colspan="3" class="text-center">Acción</th>
-            </tr>
-          </thead>
-          <body>
-            <tr>
-              <td>No hay ejercicios creados, para poder asociar los planes</td>
-            </tr>
-          </body>
-        </table>
-        </div>
-        {% endif %}
-  {% endblock %}
+
+
+{% endblock %}

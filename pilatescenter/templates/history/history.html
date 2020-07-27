@@ -1,0 +1,38 @@
+{% extends "base_template/base_tamplate.html" %}
+{% load static %}
+
+{% block title %}Historial{% endblock %}
+
+
+      {% block content %}
+      <div class="container ">
+      <div class="card panding">
+        <div class="card-header" >
+          <h5 class="card-title">Historial</h5>
+        </div>
+        
+
+        <div class="card-body">
+          <div class="container">
+            <h3>{{history_det.day_lesson|date:"l. M d, Y"}}</h3>
+            <h5>
+              Cantidad permitida: {{history_det.cant_max}}
+              Cantidad en la clase: {{history_det.cant_in}}
+              Cupos: {{history_det.quota}}
+            </h5>
+              
+              <ul>
+                <li>Hora de chance: {{history_det.hour_chance}}</li>
+                <li>Hora de comienzo: {{history_det.hour_lesson}}</li>
+                <li>Hora de terminar: {{history_det.hour_end}}</li>
+              </ul>
+              
+
+                {% for user in users%}
+                  <p><strong>Username:</strong> <a href="{% url 'content_user:modific_user_form' user.id %}">{{user.username}}</a>  <strong>Nombre:</strong> {{user.first_name}}   <strong>Apellido:</strong> {{user.last_name}}   <strong>C.I:</strong> {{user.ci}}</p>
+                {% endfor %}
+          </div>
+        </div>
+    </div>
+    </div>
+    {% endblock %}

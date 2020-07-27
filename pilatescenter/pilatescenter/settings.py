@@ -25,7 +25,7 @@ STATICFILES_DIRS = [
                     ]
 
 
-TIME_INPUT_FORMATS= ['%I:%M:%p']
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'apps.exercise',
     'apps.exercise_det',
     'apps.lesson_det',
+    'apps.history_det',
 ]
 # 'apps.exercise_det',
 
@@ -144,10 +145,16 @@ USE_L10N = False
 
 USE_TZ = True
 
+TIME_INPUT_FORMATS= ['%I:%M:%p']
 
+#email
+EMAIL_HOST= 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS= True
+EMAIL_HOST_USER= 'projects.testing.email@gmail.com'
+EMAIL_HOST_PASSWORD= 'Dani1993?3'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-# Static files (CSS, JavaScript, Images)
-#
 
 #/static/ es el directorio de principal para archivos css y javascript, que trabaja con
 #STATICFILES_DIRS para pasarle los archivos a static_root

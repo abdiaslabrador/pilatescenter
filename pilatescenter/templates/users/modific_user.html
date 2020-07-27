@@ -1,6 +1,5 @@
-<!doctype html>
 {% extends "base_template/base_tamplate.html" %}
-
+{% load static %}
 
   {% block title %}Modificación de usuario{% endblock %}
       {% block content %}
@@ -35,11 +34,17 @@
             <div class="row">
                       <input type="text" class="col-6 col-md-4" pattern="[0-9]{0,11}" name="phone_number" placeholder="teléfono" minlength="11" maxlength="11" required value="{{form.phone_number.value}}">
             </div>
+
+            {{form.email.errors}}
+            <div class="row">
+                 <input type="email" class="col-6 col-md-4" name="email" placeholder="email" value="{{form.email.value}}"required>
+            </div>
+
           <br>
             <button class='btn btn-primary' type="submit">actualizar usuario</button>
 
       </form>
-      <a  href="{% url 'content_user:change_password_form' 1  %}">Cambiar contraseña</a>
+      <a  href="{% url 'content_user:change_password_form' user_to_modific.id  %}">Cambiar contraseña</a>
     </div>
     </div>
 
@@ -54,7 +59,7 @@
         {% for exercise_det in exercises_det_list %}
           <tr>
             <td>{{exercise_det.name}}</td>
-            <td><a class="btn btn-success" href='{% url "content_user:exercise_configuration_class" exercise_det.id %}'>Ver</a></td>
+            <td><a class="btn btn-success" href='{% url "content_user:user_configuration_class" exercise_det.id %}'>Ver</a></td>
           </tr>
         {%endfor%}
       </tbody>

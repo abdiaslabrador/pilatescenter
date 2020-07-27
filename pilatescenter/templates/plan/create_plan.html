@@ -1,4 +1,5 @@
 {% extends "base_template/base_tamplate.html" %}
+{% load static %}
 
   {% block title %}Creación de planes{% endblock %}
 
@@ -38,7 +39,7 @@
                     </div>
 
                     <div class="row">
-                        <label for="{{form.id_exercise_fk.id_for_label}}">Tipo de ejercicio:</label>
+                      <!-- this attribute is hidden -->
                         {{form.id_exercise_fk}}
                     </div>
                     <br>

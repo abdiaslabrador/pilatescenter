@@ -1,6 +1,5 @@
-<!doctype html>
 {% extends "base_template/base_tamplate.html" %}
-
+{% load static %}
 
   {% block title %}Registro de usuario{% endblock %}
 
@@ -33,6 +32,11 @@
 
             <div class="row">
                       <input type="text" class="col-6 col-md-4" pattern="[0-9]{0,11}" name="phone_number" placeholder="teléfono 04141234567" minlength="11" maxlength="11" required>
+            </div>
+
+            {{form.email.errors}}
+            <div class="row">
+                 <input type="email" class="col-6 col-md-4"  name="email" placeholder="email" required>
             </div>
 
             <div class="row">
