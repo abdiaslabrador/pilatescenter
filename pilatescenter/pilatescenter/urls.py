@@ -33,6 +33,8 @@ urlpatterns = [
     path('users/', include('apps.create_user.urls')),
     path('lesson/', include('apps.lesson_det.urls')),
     path('history/', include('apps.history_det.urls')),
+    path('user_site/', include('apps.user_site.user_login.urls')),
+    path('user_site/home/', include('apps.user_site.user_home.urls')),
     path('password_reset/', PasswordResetView.as_view(template_name='password_reset/password_reset_form.html', email_template_name='password_reset/password_reset_email.html'), name= 'password_reset'),
     path('password_reset/done', PasswordResetDoneView.as_view(template_name='password_reset/password_reset_done.html'), name= 'password_reset_done'),
     path('reset/<uidb64>/<token>/', PasswordResetConfirmView.as_view(template_name='password_reset/password_reset_confirm.html'), name= 'password_reset_confirm'),
@@ -41,3 +43,5 @@ urlpatterns = [
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+    # path('user_site/', include('apps.history_det.urls')),

@@ -1,0 +1,97 @@
+<!doctype html>
+{% load static %}
+<html lang="es">
+    <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <link rel="shortcut icon" href="{% static 'pictures/favinco.ico' %}" />
+      <!-- Bootstrap CSS -->
+      <link   rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+      <!--Esto es para los botones-->
+      <link   rel = "stylesheet" type="text/css" href="{% static 'css/customstyles.css' %}">
+      <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+      {% block custom_css %}
+      {% endblock %}
+      <title>{% block title %}{% endblock %}</title>
+
+    </head>
+
+    <body style="background-color: white;">
+
+      <nav class="navbar navbar-expand-sm navbar-dark sticky-top bg-dark  container-fluid">
+        <a class="navbar-brand" href="#">
+          <img src="{% static 'pictures/logo.jpg' %}" width="30" height="30" class="d-inline-block align-top" alt="">
+        <strong>PilatesZenter</strong>
+        </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse"
+      data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+      aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse"  id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+              </li>
+                <a  class="nav-item nav-link"  href="#">Inicio</a>
+              </li>
+              <!-- <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Usuarios
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{% url 'content_user:list_user' %}">Usuarios</a>
+                        <a class="dropdown-item" href="{% url 'content_user:list_locked_user' %}">Bloqueados</a>
+                    </div>
+
+              </li>
+              <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Clases
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{% url 'lesson:create_lesson_form' %}">Crear</a>
+                        <a class="dropdown-item" href="{% url 'lesson:list_lesson_exercise_action' %}">Acciones</a>
+                        <a class="dropdown-item" href="{% url 'history:list_lesson_exercise_history' %}">Historial</a>
+                    </div>
+              </li> -->
+              <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Configuraciones
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a  class="dropdown-item" href="#">Datos</a>
+                    </div>
+              </li>
+                <a  class="nav-item nav-link"  href="/logout/">Salir</a>
+              </li>
+            </ul>
+        </div>
+      </nav>
+
+
+        {% block content %}
+
+        
+        {% endblock %}
+
+      
+        {% block footer %}
+    
+          <footer class="container-fluid _footer">
+            &copy; 2020 Abdías Labrador
+          </footer>
+        {% endblock %}
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="{% static 'js/jquery-migrate-1.4.1.min.js' %}"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/ .js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>-->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    {% block custom_js %}
+    {% endblock %}
+
+  </body>
+</html>

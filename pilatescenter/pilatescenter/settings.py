@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'apps.exercise_det',
     'apps.lesson_det',
     'apps.history_det',
+    'apps.user_site.user_login',
 ]
 # 'apps.exercise_det',
 
