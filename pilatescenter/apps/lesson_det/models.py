@@ -4,7 +4,6 @@ from apps.create_user.models import CustomUser
 from django.db.models import signals
 
 
-
 # Create your models here.
 class Lesson_det(models.Model):
 	cant_max = models.IntegerField(default=0, null=True, blank=True)
@@ -25,7 +24,7 @@ class Lesson_det(models.Model):
 	id_exercise_fk = models.ForeignKey(Exercise, null=True, blank=True, on_delete=models.CASCADE, db_column='id_exercise_fk')
 	
 	def __str__(self):
-		return "Clase nº: " + str(self.id) + "  " +  self.id_exercise_fk.name
+		return str(self.id)
 
 	def custom_update_lesson(self):
 		self.cant_in = self.id_user_fk.count()

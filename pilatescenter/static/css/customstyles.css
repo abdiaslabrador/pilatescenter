@@ -5,6 +5,14 @@
 		background-color: #212529;
 	}
 
+._oportunities_bar /*en el base_template.html al final*/
+	{
+		color: white;
+		text-align: center;
+		background-color:    #343a40;
+		font-size: 20px;
+	}
+
 .btn-bloquear /*Boton que se utiliza para bloquer a los usuarios*/
 	{
 		color: white;

@@ -189,6 +189,7 @@ class ResetUsersView(View):
 		lessons = Lesson_det.objects.filter(saw=False, id_exercise_fk=exercise).order_by("day_lesson")
 		for lesson in lessons:
 			if lesson.id_user_fk.all().count() > 0: #obtengo todos los usurios de la clase y pregunto is es mayor a 0
+				print(lesson.id)
 				messages.success(self.request, 'Hay almenos una clase con usuarios dentro. No se puede reinicar un ejercicio con usuarios en clases', extra_tags='alert-danger')
 				return redirect('exercise:list_exercise')
 

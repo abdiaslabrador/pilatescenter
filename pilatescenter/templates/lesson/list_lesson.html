@@ -7,6 +7,18 @@
 
 
       <div class="container mt-4">
+         <!-- El mensaje -->
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+              <p>{{ message }}</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endfor %}
+      {% endif %}
+
       <H1 class="text-center">{{exercise.name|title}} - Lista de clases</H1>
         <!-- Buscador de clases -->
         <form method="post">

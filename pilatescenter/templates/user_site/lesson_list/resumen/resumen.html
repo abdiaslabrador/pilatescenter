@@ -1,0 +1,42 @@
+{% extends "user_site/base_template/base_template.html" %}
+{% load static %}
+
+  {% block title %}Resumen{% endblock %}
+
+
+      {% block content %}
+
+      <div class="container">
+      <div class="card panding">
+        <div class="card-header" >
+          <h5 class="card-title">INFORMACIÓN DE CLASES</h5>
+        </div>
+
+        <div class="card-body">
+        	Ejercicio: {{exercise_det.id_exercise_fk.name}}
+        	<ul>
+        		<li>Plan: {{exercise_det.id_plan_fk.name}}</li>
+        		<li>Total de clases: {{exercise_det.total_days}}</li>
+        		<li>Disponibles: {{exercise_det.enable_lessons}}</li>
+        		<li>Vistas: {{exercise_det.saw_lessons}}</li>
+        		<li>Reservadas: {{exercise_det.bag}}</li>
+        		<li>Programadas: {{exercise_det.scheduled_lessons}}</li>
+        		<li>Oportunidades: {{exercise_det.oportunities}}</li>
+        	</ul>
+      	</div>
+      	<div class="card-header" >
+          <h5 class="card-title">DESCRIPCIÓN DEL PLAN QUE POSEO</h5>
+        </div>
+
+        <div class="card-body">
+        	<ul>
+        		<li>Plan: {{exercise_det.id_plan_fk.name}}</li>
+        		<li>Clases totales: {{exercise_det.id_plan_fk.total_days}}</li>
+        		<li>Oportunidades para reprogramar: {{exercise_det.id_plan_fk.oportunities}}</li>
+        	</ul>
+      	</div>
+    </div>
+    </div>
+
+
+    {% endblock %}

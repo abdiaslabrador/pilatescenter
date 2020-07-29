@@ -1,0 +1,102 @@
+{% extends "user_site/base_template/base_template.html" %}
+{% load static %}
+
+{% block title %}Lista de lecciones{% endblock %}
+
+  {% block content %}
+      <div class="container mt-4">
+
+        <!-- El mensaje -->
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+              <p>{{ message }}</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endfor %}
+      {% endif %}
+
+      <H1 class="text-center">{{exercise_det.id_exercise_fk.name|title}} - Lista de clases</H1>
+
+      <div class="d-flex">
+        <a class="btn btn-warning panding mr-auto" href="{% url 'user_lesson:resumen' exercise_det.id %}">Resumen</a>
+        <a class="btn btn-primary panding " href="{% url 'user_lesson:bag_search' exercise_det.id %}">Reservas {{exercise_det.bag}}</a>
+      </div>
+
+
+      {% if exercise_det.oportunities > 0 %}
+      <div class = "_oportunities_bar">Oportunidades para reprogramar: {{exercise_det.oportunities}}</div>
+      {%else%}
+      <div class = "_oportunities_bar">Ya no tinenes oportunidades para reservar</div>
+      {%endif%}
+      
+
+        <div class="table-responsive">
+          <table class="table panding" style="margin: 30px 0px;">
+          <thead class="thead-light">
+            <tr>
+                <th colspan="5">Lista de clases</th>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Tipo</th>
+                <th colspan="3" >Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if lessons %}
+              {% for lesson in lessons%}
+                  <tr>
+                  <td >{{lesson.id}}</td>
+                      <td>{{lesson.day_lesson|date:"l. M d, Y"}}</td>
+                      <td>{{lesson.hour_lesson}}</td>
+                      <td>{{lesson.id_exercise_fk.name}}</td>
+
+                       <!-- Boton de que permite eliminar la leccion-->
+                       {% if exercise_det.oportunities > 0 %}
+                      <td> 
+                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#bolsa{{lesson.id}}">Reservar
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id=bolsa{{lesson.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">¿Está seguro que quiere embolsar esta lección?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <!-- <div class="modal-body">                          
+                                 
+                              </div> --> 
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                <a class="btn btn-danger"  href="{% url 'user_lesson:inbag' lesson.id exercise_det.id %}">Aceptar</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      {%else%}
+                      <td>
+                      ---
+                      </td>
+                      {%endif%}
+                  </tr>
+              {% endfor %}
+            {%else%}
+                  <tr>
+                    <td >No hay clases</td>
+                  </tr>
+            {%endif%}
+          </tbody>
+          </table>
+          </div>
+        <br>
+          </div>
+  {% endblock %}

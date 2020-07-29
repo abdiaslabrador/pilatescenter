@@ -15,7 +15,7 @@ class ListLessonExerciseHistoryView(View):
 	context = {}
 
 	def get(self, request, *args, **kwargs):
-		exercises = Exercise.objects.all()
+		exercises = Exercise.objects.all().order_by('name')	
 		context = {
 						'exercises':exercises
 				  }

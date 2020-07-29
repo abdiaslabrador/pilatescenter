@@ -10,7 +10,7 @@ from django.views import View
 
 
 
-class LoginView(View): #class based view
+class UserLoginView(View): #class based view
 	template_name='user_site/login/login.html'
 
 	def post(self, request, *args, **kwargs):
@@ -19,7 +19,7 @@ class LoginView(View): #class based view
 			#the username is coverted in lowercase in the forms.py
 			user= CustomUser.objects.get(username=form.cleaned_data['username'])
 			login(request, user)
-			return redirect("lesson:list_lesson_exercise_action")
+			return redirect("user_home:user_home")
 		else:
 			print(form.errors)
 		return render(request, self.template_name, {'form':form})
@@ -29,8 +29,8 @@ class LoginView(View): #class based view
 		return render(request, self.template_name, {'form':form})
 
 
-class LogoutView(View):
+class UserLogoutView(View):
 	
 	def get(self, request, *args, **kwargs):
 		logout(request)
-		return redirect('login')
+		return redirect('user_login:user_login_form')

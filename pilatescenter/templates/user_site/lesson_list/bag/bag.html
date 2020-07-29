@@ -1,0 +1,71 @@
+{% extends "user_site/base_template/base_template.html" %}
+{% load static %}
+
+{% block title %}Lista de lecciones{% endblock %}
+
+  {% block content %}
+      <div class="container mt-4">
+
+        <div class="table-responsive">
+          <table class="table panding" style="margin: 30px 0px;">
+          <thead class="thead-light">
+            <tr>
+                <th colspan="5">Lista de clases</th>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Tipo</th>
+                <th colspan="3" >Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if lessons %}
+              {% for lesson in lessons%}
+                  <tr>
+                  <td >{{lesson.id}}</td>
+                      <td>{{lesson.day_lesson|date:"l. M d, Y"}}</td>
+                      <td>{{lesson.hour_lesson}}</td>
+                      <td>{{lesson.id_exercise_fk.name}}</td>
+
+                       <!-- Boton de que permite eliminar la leccion-->
+
+                      <td> 
+                        <button type="button" class="btn btn-success" data-toggle="modal"data-target="#bolsa_selected{{lesson.id}}">Escoger
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id=bolsa_selected{{lesson.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">¿Está seguro que quiere escoger esta clase?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <!-- <div class="modal-body">                          
+                                 
+                              </div> --> 
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                <a class="btn btn-primary"  href="{% url 'user_lesson:bag_day_selected' lesson.id %}">Aceptar</a>
+                              </div>  
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    
+                  </tr>
+              {% endfor %}
+            {%else%}
+                  <tr>
+                    <td >No hay clases</td>
+                  </tr>
+            {%endif%}
+          </tbody>
+          </table>
+          </div>
+        <br>
+          </div>
+  {% endblock %}

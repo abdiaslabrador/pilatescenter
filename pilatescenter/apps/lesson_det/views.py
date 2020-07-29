@@ -64,6 +64,7 @@ class CreateLessonSearchView(View):
 				 				     )
 
 			# return HttpResponse("<h1>Todo ok</h1>")
+			messages.success(request, 'La clase fue creada con éxito', extra_tags='alert-success')
 			return redirect('lesson:list_lesson', pk=exercise.id)
 		else:
 			print(form.errors.as_data)
@@ -86,7 +87,7 @@ class ListLessonExerciseActionView(View):
 	context = {}
 
 	def get(self, request, *args, **kwargs):
-		exercises = Exercise.objects.all()	
+		exercises = Exercise.objects.all().order_by('name')	
 		context = {
 						'exercises':exercises
 				  }

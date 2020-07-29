@@ -1,0 +1,24 @@
+{% extends "user_site/base_template/base_template.html" %}
+{% load static %}
+
+  {% block title %}Resumen{% endblock %}
+
+
+      {% block content %}
+
+      <div class="container">
+      <div class="card panding">
+        <div class="card-header" >
+          <h5 class="card-title">Seleccione día</h5>
+        </div>
+
+        <div class="card-body">
+        	<form method="POST">
+            {% csrf_token %}
+        		{{form.as_p}}
+        		<button class="btn btn-primary" type="submit">Buscar</button>
+        	</form>
+      	</div>
+    </div>
+    </div>
+    {% endblock %}

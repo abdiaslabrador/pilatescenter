@@ -1,0 +1,55 @@
+{% extends "user_site/base_template/base_template.html" %}
+{% load static %}
+
+ {% block content %}
+      <div class="container mt-4">
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+              <p>{{ message }}</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="card panding">
+        <div class="card-header" >
+          <h5 class="card-title">Configuración</h5>
+        </div>
+        <div class="card-body">
+        <form method="POST" autocomplete="off">
+          {% csrf_token %}
+              {{form.non_field_errors}}
+            <div class="row">
+              <input type="text" class="col-6 col-md-4" name="first_name" id="name" placeholder="nombre" size="28" maxlength="20" pattern="[a-zA-Z]+" required value="{{form.first_name.value}}">
+            </div>
+
+            <div class="row">
+              <input type="text" class="col-6 col-md-4" name="last_name" id="lastname" placeholder="apellido" size="28" maxlength="20" pattern="[a-zA-Z]+" required value="{{form.last_name.value}}">
+            </div>
+
+            <div class="row">
+              <input type="text" class="col-6 col-md-4" name="ci" id="ci" placeholder="c.i" pattern="[0-9]{0,9}" maxlength="9" required value="{{form.ci.value}}">
+            </div>
+
+            <div class="row">
+                      <input type="text" class="col-6 col-md-4" pattern="[0-9]{0,11}" name="phone_number" placeholder="teléfono" minlength="11" maxlength="11" required value="{{form.phone_number.value}}">
+            </div>
+
+            {{form.email.errors}}
+            <div class="row">
+                 <input type="email" class="col-6 col-md-4" name="email" placeholder="email" value="{{form.email.value}}"required>
+            </div>
+
+          <br>
+            <button class='btn btn-primary' type="submit">actualizar</button>
+
+        </form>
+      <a  href="{% url 'user_profile:change_password_form'  %}">Cambiar contraseña</a>
+        </div>
+      </div>
+      </div>
+    {% endblock %}

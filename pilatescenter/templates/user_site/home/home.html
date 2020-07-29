@@ -39,11 +39,8 @@
                   <tr>
                   <!-- <td hidden>{{exercise.id}}</td> -->
                       <td>{{exercise.name}}</td>
-
-
-                      <td><a class="btn btn-ver"     href="{% url 'exercise:see_exercise' exercise.id %}">Ver</a></td>
+                      <td><a class="btn btn-ver"     href="{% url 'user_lesson:lesson_list' exercise.id %}">Ver</a></td>
                       
-
                   </tr>
               {% endfor %}
 
