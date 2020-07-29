@@ -1,6 +1,6 @@
 from django.db import models
 from apps.plan.models import Plan
-from apps.exercise.models import Exercise
+from apps.exercise.models import Exercise, Day
 from apps.lesson_det.models import Lesson_det
 from apps.create_user.models import CustomUser
 from django.db.models import signals
@@ -58,7 +58,12 @@ class Exercise_det(models.Model):
 def set_null(sender, instance, *args, **kwargs):
     """ Aquì se le asigna null a la variable id_plan_fk despuès de ser eliminado"""
     exercise_dets = Exercise_det.objects.filter(id_plan_fk = instance)
-    not_one_plan  = Plan.objects.get(name__iexact= "ninguno")
+
+    not_one_plan= None
+    try:
+        not_one_plan = Plan.objects.get(name__iexact= "ninguno")
+    except Plan.DoesNotExist:
+        not_one_plan = Plan.objects.create(name= "ninguno")
 
     if exercise_dets.count() > 0:
 	    for exercise_det in exercise_dets:
@@ -75,24 +80,44 @@ signals.pre_delete.connect(set_null, sender=Plan)
 def asign_exercise_det(sender, instance, created, *args, **kwargs):
 	if created:
 		users=CustomUser.objects.all()
-		plan=Plan.objects.get(name__icontains="ninguno")
+
+		not_one_plan= None
+
+		try:
+			not_one_plan = Plan.objects.get(name__iexact= "ninguno")
+		except Plan.DoesNotExist:
+			not_one_plan = Plan.objects.create(name= "ninguno")
 
 		for user in users:
-			Exercise_det.objects.create(name=instance.name, id_plan_fk=plan, id_exercise_fk=instance, id_user_fk=user)
+			Exercise_det.objects.create(name=instance.name, id_plan_fk=not_one_plan, id_exercise_fk=instance, id_user_fk=user)
 signals.post_save.connect(asign_exercise_det, sender=Exercise)
 
 
 """
-	Este signal le asigna todos los ejercicios disponibles a un usuario cuando es creado
+	Este signal le asigna a todos los ejercicios disponibles  cuando un usuario es creado
 """
 def asign_exercise_after_user_created(sender, instance, created, *args, **kwargs):
 	if created:
 		exercises=Exercise.objects.all()
+		not_one_plan= None
+
+		if not Day.objects.all():
+			Day.objects.create(name="lunes")
+			Day.objects.create(name="martes")
+			Day.objects.create(name="miercoles")
+			Day.objects.create(name="jueves")
+			Day.objects.create(name="viernes")
+			Day.objects.create(name="sabado")
+			Day.objects.create(name="domingo")
+
 		if exercises.count() > 0:
-			plan=Plan.objects.get(name__iexact="ninguno")
+			try:
+				not_one_plan = Plan.objects.get(name__iexact= "ninguno")
+			except Plan.DoesNotExist:
+				not_one_plan = Plan.objects.create(name= "ninguno")
 
 			for i in exercises:
-				Exercise_det.objects.create(name=i.name, id_plan_fk=plan, id_exercise_fk=i, id_user_fk=instance)
+				Exercise_det.objects.create(name=i.name, id_plan_fk=not_one_plan, id_exercise_fk=i, id_user_fk=instance)
 signals.post_save.connect(asign_exercise_after_user_created, sender=CustomUser)
 
 

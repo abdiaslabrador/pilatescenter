@@ -18,19 +18,19 @@ class ConfigurationUserExerciseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['scheduled_lessons'].widget.attrs.update({'readonly': 'readonly',  'min':0, 'max':28})
+        self.fields['enable_lessons'].widget.attrs.update({'readonly': 'readonly',  'min':0, 'max':28})
         self.fields['saw_lessons'].widget.attrs.update({'readonly': 'readonly',  'min':0, 'max':28})
         self.fields['bag'].widget.attrs.update({'readonly': 'readonly',  'min':0, 'max':28})
 
     def clean(self):
         clean = super().clean()
-        enable_lessons    = self.cleaned_data.get("enable_lessons")
+        total_days    = self.cleaned_data.get("total_days")
         scheduled_lessons = self.cleaned_data.get("scheduled_lessons")
         saw_lessons    = self.cleaned_data.get("saw_lessons")
-        bag    = self.cleaned_data.get("bag")
 
     
 
-        if enable_lessons < (bag + scheduled_lessons + saw_lessons):
+        if total_days < (scheduled_lessons + saw_lessons):
             
             raise forms.ValidationError("La cantidad de días disponibles no puede ser menor que la suma de días programados, vistos y en bolsa")
 

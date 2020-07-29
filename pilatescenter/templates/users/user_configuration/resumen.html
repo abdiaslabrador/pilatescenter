@@ -59,13 +59,12 @@
     </div>
     <div class="row">
       <label for="{{form.enable_lessons.id_for_label}}">Disponibles:
-      <input type="number" name="{{form.enable_lessons.name}}"  min=0 max=28 value="{{form.enable_lessons.value}}" id="{{form.enable_lessons.id_for_label}}" {%if exercise_det.reset == False %} readonly="readonly" {%endif%}  required>
-       </label>
-    </div>
+      {{form.enable_lessons}}
+      </label>
+      </div>
     <div class="row">
       <label for="{{form.saw_lessons.id_for_label}}">Vistas:
       {{form.saw_lessons}}
-
       </label>
     </div>
     <div class="row"> 

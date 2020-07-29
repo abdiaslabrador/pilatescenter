@@ -35,25 +35,25 @@ from apps.lesson_det.models import Lesson_det
 from apps.history_det.models import History_det
 from .models import CustomUser
 
-
 #------------------------------------------------------------------------------------------
 #user
 #------------------------------------------------------------------------------------------
-class ListUserView(ListView):
-	model = CustomUser
+
+class ListUserView(View):
 	template_name = 'users/list_users.html'
 
 
-	def get_queryset(self):
-		queryset = CustomUser.objects.filter(is_active=True).order_by("username")
-		return queryset
+	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
 
-	def get_context_data(self, **kwargs):
-		context = super(ListUserView, self).get_context_data(**kwargs)
-		users = self.get_queryset()
-		context['users'] = users
-		return context
+		users = CustomUser.objects.filter(is_active=True).order_by("username")
+		context={
+				'users':users,
+			 }
 
+		return render(request, self.template_name, context)
 
 #Creating a user
 def create_user(request):
@@ -62,37 +62,27 @@ def create_user(request):
 		if form.is_valid():
 			form.save()
 			print("ES VALIDO!")
-
-			"""#This not work if i create a user in the admin page, it means, y i create a user
-			#in the admin page, the user won't have the relation between users and exercise_det
-			exercises=Exercise.objects.all()
-			if exercises.count() > 0:
-				form.save()
-				user=CustomUser.objects.get(username=form.cleaned_data['username'])
-				plan=Plan.objects.get(name__icontains="ninguno")
-
-				x = None
-				for i in exercises:
-					Exercise_det.objects.create(name=i.name, id_plan_fk=plan, id_exercise_fk=i, id_user_fk=user)
-			else:
-				print("\n No hay ejercicios creados. No se le asignò ejercicios a este usuario.")"""
-
 			return redirect('content_user:list_user')
 		else:
 			print("es invalido chao!")
 	else:
-
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
 		form = UserCreationForm()
 
 	return render(request,'users/create_user.html', {'form':form})
 
 #Updating a user
 def modific_user(request, pk):
-
-
 	user=CustomUser.objects.get(pk=pk)
 	exercises_det = Exercise_det.objects.filter(id_user_fk = user).order_by('name')
+
 	if request.method == 'GET':
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		form = UserUpdateForm(instance=user, initial={'primarykey': user.pk})
 	else:
 		form = UserUpdateForm(request.POST, instance=user)
@@ -116,6 +106,9 @@ class DeleteUserView(View):
  	"""
 	def get(self, request, *args, **kwargs):
 
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
 
 		user = CustomUser.objects.get(pk=self.kwargs['pk'])
 
@@ -140,26 +133,39 @@ def change_password_user(request, pk):
 		# else:
 			# print("NO es invalido chao!")
 	else:
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		form = ChangePasswordForm()
 	return render(request,'users/change_password_user.html', {'form':form})
 
 
-class ListLockedUserView(ListView):
-
-	model = CustomUser
+class ListLockedUserView(View):
 	template_name = 'users/locked_users.html'
 
 
-	def get_context_data(self, **kwargs):
-		context = super(ListLockedUserView, self).get_context_data(**kwargs)
-		context['users'] = CustomUser.objects.filter(is_active=False).order_by("username")
-		return context
+	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
+		users = CustomUser.objects.filter(is_active=False).order_by("username")
+		context={
+				'users':users,
+			 }
+
+		return render(request, self.template_name, context)
 
 class LockUserView(View):
 	"""
 		Pendiente: cuando un usuario se bloquea sacarlo de todas las clases
  	"""
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		user = CustomUser.objects.get(pk=self.kwargs['pk'])
 
 		if Lesson_det.objects.filter(id_user_fk= user, saw=False).count() > 0:
@@ -173,6 +179,10 @@ class LockUserView(View):
 class  UnlockUserView(View):
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		user = CustomUser.objects.get(pk=self.kwargs['pk'])
 		user.is_active=True
 		user.save()
@@ -182,6 +192,10 @@ class  UnlockUserView(View):
 
 class ResetUsersView(View):
 	def get(self, request, *args, **kwargs):
+
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
 
 		exercise = Exercise.objects.get(pk=self.kwargs['pk'])
 				
@@ -247,6 +261,10 @@ class UserConfigurationClassView(View):
 		return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		form = SearchClasses()
 		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
@@ -264,6 +282,11 @@ class UserConfigurationClassView(View):
 class UserConfigurationSawLessonView(View):
 
 	def get(self, request, *args, **kwargs):
+
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
 		except Lesson_det.DoesNotExist:
@@ -298,6 +321,10 @@ class UserConfigurationSawLessonView(View):
 		
 class DeleteLessonView(View):
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
 		except Lesson_det.DoesNotExist:
@@ -323,7 +350,7 @@ class DeleteLessonView(View):
 
 		return redirect('content_user:user_configuration_class', pk=self.kwargs['id_exercise_det'])	
 
-class UserConfigurationPlanView(View):
+class UserConfigurationResumenView(View):
 	template_name = 'users/user_configuration/resumen.html'
 	context = {}
 
@@ -336,6 +363,13 @@ class UserConfigurationPlanView(View):
 		if exercise_det.reset == True:
 			if form.is_valid():
 				form.save()
+				
+				user_exercise_det = Exercise_det.objects.get(id_exercise_fk= exercise_det.id_exercise_fk, id_user_fk= user_to_modific)
+				# #Esta el la cantidad de clases programadas del usuario
+				user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(id_exercise_fk= exercise_det.id_exercise_fk, id_user_fk= user_to_modific, saw= False).count()
+				user_exercise_det.saw_lessons = Lesson_det.objects.filter(id_exercise_fk= exercise_det.id_exercise_fk, id_user_fk= user_to_modific, saw= True).count()
+				user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
+				user_exercise_det.save()
 				# print("Este es la data" + str(form.cleaned_data))
 				# print("ES VALIDO!")
 				return redirect('content_user:user_configuration_class', pk=self.kwargs['pk'])
@@ -361,6 +395,10 @@ class UserConfigurationPlanView(View):
 
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
 		form 			= ConfigurationUserExerciseForm(instance=exercise_det)
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
@@ -394,6 +432,10 @@ class UserConfigurationChangePlanView(View):
 
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
 		form = ConfigurationUserChangePlanForm(instance=exercise_det)
 
@@ -450,6 +492,10 @@ class UserConfigurationHistoryView(View):
 		return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
 		histories = History_det.objects.filter(id_exercise_fk=exercise_det.id_exercise_fk.id, id_user_fk=user_to_modific.id).order_by("day_lesson")
@@ -487,6 +533,10 @@ class UserConfigurationResetView(View):
 		return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
 		form = ConfigurationUserResetForm(instance=exercise_det)

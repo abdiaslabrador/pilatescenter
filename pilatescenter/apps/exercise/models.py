@@ -33,3 +33,14 @@ class Hour(models.Model):
 		# return str(self.id_exercise_fk) + str(self.id_day_fk)
 		return "Chance:" + str(self.hour_chance) + "----Leccion:" + str(self.hour_lesson) + "----Final:" + str(self.hour_end)
 
+# """
+#  	Este signal crea los dias para no hacerlos manual
+# """
+# def create_days(sender, instance, created, *args, **kwargs):
+# 	if created:
+# 		users=CustomUser.objects.all()
+# 		plan=Plan.objects.get_or_create(name__icontains="ninguno")
+
+# 		for user in users:
+# 			Exercise_det.objects.create(name=instance.name, id_plan_fk=plan, id_exercise_fk=instance, id_user_fk=user)
+# signals.post_save.connect(asign_exercise_det, sender=Exercise)

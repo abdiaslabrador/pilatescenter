@@ -61,5 +61,8 @@ class UserChangePasswordView(View):
 			return render(request,'user_site/profile/change_password_user.html', {'form':form})
 
 	def get(self, request, *args, **kwargs):
+		if request.user.is_anonymous:
+			return redirect('user_login:user_login_form')
+			
 		form = ChangePasswordForm()
 		return render(request,'user_site/profile/change_password_user.html', {'form':form})

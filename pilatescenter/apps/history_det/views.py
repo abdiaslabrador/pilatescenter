@@ -15,6 +15,10 @@ class ListLessonExerciseHistoryView(View):
 	context = {}
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		exercises = Exercise.objects.all().order_by('name')	
 		context = {
 						'exercises':exercises
@@ -49,6 +53,10 @@ class ListHistoryView(View):
 		return render(request, self.template_name, {'form':form})
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		form = SearchClasses()
 		exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
 		histories = History_det.objects.filter(id_exercise_fk=exercise).order_by("day_lesson")	
@@ -62,6 +70,10 @@ class ListHistoryView(View):
 
 class GeneralSeeHistoryView(View):
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		try:
 			history_det = History_det.objects.get(pk=self.kwargs['id_history'])
 		except History_det.DoesNotExist:
@@ -79,6 +91,9 @@ class GeneralSeeHistoryView(View):
 
 class GeneralDeleteHistoryView(View):
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
 
 		try:
 			history_det = History_det.objects.get(pk=self.kwargs['id_history'])
@@ -95,6 +110,10 @@ class GeneralDeleteHistoryView(View):
 #------------------------------------------------------------------------------------------
 class UserConfigurationSeeHistoryView(View):
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		try:
 			history_det = History_det.objects.get(pk=self.kwargs['id_history'])
 		except History_det.DoesNotExist:
@@ -112,7 +131,10 @@ class UserConfigurationSeeHistoryView(View):
 
 class UserConfigurationDeleteHistoryView(View):
 	def get(self, request, *args, **kwargs):
-
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+			
 		try:
 			history_det = History_det.objects.get(pk=self.kwargs['id_history'])
 		except History_det.DoesNotExist:

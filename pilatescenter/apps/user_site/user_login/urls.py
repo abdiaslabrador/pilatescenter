@@ -7,3 +7,4 @@ urlpatterns = [
     path('', views.UserLoginView.as_view(), name='user_login_form'),
     path('logout', views.UserLogoutView.as_view(), name='user_logout'),
 ]
+'user_login:user_login_form'

@@ -21,6 +21,12 @@ class ListExerciseView(View):
 	context = {}
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
+		
+
 		exercises = Exercise.objects.all().order_by("name")
 		context = {
 						'exercises':exercises
@@ -41,6 +47,10 @@ class CreateExerciseView(View):
 		return render(request, self.template_name, {'form':form})
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		# form =  CreatePlanForm(initial={'name': 'Pepe'})
 		form =  CreateExerciseForm()
 		# (form.errors.as_data)
@@ -67,6 +77,10 @@ class UpdateExerciseView(View):
 		return render(request,'exercise/update_exercise.html', {'form':form})
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		exercise= Exercise.objects.get(id=self.kwargs['pk'])
 		form = UpdateExerciseForm(instance=exercise, initial={'primarykey': exercise.pk})
 
@@ -78,6 +92,10 @@ class UpdateExerciseView(View):
 
 class DeleteExerciseView(View):
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		exercise = Exercise.objects.get(pk=self.kwargs['pk'])
 		exercise.delete()
 		return redirect('exercise:list_exercise')
@@ -85,6 +103,10 @@ class DeleteExerciseView(View):
 
 class See(View):
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		exercise = Exercise.objects.get(pk=self.kwargs['pk'])
 		return render(request, "exercise/exercise/see_exercise.html", {"exercise":exercise})
 
@@ -97,6 +119,10 @@ class ListDayView(View):
 	template_name= 'exercise/day/list_day.html'
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		exercise = Exercise.objects.get(id = self.kwargs['pk'])
 		days = Day.objects.filter(hour__id_exercise_fk=self.kwargs['pk']).distinct('name').order_by('name')
 		context = {	
@@ -129,7 +155,10 @@ class CreateDayView(View):
 		return render(request, self.template_name, {'form':form})
 
 	def get(self, request, *args, **kwargs):
-		
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		form = CreateDayForm()
 					
 		return render(request, self.template_name, {'form':form})
@@ -137,6 +166,10 @@ class CreateDayView(View):
 class DeleteDayView(View):
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		# day = Day.objects.get(name__iexact = self.kwargs['name_day'])
 		all_hours = Hour.objects.filter(id_exercise_fk = self.kwargs['pk'], id_day_fk = self.kwargs['id_day'])
 		for hour_day in all_hours:
@@ -150,6 +183,10 @@ class ListHourView(View):
 	template_name= 'exercise/hour/list_hour.html'
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		exercise = Exercise.objects.get(id = self.kwargs['pk'])
 		day = Day.objects.get(id = self.kwargs['id_day'])
 		hours = Hour.objects.filter(id_exercise_fk = exercise,).filter(id_day_fk=day).order_by('hour_lesson')
@@ -186,6 +223,10 @@ class CreateHourView(View):
 		return render(request, self.template_name, {'form':form})
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		form =  Create_hour()
 		context = {	
 					'form':form,
@@ -206,6 +247,10 @@ class UpdateHourView(View):
 		return render(request,'exercise/hour/update_hour.html', {'form':form})
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		hour = Hour.objects.get(id=self.kwargs['pk'])
 		form = UpdateHourForm(instance=hour, initial={'primarykey': hour.pk})
 
@@ -218,6 +263,10 @@ class UpdateHourView(View):
 
 class DeleteHourView(View):
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		hour = Hour.objects.get(id=self.kwargs['pk'])
 		id_exercise_fk = hour.id_exercise_fk.id
 		hour.delete()

@@ -41,6 +41,10 @@ class CreateLessonView(View):
 
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		form = CreateLessonForm()
 		return render(request, self.template_name, {'form':form})
 
@@ -72,6 +76,10 @@ class CreateLessonSearchView(View):
 		return render(request, self.template_name, {'form':form})
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		week_days = {"Sunday":"domingo", "Monday":"lunes", "Tuesday":"martes", "Wednesday":"miercoles", "Thursday":"jueves", "Friday":"viernes", "Saturday":"sabado"}
 		exercise=Exercise.objects.get(id = self.kwargs['pk'])
 		fecha_object = datetime.date(self.kwargs['year'], self.kwargs['month'], self.kwargs['day'])
@@ -87,6 +95,10 @@ class ListLessonExerciseActionView(View):
 	context = {}
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		exercises = Exercise.objects.all().order_by('name')	
 		context = {
 						'exercises':exercises
@@ -123,6 +135,10 @@ class ListLessonView(View):
 		return render(request, self.template_name, {'form':form})
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		form = SearchClasses()
 		exercise=Exercise.objects.get(id = self.kwargs['pk'])
 		lessons = Lesson_det.objects.filter(saw=False, id_exercise_fk=exercise).order_by("day_lesson")	
@@ -157,6 +173,10 @@ class UpdateLessonView(View):
 		return render(request, self.template_name, {'form':form})
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['pk'])
 		except Lesson_det.DoesNotExist:
@@ -209,6 +229,10 @@ class UpdateLessonView(View):
 class AddToLessonView(View):
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
 		except Lesson_det.DoesNotExist:
@@ -245,6 +269,10 @@ class AddToLessonView(View):
 class TakeOutToLessonView(View):
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
 		except Lesson_det.DoesNotExist:
@@ -268,6 +296,10 @@ class TakeOutToLessonView(View):
 class SawLessonView(View):
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
 		except Lesson_det.DoesNotExist:
@@ -302,7 +334,10 @@ class SawLessonView(View):
 
 class DeleteLessonView(View):
 	def get(self, request, *args, **kwargs):
-
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+			
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
 		except Lesson_det.DoesNotExist:

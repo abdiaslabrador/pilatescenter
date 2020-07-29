@@ -39,6 +39,10 @@ class CreatePlanView(View):
 		return render(request, self.template_name, {'form':form})
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		exercise = Exercise.objects.get(id =self.kwargs["id_exercise"])
 		form =  CreatePlanForm(initial = { 'id_exercise_fk': exercise})
 		# (form.errors.as_data)
@@ -51,6 +55,9 @@ class ListPlanView(View):
 	dic_plans_id={}
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
 
 		exercise = Exercise.objects.get(id =self.kwargs["id_exercise"])
 		plans = Plan.objects.filter(id_exercise_fk=exercise).order_by('name')
@@ -89,6 +96,10 @@ class UpdatePlanView(View):
 		return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		plan = Plan.objects.get(id=self.kwargs['pk'])
 		form = UpdatePlanForm(instance=plan, initial={'primarykey': plan.pk})
 		exercise_obj = Exercise.objects.get(plan__pk=self.kwargs['pk'])
@@ -101,6 +112,10 @@ class UpdatePlanView(View):
 
 class DeletePlanView(View):
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
 		plan = Plan.objects.get(pk=self.kwargs['pk'])
 		exercises_det = Exercise_det.objects.filter(id_plan_fk=plan)
 
@@ -119,6 +134,10 @@ class DeletePlanView(View):
 
 class See(View):
 	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+			
 		plan = Plan.objects.get(pk=self.kwargs['pk'])
 		return render(request, "plan/see_plan.html", {"plan":plan})
 
