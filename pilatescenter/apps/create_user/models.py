@@ -112,26 +112,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 		return True
 
 
-
+#this create a token when a user is created
 @receiver(post_save, sender=CustomUser)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
-
-"""class Exercise_det(models.Model):
-	name  =	models.CharField(max_length=64)
-
-	total_days	 = models.IntegerField(default=0)
-	oportunities = models.IntegerField(default=0)
-
-	enable_lessons 		= models.IntegerField(default=0)
-	scheduled_lessons 	= models.IntegerField(default=0)
-	saw_lessons = models.IntegerField(default=0)
-	bag 		= models.IntegerField(default=0)
-
-	id_plan_fk 	   = models.ForeignKey(Plan, null=True, blank=True, on_delete=models.CASCADE, db_column='id_plan_fk')
-	id_exercise_fk = models.ForeignKey(Exercise, null=True, blank=True, on_delete=models.CASCADE, db_column='id_exercise_fk')
-	id_user_fk 	   = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.CASCADE, db_column='id_customuser_fk')
-
-	def __str__(self):
-		return "name: " + str(self.id_user_fk) + " - " + "ejericicio: "+ str(self.id_exercise_fk)"""

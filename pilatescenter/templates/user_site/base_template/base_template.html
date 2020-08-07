@@ -32,31 +32,12 @@
 
       <div class="collapse navbar-collapse"  id="navbarSupportedContent">
         <ul class="navbar-nav ml-auto">
+
+              <a  class="nav-item nav-link active"  href="#"><strong>{{user.first_name|title}}</strong></a>
+
               </li>
                 <a  class="nav-item nav-link"  href="{% url 'user_home:user_home' %}">Inicio</a>
               </li>
-              <!-- <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Usuarios
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{% url 'content_user:list_user' %}">Usuarios</a>
-                        <a class="dropdown-item" href="{% url 'content_user:list_locked_user' %}">Bloqueados</a>
-                    </div>
-
-              </li>
-              <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Clases
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{% url 'lesson:create_lesson_form' %}">Crear</a>
-                        <a class="dropdown-item" href="{% url 'lesson:list_lesson_exercise_action' %}">Acciones</a>
-                        <a class="dropdown-item" href="{% url 'history:list_lesson_exercise_history' %}">Historial</a>
-                    </div>
-              </li> -->
               <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -90,7 +71,7 @@
     <script src="{% static 'js/jquery-migrate-1.4.1.min.js' %}"></script>
     <!--<script src="https://cdn.jsdelivr.net/npm/ .js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>-->
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  
     {% block custom_js %}
     {% endblock %}
 

@@ -7,7 +7,7 @@ from django.views import View
 
 
 
-class UserHomeView(View): #class based view
+class UserHomeView(View):
 	template_name='user_site/home/home.html'
 	context = {}
 

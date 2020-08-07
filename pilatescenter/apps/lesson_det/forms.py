@@ -20,7 +20,7 @@ class CreateLessonSearchForm(forms.Form):
 	cant_max = forms.IntegerField(label='Cant max',required=True, min_value=0)
 
 
-class SearchClasses(forms.Form):
+class SearchClassesForm(forms.Form):
 	since = forms.DateField(required=True)
 	until = forms.DateField(required=True)
 

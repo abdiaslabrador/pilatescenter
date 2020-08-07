@@ -2,6 +2,10 @@ from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from .models import CustomUser
 
+#------------------------------------------------------------------------------------------
+#users
+#------------------------------------------------------------------------------------------
+
 # I used this form to create a user
 class UserCreationForm(forms.ModelForm):
 
@@ -111,7 +115,3 @@ class ChangePasswordForm(forms.ModelForm):
 		if password and password2 and password != password2:
 			raise forms.ValidationError("Contraseñas no coinciden")
 		return password2
-
-class SearchClasses(forms.Form):
-	since = forms.DateField(required=True)
-	until = forms.DateField(required=True)

@@ -4,6 +4,8 @@ from apps.lesson_det.models import Lesson_det
 
 
 class ConfigurationUserExerciseForm(forms.ModelForm):
+    """this is the function that show the form of the user summary in the modification user part"""
+
     class Meta:
         model = Exercise_det
         fields = (
@@ -37,14 +39,14 @@ class ConfigurationUserExerciseForm(forms.ModelForm):
         return clean
 
 class ConfigurationUserChangePlanForm(forms.ModelForm):
-    
+    """this is the function that change the plan of the user in the modification user part"""
 
     class Meta:
         model = Exercise_det
         fields = (
                     "id_plan_fk",
-                    "id_exercise_fk",
-                    "id_user_fk",
+                    "id_exercise_fk", #i pass this variables tu make comparations
+                    "id_user_fk", #i pass this variables tu make comparations
         		  )
 
     def __init__(self, *args, **kwargs):
@@ -70,12 +72,14 @@ class ConfigurationUserChangePlanForm(forms.ModelForm):
 
 
 class ConfigurationUserResetForm(forms.ModelForm):
+    """This is the checkbox. This have a validation which is the user can't have schedule lesson"""
+
     class Meta:
         model = Exercise_det
         fields = (
         			"reset",
-                    "id_exercise_fk",
-                    "id_user_fk",
+                    "id_exercise_fk",#i pass this variables tu make comparations
+                    "id_user_fk",#i pass this variables tu make comparations
         		  )
 
     def __init__(self, *args, **kwargs):

@@ -4,7 +4,10 @@ from apps.exercise.models import Exercise
 from django.core.exceptions import ValidationError
 
 class CreatePlanForm(forms.ModelForm):
-	
+	"""
+		this form create a plan.
+		Validations: can't be exercises with plans with the same name.
+	"""
 	class Meta:
 		model= Plan
 		fields= (
@@ -50,6 +53,11 @@ class CreatePlanForm(forms.ModelForm):
 
 
 class UpdatePlanForm(forms.ModelForm):
+	"""
+		here i update the plan.
+		Validations: can't be exercises with plans with the same name.
+	"""
+
 	primarykey 		= forms.IntegerField(widget=forms.HiddenInput())
 	
 	class Meta:

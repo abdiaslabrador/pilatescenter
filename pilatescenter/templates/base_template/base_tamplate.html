@@ -18,7 +18,7 @@
     </head>
 
     <body style="background-color: white;">
-
+      
       <nav class="navbar navbar-expand-sm navbar-dark sticky-top bg-dark  container-fluid">
         <a class="navbar-brand" href="#">
           <img src="{% static 'pictures/logo.jpg' %}" width="30" height="30" class="d-inline-block align-top" alt="">
@@ -32,39 +32,42 @@
 
       <div class="collapse navbar-collapse"  id="navbarSupportedContent">
         <ul class="navbar-nav ml-auto">
+              <a  class="nav-item nav-link active"  href="#"><strong>{{user.first_name|title}}</strong></a>
 
               <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button"
+                    <a class="nav-item nav-link dropdown-toggle"  id="navbarDropdown1" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Usuarios
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
                         <a class="dropdown-item" href="{% url 'content_user:list_user' %}">Activos</a>
                         <a class="dropdown-item" href="{% url 'content_user:list_locked_user' %}">Bloqueados</a>
                     </div>
 
               </li>
               <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button"
+                    <a class="nav-link dropdown-toggle"  id="navbarDropdown2" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Clases
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
                         <a class="dropdown-item" href="{% url 'lesson:create_lesson_form' %}">Crear</a>
                         <a class="dropdown-item" href="{% url 'lesson:list_lesson_exercise_action' %}">Acciones</a>
                         <a class="dropdown-item" href="{% url 'history:list_lesson_exercise_history' %}">Historial</a>
                     </div>
               </li>
               <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle"  id="navbarDropdown" role="button"
+                    <a class="nav-link dropdown-toggle"  id="navbarDropdown3" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Configuraciones
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
                         <a  class="dropdown-item" href="{% url 'exercise:list_exercise' %}">Ejercicio</a>
                     </div>
               </li>
-                <a  class="nav-item nav-link"  href="{% url 'admin_login:login_admin' %}">Salir</a>
+              
+              <a  class="nav-item nav-link"  href="{% url 'admin_login:login_admin' %}">Salir</a>
+
             </ul>
         </div>
       </nav>
@@ -85,9 +88,9 @@
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="{% static 'js/jquery-migrate-1.4.1.min.js' %}"></script>
-    <!--<script src="https://cdn.jsdelivr.net/npm/ .js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>-->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/ .js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script> -->
   <script src="{% static 'js/bootstrap.min.js' %}"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  
     {% block custom_js %}
     {% endblock %}
 

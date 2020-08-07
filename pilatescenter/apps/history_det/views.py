@@ -1,16 +1,24 @@
+#shortcuts
 from django.shortcuts import render, redirect
+
+#models
 from .models import History_det
 from apps.exercise.models import Exercise
 from apps.create_user.models import CustomUser
+
+#views
 from django.views import View
-from .forms import SearchClasses
 from django.contrib import messages
+
+#forms
+from apps.lesson_det.forms import SearchClassesForm
+
 
 #------------------------------------------------------------------------------------------
 #the general history
 #------------------------------------------------------------------------------------------
 class ListLessonExerciseHistoryView(View):
-	"""Este se muestra en la opcion barra-historial"""
+	"""Este se muestra los ejercicios """
 	template_name= 'history/list_lesson_exercise_history.html'
 	context = {}
 
@@ -26,12 +34,12 @@ class ListLessonExerciseHistoryView(View):
 		return render(request, self.template_name, context)
 
 class ListHistoryView(View):
-	"""Este se muestra en la opcion barra-historial-ejercicio seleccionado"""
+	"""Muestra todos los historiales de un ejercicio en la opcion barra-historial""" 
 	template_name= 'history/list_history.html'
 	context = {}
 
 	def post(self, request, *args, **kwargs):
-		form =  SearchClasses(request.POST)
+		form =  SearchClassesForm(request.POST)
 
 		if form.is_valid():
 			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
@@ -39,36 +47,47 @@ class ListHistoryView(View):
 												    id_exercise_fk=exercise,
 												    day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
 												    
-												).order_by("day_lesson")	
-			context = {
+												).order_by("day_lesson", "hour_lesson")	
+			context = {	
+						'form':form,
 						'exercise':exercise,
 						'lessons':lessons,
-						'form':form
 				       }
 			# return HttpResponse("<h1>Todo ok</h1>")
 			return render(request, self.template_name, context)
 		else:
 			print(form.errors.as_data)
 			print("something happened")
-		return render(request, self.template_name, {'form':form})
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+			histories = History_det.objects.filter(id_exercise_fk=exercise).order_by("day_lesson", "hour_lesson")
+			context = {		
+							'form':form,
+							'exercise':exercise,
+							'histories':histories,
+					  }
+
+		return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-		form = SearchClasses()
+		form = SearchClassesForm()
 		exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
-		histories = History_det.objects.filter(id_exercise_fk=exercise).order_by("day_lesson")	
+		histories = History_det.objects.filter(id_exercise_fk=exercise).order_by("day_lesson", "hour_lesson")
 		context = {		
+						'form':form,
 						'exercise':exercise,
 						'histories':histories,
-						'form':form
 				  }
 
 		return render(request, self.template_name, context)
 
 class GeneralSeeHistoryView(View):
+	"""
+		this function is to see  all histories (no in the modification user)
+	"""
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
@@ -90,6 +109,9 @@ class GeneralSeeHistoryView(View):
 
 
 class GeneralDeleteHistoryView(View):
+	"""
+		this function is to deletes a particular history in the histories (no in the modification user)
+	"""
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
@@ -109,6 +131,9 @@ class GeneralDeleteHistoryView(View):
 #the user configuration history
 #------------------------------------------------------------------------------------------
 class UserConfigurationSeeHistoryView(View):
+	"""
+		here i see a particular history when the button "see" is pressed in the user configuration
+	"""
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
@@ -130,6 +155,9 @@ class UserConfigurationSeeHistoryView(View):
 
 
 class UserConfigurationDeleteHistoryView(View):
+	"""
+		here i delete a particular history when the button "delete" is pressed in the user configuration
+	"""
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:

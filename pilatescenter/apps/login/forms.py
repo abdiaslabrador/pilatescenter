@@ -9,7 +9,7 @@ class LoginForm(forms.Form):
 
 
 	def clean(self):
-		# Check that the username and password will be correct
+		#Check that the username and password will be correct
 		cleaned_data=super().clean()
 
 		username = cleaned_data.get("username")

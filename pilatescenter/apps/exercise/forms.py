@@ -19,9 +19,11 @@ class CreateExerciseForm(forms.ModelForm):
 	def clean(self):
 		cleaned_data =super(CreateExerciseForm, self).clean()
 
+	
 	def clean_name(self):
 		name = self.cleaned_data.get("name")
 
+		# I compare the name with the other names of the exercises, so as not to repeat them
 		if name == None or len(name) == 0:
 			raise forms.ValidationError("Escriba un nombre para el ejercicio")
 		print("this is the space: " + name)
@@ -86,11 +88,11 @@ class CreateDayForm(forms.ModelForm):
 	id_day_fk	= forms.ModelChoiceField(queryset=Day.objects.all().order_by('name'), label= 'Día')
 	class Meta:
 		model = Hour
-		fields = (
+		fields = (	
+					'id_day_fk',
 					'hour_chance', 
 					'hour_lesson', 
 					'hour_end',
-					'id_day_fk',
 				)
 
 #------------------------------------------------------------------------------------------

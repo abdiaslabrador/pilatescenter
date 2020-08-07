@@ -1,22 +1,29 @@
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.shortcuts import render
-from django.views.generic.list import ListView
-from .models import Exercise
-from apps.exercise_det.models import Exercise_det
-from django.views import View
-from .forms import CreateExerciseForm, UpdateExerciseForm
+#shortcuts
 from django.shortcuts import render, redirect
 from django.http import  HttpResponse
+
+#views
+from django.views.generic.list import ListView
+from django.views import View
+
+#forms
+from .forms import CreateExerciseForm, UpdateExerciseForm
 from .forms import Create_hour, UpdateHourForm, CreateDayForm
+
+#models
+from .models import Exercise
 from .models import Hour, Day
+from apps.exercise_det.models import Exercise_det
+
+# from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 #------------------------------------------------------------------------------------------
 #exercise
 #------------------------------------------------------------------------------------------
 
-
 class ListExerciseView(View):
+	"""here i show the list of the exercises"""
 	template_name= 'exercise/exercise/list_exercise.html'
 	context = {}
 
@@ -102,6 +109,7 @@ class DeleteExerciseView(View):
 
 
 class See(View):
+	"""here i see the exercise"""
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:

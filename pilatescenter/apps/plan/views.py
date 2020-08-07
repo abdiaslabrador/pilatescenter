@@ -19,8 +19,6 @@ from .forms import CreatePlanForm, UpdatePlanForm
 
 
 
-
-
 class CreatePlanView(View):
 	template_name= 'plan/create_plan.html'
 
@@ -50,6 +48,11 @@ class CreatePlanView(View):
 
 
 class ListPlanView(View):
+	"""
+		here i print the list of the plans as normalsly i do. I pass the users because before to delete the plan i throw a 
+		warning message showing the users that are in not reset mode and how are using that plan.
+		
+	"""
 	template_name='plan/list_plan.html'
 	contexto= {}
 	dic_plans_id={}
@@ -68,9 +71,9 @@ class ListPlanView(View):
 		print("dfasfd"+ str(self.dic_plans_id))
 
 		self.context = {
-					'exercise': exercise,
-					'plans': plans,
-					'dic_plans_id': self.dic_plans_id,
+							'exercise': exercise,
+							'plans': plans,
+							'dic_plans_id': self.dic_plans_id,
 					}
 
 		return render(request, self.template_name, self.context)

@@ -10,7 +10,10 @@ from django.contrib import messages
 from .forms import UserUpdateForm, ChangePasswordForm
 
 
-class UserConfigurationProfileView(View): #class based view
+class UserConfigurationProfileView(View):
+	"""
+		This class updates the user personal information
+	"""	
 	template_name='user_site/profile/configuration_profile.html'
 	context = {}
 	

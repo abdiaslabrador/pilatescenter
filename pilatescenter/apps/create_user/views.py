@@ -1,21 +1,31 @@
-
+#shortcuts
 from django.shortcuts import render, redirect
 from django.http import  HttpResponse
 
+#models
+from apps.plan.models import Plan
+from apps.exercise.models import Exercise
+from apps.exercise_det.models import Exercise_det, update_resumen
+from apps.lesson_det.models import Lesson_det 
+from apps.history_det.models import History_det
+from .models import CustomUser
+
 #views
+from django.views.generic.list import ListView
+from django.views import View
+from django.contrib import messages
+
+#forms
 from .forms import ( 
 						UserCreationForm, ChangePasswordForm,
-						 UserUpdateForm, SearchClasses
+						 UserUpdateForm
 					)
 
 from apps.exercise_det.forms import ( 
 									  ConfigurationUserExerciseForm, ConfigurationUserChangePlanForm,
 									  ConfigurationUserResetForm
 									)
-from django.views.generic.list import ListView
-from django.views import View
-from django.contrib import messages
-
+from apps.lesson_det.forms import SearchClassesForm
 
 #django rest-rest_framework
 from django.core import serializers
@@ -27,21 +37,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
 
-#this is necesary to make the relations between Exercise_det and customuser
-from apps.plan.models import Plan
-from apps.exercise.models import Exercise
-from apps.exercise_det.models import Exercise_det, update_resumen
-from apps.lesson_det.models import Lesson_det
-from apps.history_det.models import History_det
-from .models import CustomUser
+
 
 #------------------------------------------------------------------------------------------
 #user
 #------------------------------------------------------------------------------------------
 
 class ListUserView(View):
+	"""this function is to list all users in the admin page"""
 	template_name = 'users/list_users.html'
-
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
@@ -57,6 +61,7 @@ class ListUserView(View):
 
 #Creating a user
 def create_user(request):
+	"""this form creates a user which has a signal in exercise_det model"""
 	if request.method == 'POST':
 		form = UserCreationForm(request.POST)
 		if form.is_valid():
@@ -75,6 +80,10 @@ def create_user(request):
 
 #Updating a user
 def modific_user(request, pk):
+	"""
+		this  form  modifies a user. In the below of the page is presented
+		all exercise that the business offer.
+	"""
 	user=CustomUser.objects.get(pk=pk)
 	exercises_det = Exercise_det.objects.filter(id_user_fk = user).order_by('name')
 
@@ -83,7 +92,8 @@ def modific_user(request, pk):
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-		form = UserUpdateForm(instance=user, initial={'primarykey': user.pk})
+		form = UserUpdateForm(instance=user, initial={'primarykey': user.pk})#i use the primary key to validate the username modificated whit the other usernames registered
+
 	else:
 		form = UserUpdateForm(request.POST, instance=user)
 		if form.is_valid():
@@ -100,10 +110,12 @@ def modific_user(request, pk):
 			 }
 	return render(request,'users/modific_user.html', contexto)
 
+#deleting a user
 class DeleteUserView(View):
 	"""
-		Pendiente: cuando un usuario se elimina sacarlo de todas las clases
- 	"""
+		This function deletes the user when the delete button in the list of user is pressed.
+		The condition to delete a user is: a user cannot has a least one lesson scheduled
+	"""
 	def get(self, request, *args, **kwargs):
 
 		#validacion de que sea un superusuario
@@ -121,7 +133,7 @@ class DeleteUserView(View):
 
 #Changing the user password
 def change_password_user(request, pk):
-
+	"""This form is located inside of the modific user part"""
 	user=CustomUser.objects.get(pk=pk)
 	if request.method == 'POST':
 		form = ChangePasswordForm(request.POST)
@@ -142,8 +154,8 @@ def change_password_user(request, pk):
 
 
 class ListLockedUserView(View):
+	"""here i show all the locked users"""
 	template_name = 'users/locked_users.html'
-
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
@@ -152,15 +164,15 @@ class ListLockedUserView(View):
 
 		users = CustomUser.objects.filter(is_active=False).order_by("username")
 		context={
-				'users':users,
-			 }
+					'users':users,
+				}
 
 		return render(request, self.template_name, context)
 
+#locking a  user
 class LockUserView(View):
-	"""
-		Pendiente: cuando un usuario se bloquea sacarlo de todas las clases
- 	"""
+	"""here i lock a user when the button "Bloquear" is pressed in the list users """
+
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
@@ -168,7 +180,7 @@ class LockUserView(View):
 
 		user = CustomUser.objects.get(pk=self.kwargs['pk'])
 
-		if Lesson_det.objects.filter(id_user_fk= user, saw=False).count() > 0:
+		if Lesson_det.objects.filter(saw=False, id_user_fk= user).count() > 0:
 			messages.success(self.request, 'No se puede bloquear un usuario con clases programadas', extra_tags='alert-danger')
 			return redirect('content_user:list_user')
 
@@ -176,8 +188,9 @@ class LockUserView(View):
 		user.save()
 		return redirect('content_user:list_user')
 
+#unloking a user
 class  UnlockUserView(View):
-
+	
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
@@ -189,8 +202,12 @@ class  UnlockUserView(View):
 		return redirect('content_user:list_locked_user')
 
 
-
+#reset a user
 class ResetUsersView(View):
+	"""
+		here i reset all users when  the button is pressed that had the exercise specified
+		The condition to reset a user is: a user cannot has at least one lesson scheduled
+	 """
 	def get(self, request, *args, **kwargs):
 
 		#validacion de que sea un superusuario
@@ -200,7 +217,10 @@ class ResetUsersView(View):
 		exercise = Exercise.objects.get(pk=self.kwargs['pk'])
 				
 		#esto es para verificar que no hayan usuarios con clases programadas para hacer el reinicio
-		lessons = Lesson_det.objects.filter(saw=False, id_exercise_fk=exercise).order_by("day_lesson")
+		lessons = Lesson_det.objects.filter(
+												saw=False, 
+												id_exercise_fk=exercise
+											).order_by("day_lesson")
 		for lesson in lessons:
 			if lesson.id_user_fk.all().count() > 0: #obtengo todos los usurios de la clase y pregunto is es mayor a 0
 				print(lesson.id)
@@ -219,15 +239,20 @@ class ResetUsersView(View):
 		return redirect('exercise:list_exercise')
 
 #------------------------------------------------------------------------------------------
-#setting up the user
+#setting up the user. This part is inside the user modification table
 #------------------------------------------------------------------------------------------
+#this class work when the "ver" button is pressed
 class UserConfigurationClassView(View):
+	"""
+		In this class i show:
+		 - table with all classes that a user haven't seen yet of specific user with a date filter.
+	"""
 	template_name= 'users/user_configuration/table_lesson.html'
 
 	def post(self, request, *args, **kwargs):
 		exercise_det=Exercise_det.objects.get(id = self.kwargs['pk'])
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
-		form =  SearchClasses(request.POST)
+		form =  SearchClassesForm(request.POST)
 
 		if form.is_valid():
 			
@@ -237,13 +262,13 @@ class UserConfigurationClassView(View):
 												    id_exercise_fk=exercise_det.id_exercise_fk.id,
 												    id_user_fk=user_to_modific.id
 												    
-
-												).order_by("day_lesson")	
-			context = {
+												).order_by("day_lesson", "hour_lesson")	
+			context = {	
+						'form':form,
 						'exercise_det' : exercise_det,
 						'user_to_modific': user_to_modific,
 						'lessons':lessons,
-						'form':form
+						
 				       }
 			# return HttpResponse("<h1>Todo ok</h1>")
 			return render(request, self.template_name, context)
@@ -251,12 +276,17 @@ class UserConfigurationClassView(View):
 			print(form.errors.as_data)
 			print("something happened")
 
-			lessons = Lesson_det.objects.filter(saw= False, id_exercise_fk=exercise_det.id_exercise_fk.id, id_user_fk=user_to_modific.id)
-			context = {
+			lessons = Lesson_det.objects.filter(
+													saw= False,
+													id_exercise_fk=exercise_det.id_exercise_fk.id, 
+													id_user_fk=user_to_modific.id
+												).order_by("day_lesson", "hour_lesson")
+			context = {	
+						'form':form,
 						'exercise_det' : exercise_det,
 						'user_to_modific': user_to_modific,
 						'lessons':lessons,
-						'form':form
+						
 				       }
 		return render(request, self.template_name, context)
 
@@ -265,22 +295,29 @@ class UserConfigurationClassView(View):
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-		form = SearchClasses()
+		form = SearchClassesForm()
 		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
-		lessons = Lesson_det.objects.filter(saw= False, id_exercise_fk=exercise_det.id_exercise_fk.id, id_user_fk=user_to_modific.id)
+		lessons = Lesson_det.objects.filter(
+												saw= False, 
+												id_exercise_fk=exercise_det.id_exercise_fk.id,
+												id_user_fk=user_to_modific.id
+											).order_by("day_lesson", "hour_lesson")
 
 		context = {	
-						
+						'form':form,
 						'exercise_det' : exercise_det,
 						'user_to_modific': user_to_modific,
-						'form':form,
 						'lessons':lessons,
 				   }
 		return render(request, self.template_name, context)
 
+#this class work when the "saw" button is pressed
 class UserConfigurationSawLessonView(View):
-
+	"""
+		In this class i put a particular lesson as saw and update his summary too. Once i did it, 
+		i create a history with the lesson datas.
+	"""
 	def get(self, request, *args, **kwargs):
 
 		#validacion de que sea un superusuario
@@ -300,9 +337,9 @@ class UserConfigurationSawLessonView(View):
 		
 		lesson.saw = True
 		lesson.save()
-		update_resumen(lesson)
+		update_resumen(lesson)#this function updates the "summary" of the exercise related to the lesson, and is located in model of the exercise_det app
 
-		#Se crea el historial de las personas
+		#Se crea el historial
 		history_obj = History_det.objects.create(
 													cant_max = lesson.cant_max,
 													cant_in = lesson.cant_in,
@@ -314,12 +351,16 @@ class UserConfigurationSawLessonView(View):
 													id_exercise_fk = lesson.id_exercise_fk
 												)
 
+		#Se añaden las personas de la clase vista al historial
 		for users_in_lesson in lesson.id_user_fk.all():
 			history_obj.id_user_fk.add(users_in_lesson)
 
 		return redirect('content_user:user_configuration_class', pk=self.kwargs['id_exercise_det'])
 		
 class DeleteLessonView(View):
+	"""
+		here i delete a particular user lesson and after to do this i update the summary
+	"""
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
@@ -335,22 +376,18 @@ class DeleteLessonView(View):
 			messages.success(request, 'La clase ya fue vista', extra_tags='alert-danger')
 			return redirect('content_user:user_configuration_class', pk=self.kwargs['id_exercise_det'])	
 			
-		users_in_lesson = lesson.id_user_fk.all() #i get all users that are in the lesson		
+		update_resumen(lesson)#this function updates the "summary" of the exercise related to the lesson, and is located in model of the exercise_det app
 
-		for user in users_in_lesson:
-			user_exercise_det = Exercise_det.objects.get(id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user)
+		lesson.delete()#this method has a signal in the exercise_det model
 
-			#Esta el la cantidad de clases programadas del usuario
-			cant_lesson_scheduled = Lesson_det.objects.filter(saw= False, id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user).exclude(id=lesson.id).count()#here rest to each one in the class -1 before clear the class
-			user_exercise_det.scheduled_lessons = cant_lesson_scheduled
-			user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
-			user_exercise_det.save()
+		return redirect('content_user:user_configuration_class', pk=self.kwargs['id_exercise_det'])
 
-		lesson.delete()
-
-		return redirect('content_user:user_configuration_class', pk=self.kwargs['id_exercise_det'])	
-
+#the class that manage the summary status
 class UserConfigurationResumenView(View):
+	"""
+		Here i show the summary of a particular user.
+		the form of this class is located in the exercise_det forms. 
+	"""
 	template_name = 'users/user_configuration/resumen.html'
 	context = {}
 
@@ -366,8 +403,18 @@ class UserConfigurationResumenView(View):
 				
 				user_exercise_det = Exercise_det.objects.get(id_exercise_fk= exercise_det.id_exercise_fk, id_user_fk= user_to_modific)
 				# #Esta el la cantidad de clases programadas del usuario
-				user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(id_exercise_fk= exercise_det.id_exercise_fk, id_user_fk= user_to_modific, saw= False).count()
-				user_exercise_det.saw_lessons = Lesson_det.objects.filter(id_exercise_fk= exercise_det.id_exercise_fk, id_user_fk= user_to_modific, saw= True).count()
+				user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(
+																					saw= False,
+																					id_exercise_fk= exercise_det.id_exercise_fk,
+																					id_user_fk= user_to_modific
+																				).count()
+
+				user_exercise_det.saw_lessons = Lesson_det.objects.filter(
+																			saw= True,
+																			id_exercise_fk= exercise_det.id_exercise_fk,
+																			id_user_fk= user_to_modific
+																		).count()
+
 				user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
 				user_exercise_det.save()
 				# print("Este es la data" + str(form.cleaned_data))
@@ -376,9 +423,10 @@ class UserConfigurationResumenView(View):
 			else:
 				print("no es válido")
 				self.context = {
-							'user_to_modific': user_to_modific,
-							'exercise_det': exercise_det,
-							'form':form
+									'form':form,
+									'user_to_modific': user_to_modific,
+									'exercise_det': exercise_det,
+							
 					   }
 			return render(request, self.template_name, self.context)
 
@@ -386,10 +434,11 @@ class UserConfigurationResumenView(View):
 			messages.success(self.request, 'No se han guardado cambios porque previamente ha activado la opción de "No reiniciar"', extra_tags='alert-danger')
 			print("no es válido")
 			self.context = {
-						'user_to_modific': user_to_modific,
-						'exercise_det': exercise_det,
-						'form':form
-				   }
+								'form':form,
+								'user_to_modific': user_to_modific,
+								'exercise_det': exercise_det,
+						
+				   			}
 
 			return render(request, self.template_name, self.context)
 
@@ -404,13 +453,18 @@ class UserConfigurationResumenView(View):
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
 
 		self.context = {
-						'user_to_modific': user_to_modific,
-						'exercise_det': exercise_det,
-						'form':form
-				   }
+							'form':form,
+							'user_to_modific': user_to_modific,
+							'exercise_det': exercise_det,
+				   		}
 		return render(request, self.template_name, self.context)
 
+#change the user plan
 class UserConfigurationChangePlanView(View):
+	"""In this class i show to the admin a the exercise plans to change the old plan.
+		I make a union among the plan named "ninguno" and the especific plans
+		because the model "PLAN" have serveral plans of diferenet exercises
+	"""
 
 	def post(self, request, *args, **kwargs):
 		
@@ -440,26 +494,32 @@ class UserConfigurationChangePlanView(View):
 		form = ConfigurationUserChangePlanForm(instance=exercise_det)
 
 		plan_ninguno = Plan.objects.filter(name__iexact="ninguno")
-		plan_actual_exercise = Plan.objects.filter(id_exercise_fk__name__iexact=exercise_det.name)
+		plan_actual_exercise = Plan.objects.filter(id_exercise_fk=exercise_det.id_exercise_fk)
+
+		#here i make the uniom
 		plan_actual_exercise = plan_actual_exercise.union(plan_ninguno)
 
 		form.fields['id_plan_fk'].queryset = plan_actual_exercise.order_by("name")
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
 
-		context = {
+		context = {		
+						'form':form,
 						'user_to_modific': user_to_modific,
-						'exercise_det': exercise_det,
-						'form':form
+						'exercise_det': exercise_det,						
 				   }
 		return render(request,'users/user_configuration/change_plan.html', context)
 
 class UserConfigurationHistoryView(View):
+	"""
+		In this class i show:
+		 - table with all classes that a user have already seen of specific user, this contain a date filter too.
+	"""
 	template_name = 'users/user_configuration/table_history.html'
 
 	def post(self, request, *args, **kwargs):
 		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
-		form =  SearchClasses(request.POST)
+		form =  SearchClassesForm(request.POST)
 		
 		if form.is_valid():
 			
@@ -468,26 +528,29 @@ class UserConfigurationHistoryView(View):
 														id_user_fk=user_to_modific.id,
 														day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
 
-													).order_by("day_lesson")
+													).order_by("day_lesson", "hour_lesson")
 
 			context = {
+						'form':form,
 						'user_to_modific': user_to_modific,
 						'exercise_det' : exercise_det,
 						'histories':histories,
-						'form':form
 				       }
 			# return HttpResponse("<h1>Todo ok</h1>")
 			return render(request, self.template_name, context)
 		else:
 			print(form.errors.as_data)
 			print("something happened")
-			histories = History_det.objects.filter(id_exercise_fk=exercise_det.id_exercise_fk.id, id_user_fk=user_to_modific.id).order_by("day_lesson")
+			histories = History_det.objects.filter(
+													id_exercise_fk=exercise_det.id_exercise_fk.id,
+													id_user_fk=user_to_modific.id
+												   ).order_by("day_lesson", "hour_lesson")
 
-			context = {
+			context = {	
+						'form':form,
 						'user_to_modific': user_to_modific,
 						'exercise_det' : exercise_det,
 						'histories':histories,
-						'form':form
 				       }
 		return render(request, self.template_name, context)
 
@@ -498,19 +561,26 @@ class UserConfigurationHistoryView(View):
 
 		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
-		histories = History_det.objects.filter(id_exercise_fk=exercise_det.id_exercise_fk.id, id_user_fk=user_to_modific.id).order_by("day_lesson")
-		# lessons = Lesson_det.objects.filter(saw= True, id_exercise_fk=exercise_det.id_exercise_fk.id, id_user_fk=user_to_modific.id)
-		form =  SearchClasses()
+		histories = History_det.objects.filter(
+												id_exercise_fk=exercise_det.id_exercise_fk.id, 
+												id_user_fk=user_to_modific.id
+											  ).order_by("day_lesson", "hour_lesson")
+		
+		form =  SearchClassesForm()
 
 		context = {
+						'form':form,
 						'user_to_modific': user_to_modific,
 						'exercise_det' : exercise_det,
 						'histories':histories,
-						'form':form
 				   }
 		return render(request, self.template_name, context)
 
+
 class UserConfigurationResetView(View):
+	"""
+		here i reset the user summary. The condition to reset is the user can't has lesson scheduled
+	"""
 	template_name = 'users/user_configuration/reset.html'
 
 	def post(self, request, *args, **kwargs):
@@ -525,11 +595,11 @@ class UserConfigurationResetView(View):
 			return redirect('content_user:user_configuration_class', pk=self.kwargs['pk'])
 		else:
 			print("no es válido")
-			context = {
+			context = {	
+						'form':form,
 						'user_to_modific': user_to_modific,
 						'exercise_det': exercise_det,
-						'form':form
-				   }
+				   	  }
 		return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
@@ -541,10 +611,10 @@ class UserConfigurationResetView(View):
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
 		form = ConfigurationUserResetForm(instance=exercise_det)
 
-		context = {
+		context = {		
+						'form':form,	
 						'user_to_modific': user_to_modific,
 						'exercise_det': exercise_det,
-						'form':form
 				   }
 		return render(request, self.template_name, context)
 

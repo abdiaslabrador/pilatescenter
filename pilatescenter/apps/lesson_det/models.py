@@ -26,6 +26,7 @@ class Lesson_det(models.Model):
 	def __str__(self):
 		return str(self.id)
 
+	#here i refresh the lesson status
 	def custom_update_lesson(self):
 		self.cant_in = self.id_user_fk.count()
 		self.quota = self.cant_max - self.cant_in
