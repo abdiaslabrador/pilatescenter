@@ -68,7 +68,7 @@ class ListPlanView(View):
 		for plan in plans:
 			self.dic_plans_id[plan.id] = CustomUser.objects.filter(exercise_det__id_plan_fk=plan,  exercise_det__reset=False)
 
-		print("dfasfd"+ str(self.dic_plans_id))
+		
 
 		self.context = {
 							'exercise': exercise,
@@ -128,7 +128,7 @@ class DeletePlanView(View):
 				return redirect('Plan:list_plan', id_exercise=plan.id_exercise_fk.id)
 
 
-		print("Se ha eliminado el plan")
+		
 		plan.delete()
 
 		return redirect('Plan:list_plan', id_exercise=plan.id_exercise_fk.id)

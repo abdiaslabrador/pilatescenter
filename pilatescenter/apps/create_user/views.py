@@ -229,8 +229,6 @@ class ResetUsersView(View):
 
 		#obtengo todos los exercise_det de los usuarios con el respectivo ejercicio que se puedan reiniciar
 		exercises_det = Exercise_det.objects.filter(id_exercise_fk=exercise).filter(reset=True)
-
-
 		for exercise_det in exercises_det:
 			exercise_det.resetter()
 

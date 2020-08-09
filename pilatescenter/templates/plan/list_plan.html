@@ -77,7 +77,7 @@
                                       {%for user in dic_plans_id|get_value_from_dict:plan.id%}
                                        <ul> 
                                         <li>
-                                          <a href="{% url 'content_user:modific_user_form' user.id %}">{{user.username}}</a>
+                                          <a target="_blank" href="{% url 'content_user:modific_user_form' user.id %}">{{user.username}}</a>
                                           </li>
                                         </ul>
                                       {%endfor%}

@@ -32,3 +32,4 @@ class Lesson_det(models.Model):
 		self.quota = self.cant_max - self.cant_in
 		print("este es el estado de saw: " + str(self.saw))
 		self.save()
+

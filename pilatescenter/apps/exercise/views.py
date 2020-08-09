@@ -13,7 +13,9 @@ from .forms import Create_hour, UpdateHourForm, CreateDayForm
 #models
 from .models import Exercise
 from .models import Hour, Day
+from apps.create_user.models import CustomUser 
 from apps.exercise_det.models import Exercise_det
+
 
 # from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
@@ -24,19 +26,27 @@ from apps.exercise_det.models import Exercise_det
 
 class ListExerciseView(View):
 	"""here i show the list of the exercises"""
-	template_name= 'exercise/exercise/list_exercise.html'
+	template_name = 'exercise/exercise/list_exercise.html'
 	context = {}
+	dic_exercise_id = {}
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-		
-
 		exercises = Exercise.objects.all().order_by("name")
+
+		for exercise in exercises:
+			self.dic_exercise_id[exercise.id] = CustomUser.objects.filter(
+																			lesson_det__id_exercise_fk=exercise,
+																			lesson_det__saw=False
+																		)
+
+		
 		context = {
-						'exercises':exercises
+						'exercises':exercises,
+						'dic_exercise_id':self.dic_exercise_id,
 				  }
 		return render(request, self.template_name, context)
 

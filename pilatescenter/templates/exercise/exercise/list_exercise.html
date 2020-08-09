@@ -1,5 +1,6 @@
 {% extends "base_template/base_tamplate.html" %}s
 {% load static %}
+{% load plan_extras %}
 
 {% block title %}Lista de ejercicios{% endblock %}
 
@@ -84,7 +85,22 @@
                                 </button>
                               </div>
                               <div class="modal-body">                          
-                                <strong>Recordatorio:</strong> al eliminar un ejercicio se eliminaran los objetos relacionados a este los cuales son: <strong> planes, horas, dias, lecciones y  historiales.</strong>
+                                <p><strong>Recordatorio:</strong> al eliminar un ejercicio se eliminaran los objetos relacionados a este, los cuales son: <strong> planes, horas, dias, lecciones y  historiales.</strong></p>
+                                {%if dic_exercise_id|get_value_from_dict:exercise.id %}
+                                <p>Hay usuarios con este ejercicio con clases programadas</p>
+                                      <p><strong>ADVERTENCIA: </strong>Usuarios con clases programadas:
+                                      <br> 
+
+                                      {%for user in dic_exercise_id|get_value_from_dict:exercise.id%}
+                                       <ul> 
+                                        <li>
+                                          <a target="_blank" href="{% url 'content_user:modific_user_form' user.id %}">{{user.username}}</a>
+                                          </li>
+                                        </ul>
+                                      {%endfor%}
+                                      <br> 
+
+                                  {%endif%}
                               </div> 
                               <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
@@ -109,3 +125,5 @@
         <br>
           </div>
   {% endblock %}
+<div class="modal-body">
+                                    
