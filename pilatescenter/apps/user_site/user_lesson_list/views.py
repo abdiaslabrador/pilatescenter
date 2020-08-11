@@ -181,10 +181,10 @@ class UserBagDaySelectedView(View):
 				messages.success(self.request, 'La lección ya fu vista o ya está llena', extra_tags='alert-warning')
 				return redirect('user_lesson:lesson_list', id_exercise= lesson.id_exercise_fk.id)
 
-				exercise_det = Exercise_det.objects.get(
-															id_user_fk=request.user,
-															id_exercise_fk=lesson.id_exercise_fk,
-														)
+			exercise_det = Exercise_det.objects.get(
+														id_user_fk=request.user,
+														id_exercise_fk=lesson.id_exercise_fk,
+													)
 
 			if exercise_det.bag > 0:
 				exercise_det.bag-=1
