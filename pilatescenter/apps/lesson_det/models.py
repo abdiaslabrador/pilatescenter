@@ -6,6 +6,31 @@ from django.db.models import signals
 
 # Create your models here.
 class Lesson_det(models.Model):
+
+	#is the value asign here is in capital case or not, is the way that appear in the database
+	NOTONE		= 'NOTONE'
+	OPEN		= 'OPEN'
+	CLOSE		= 'CLOSE'
+	NOTCHANCE 	= 'NOTCHANCE'
+	INPROCESS 	= 'INPROCESS'
+	FINISHED 	= 'FINISHED'
+    
+
+	lesson_status_choices = [
+		(NOTONE, 'NOTONE'),
+		(OPEN, 'OPEN'),
+		(CLOSE, 'CLOSE'),
+		(NOTCHANCE, 'NOTCHANCE'),
+		(INPROCESS, 'INPROCESS'),
+		(FINISHED, 'FINISHED'),
+    ]
+
+	lesson_status = models.CharField(
+		max_length=10,
+		choices=lesson_status_choices,
+		default=NOTONE,
+	)
+
 	cant_max = models.IntegerField(default=0, null=True, blank=True)
 	cant_in = models.IntegerField(default=0)
 	quota 	= models.IntegerField(default=0)

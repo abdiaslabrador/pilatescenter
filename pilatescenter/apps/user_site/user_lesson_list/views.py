@@ -21,7 +21,6 @@ class UserLessonListView(View):
 	exercise_det = None
 
 	def get(self, request, *args, **kwargs):
-		print(request.user.username)
 		if request.user.is_anonymous:
 			return redirect('user_login:user_login_form')
 		else:
@@ -36,10 +35,9 @@ class UserLessonListView(View):
 				return redirect('user_home:user_home')
 
 			lessons = Lesson_det.objects.filter(
-													saw=False,
 													id_user_fk=request.user,
 													id_exercise_fk=self.kwargs['id_exercise'],
-												).order_by("day_lesson")
+												).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson")
 			self.context ={
 							'lessons':lessons,
 							'exercise_det':self.exercise_det,
@@ -125,9 +123,8 @@ class UserBagView(View):
 			if self.exercise_det.bag > 0:
 
 				days_already_have = Lesson_det.objects.filter(	
-																				saw = False,
-																				id_user_fk=request.user.id,
-													).values('day_lesson')
+																id_user_fk=request.user.id,
+													).exclude(lesson_status = Lesson_det.FINISHED).values('day_lesson')
 
 				user_days_already_have=[]
 				for day in days_already_have:
@@ -135,17 +132,16 @@ class UserBagView(View):
 				
 				
 				unfiltered_lessons = Lesson_det.objects.filter(
-														saw = False, 
 														id_exercise_fk=self.exercise_det.id_exercise_fk,
 														cant_in__lt=F('cant_max'),
 														day_lesson__range=(today, plus_days),
-													).exclude(id_user_fk__id=request.user.id).order_by("day_lesson") 
+													).exclude(id_user_fk__id=request.user.id).exclude( lesson_status = Lesson_det.FINISHED).order_by("day_lesson") 
 				lessons = []
 				for unfiltered_lesson in unfiltered_lessons:
 					if unfiltered_lesson.day_lesson.strftime("%A") not in user_days_already_have:
 						lessons.append(unfiltered_lesson)
 
-				print(user_days_already_have)
+				
 				self.context ={
 								'lessons':lessons,
 							   }
@@ -177,7 +173,7 @@ class UserBagDaySelectedView(View):
 				return redirect('user_home:user_home')
 
 			#validacion de que la clase todavía se pueda ver
-			if lesson.cant_in == lesson.cant_max or lesson.saw == True:
+			if lesson.cant_in == lesson.cant_max or lesson.lesson_status == Lesson_det.FINISHED:
 				messages.success(self.request, 'La lección ya fu vista o ya está llena', extra_tags='alert-warning')
 				return redirect('user_lesson:lesson_list', id_exercise= lesson.id_exercise_fk.id)
 

@@ -14,6 +14,7 @@ from .forms import Create_hour, UpdateHourForm, CreateDayForm
 from .models import Exercise
 from .models import Hour, Day
 from apps.create_user.models import CustomUser 
+from apps.lesson_det.models import Lesson_det 
 from apps.exercise_det.models import Exercise_det
 
 
@@ -39,9 +40,8 @@ class ListExerciseView(View):
 
 		for exercise in exercises:
 			self.dic_exercise_id[exercise.id] = CustomUser.objects.filter(
-																			lesson_det__id_exercise_fk=exercise,
-																			lesson_det__saw=False
-																		)
+																			lesson_det__id_exercise_fk=exercise
+																		).exclude(lesson_det__lesson_status = Lesson_det.FINISHED)
 
 		
 		context = {

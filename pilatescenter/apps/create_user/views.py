@@ -124,7 +124,7 @@ class DeleteUserView(View):
 
 		user = CustomUser.objects.get(pk=self.kwargs['pk'])
 
-		if Lesson_det.objects.filter(id_user_fk= user, saw=False).count() > 0:
+		if Lesson_det.objects.filter(id_user_fk= user).exclude(lesson_status = Lesson_det.FINISHED).count() > 0:
 			messages.success(self.request, 'No se puede eliminar un usuario con clases programadas', extra_tags='alert-danger')
 			return redirect('content_user:list_user')
 
@@ -180,7 +180,7 @@ class LockUserView(View):
 
 		user = CustomUser.objects.get(pk=self.kwargs['pk'])
 
-		if Lesson_det.objects.filter(saw=False, id_user_fk= user).count() > 0:
+		if Lesson_det.objects.filter(id_user_fk= user).exclude(lesson_status = Lesson_det.FINISHED).count() > 0:
 			messages.success(self.request, 'No se puede bloquear un usuario con clases programadas', extra_tags='alert-danger')
 			return redirect('content_user:list_user')
 
@@ -218,9 +218,8 @@ class ResetUsersView(View):
 				
 		#esto es para verificar que no hayan usuarios con clases programadas para hacer el reinicio
 		lessons = Lesson_det.objects.filter(
-												saw=False, 
 												id_exercise_fk=exercise
-											).order_by("day_lesson")
+											).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson")
 		for lesson in lessons:
 			if lesson.id_user_fk.all().count() > 0: #obtengo todos los usurios de la clase y pregunto is es mayor a 0
 				print(lesson.id)
@@ -255,12 +254,11 @@ class UserConfigurationClassView(View):
 		if form.is_valid():
 			
 			lessons = Lesson_det.objects.filter(
-													saw=False,
 													day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until']),
 												    id_exercise_fk=exercise_det.id_exercise_fk.id,
 												    id_user_fk=user_to_modific.id
 												    
-												).order_by("day_lesson", "hour_lesson")	
+												).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")	
 			context = {	
 						'form':form,
 						'exercise_det' : exercise_det,
@@ -275,10 +273,9 @@ class UserConfigurationClassView(View):
 			print("something happened")
 
 			lessons = Lesson_det.objects.filter(
-													saw= False,
 													id_exercise_fk=exercise_det.id_exercise_fk.id, 
 													id_user_fk=user_to_modific.id
-												).order_by("day_lesson", "hour_lesson")
+												).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")
 			context = {	
 						'form':form,
 						'exercise_det' : exercise_det,
@@ -296,11 +293,10 @@ class UserConfigurationClassView(View):
 		form = SearchClassesForm()
 		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
-		lessons = Lesson_det.objects.filter(
-												saw= False, 
+		lessons = Lesson_det.objects.filter( 
 												id_exercise_fk=exercise_det.id_exercise_fk.id,
 												id_user_fk=user_to_modific.id
-											).order_by("day_lesson", "hour_lesson")
+											).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")
 
 		context = {	
 						'form':form,
@@ -328,12 +324,12 @@ class UserConfigurationSawLessonView(View):
 			messages.success(request, 'La clase que desea manipular fue eliminada o no existe', extra_tags='alert-danger')
 			return redirect('content_user:user_configuration_class', pk=self.kwargs['id_exercise_det'])
 
-		if lesson.saw == True:
+		if lesson.lesson_status == Lesson_det.FINISHED:
 			messages.success(request, 'La clase ya fue vista', extra_tags='alert-danger')
 			return redirect('content_user:user_configuration_class', pk=self.kwargs['id_exercise_det'])
 		
 		
-		lesson.saw = True
+		lesson.lesson_status = Lesson_det.FINISHED
 		lesson.save()
 		update_resumen(lesson)#this function updates the "summary" of the exercise related to the lesson, and is located in model of the exercise_det app
 
@@ -370,7 +366,7 @@ class DeleteLessonView(View):
 			messages.success(request, 'La clase que desea manipular fue eliminada o no existe', extra_tags='alert-danger')
 			return redirect('content_user:user_configuration_class', pk=self.kwargs['id_exercise_det'])	
 
-		if lesson.saw == True:
+		if lesson.lesson_status == Lesson_det.FINISHED:
 			messages.success(request, 'La clase ya fue vista', extra_tags='alert-danger')
 			return redirect('content_user:user_configuration_class', pk=self.kwargs['id_exercise_det'])	
 			
@@ -402,13 +398,12 @@ class UserConfigurationResumenView(View):
 				user_exercise_det = Exercise_det.objects.get(id_exercise_fk= exercise_det.id_exercise_fk, id_user_fk= user_to_modific)
 				# #Esta el la cantidad de clases programadas del usuario
 				user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(
-																					saw= False,
 																					id_exercise_fk= exercise_det.id_exercise_fk,
 																					id_user_fk= user_to_modific
-																				).count()
+																				).exclude(lesson_status = Lesson_det.FINISHED).count()
 
 				user_exercise_det.saw_lessons = Lesson_det.objects.filter(
-																			saw= True,
+																			lesson_status = Lesson_det.FINISHED,
 																			id_exercise_fk= exercise_det.id_exercise_fk,
 																			id_user_fk= user_to_modific
 																		).count()

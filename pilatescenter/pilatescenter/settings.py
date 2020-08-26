@@ -159,8 +159,15 @@ EMAIL_HOST_USER= 'projects.testing.email@gmail.com'
 EMAIL_HOST_PASSWORD= 'Dani1993?3'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-
 #/static/ es el directorio de principal para archivos css y javascript, que trabaja con
 #STATICFILES_DIRS para pasarle los archivos a static_root
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'trans_static_al_servidor')
+
+# CELERY STUFF
+BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
