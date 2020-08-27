@@ -5,7 +5,6 @@ from django.http import HttpResponse
 #models
 from apps.exercise.models import Exercise, Hour
 from apps.exercise_det.models import Exercise_det, update_resumen
-from apps.history_det.models import History_det
 from apps.create_user.models import CustomUser
 from .models import Lesson_det
 
@@ -361,18 +360,6 @@ class SawLessonView(View):
 		lesson.lesson_status = Lesson_det.FINISHED
 		lesson.save()
 		update_resumen(lesson)#this function updates the "summary" of the exercise related to the lesson
-
-		#Se crea el historial de las personas
-		history_obj = History_det.objects.create(
-													cant_max = lesson.cant_max,
-													cant_in = lesson.cant_in,
-													quota = lesson.quota,
-													day_lesson = lesson.day_lesson,
-													hour_chance = lesson.hour_chance,
-													hour_lesson = lesson.hour_lesson,
-													hour_end = lesson.hour_end, 
-													id_exercise_fk = lesson.id_exercise_fk
-												)
 
 		for users_in_lesson in lesson.id_user_fk.all():
 			history_obj.id_user_fk.add(users_in_lesson)

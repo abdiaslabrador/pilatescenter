@@ -2,9 +2,10 @@
 from django.shortcuts import render, redirect
 
 #models
-from .models import History_det
 from apps.exercise.models import Exercise
 from apps.create_user.models import CustomUser
+from apps.lesson_det.models import Lesson_det
+
 
 #views
 from django.views import View
@@ -43,7 +44,7 @@ class ListHistoryView(View):
 
 		if form.is_valid():
 			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
-			lessons = History_det.objects.filter(
+			lessons = Lesson_det.objects.filter(
 												    id_exercise_fk=exercise,
 												    day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
 												    
@@ -59,7 +60,7 @@ class ListHistoryView(View):
 			print(form.errors.as_data)
 			print("something happened")
 			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
-			histories = History_det.objects.filter(id_exercise_fk=exercise).order_by("day_lesson", "hour_lesson")
+			histories = Lesson_det.objects.filter(id_exercise_fk=exercise).order_by("day_lesson", "hour_lesson")
 			context = {		
 							'form':form,
 							'exercise':exercise,
@@ -75,7 +76,10 @@ class ListHistoryView(View):
 
 		form = SearchClassesForm()
 		exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
-		histories = History_det.objects.filter(id_exercise_fk=exercise).order_by("day_lesson", "hour_lesson")
+		histories = Lesson_det.objects.filter(
+												lesson_status = Lesson_det.FINISHED,
+											  	id_exercise_fk=exercise
+											  ).order_by("day_lesson", "hour_lesson")
 		context = {		
 						'form':form,
 						'exercise':exercise,
@@ -94,12 +98,12 @@ class GeneralSeeHistoryView(View):
 			return redirect('admin_login:login_admin')
 
 		try:
-			history_det = History_det.objects.get(pk=self.kwargs['id_history'])
-		except History_det.DoesNotExist:
+			history_det = Lesson_det.objects.get(pk=self.kwargs['id_history'])
+		except Lesson.DoesNotExist:
 			messages.success(request, 'Este historial que desea manipular fue eliminado o no existe', extra_tags='alert-danger')
 			return redirect('history:list_history', id_exercise=self.kwargs['id_exercise'])
 
-		users = CustomUser.objects.filter(history_det__id = history_det.id)
+		users = CustomUser.objects.filter(lesson_det__id = history_det.id)
 
 		context = {
 						'history_det': history_det,
@@ -118,8 +122,8 @@ class GeneralDeleteHistoryView(View):
 			return redirect('admin_login:login_admin')
 
 		try:
-			history_det = History_det.objects.get(pk=self.kwargs['id_history'])
-		except History_det.DoesNotExist:
+			history_det = Lesson_det.objects.get(pk=self.kwargs['id_history'])
+		except Lesson_det.DoesNotExist:
 			messages.success(request, 'Este historial que desea manipular fue eliminado o no existe', extra_tags='alert-danger')
 			return redirect('history:list_history', id_exercise=self.kwargs['id_exercise'])
 
@@ -140,12 +144,12 @@ class UserConfigurationSeeHistoryView(View):
 			return redirect('admin_login:login_admin')
 
 		try:
-			history_det = History_det.objects.get(pk=self.kwargs['id_history'])
-		except History_det.DoesNotExist:
+			history_det = Lesson_det.objects.get(pk=self.kwargs['id_history'])
+		except Lesson_det.DoesNotExist:
 			messages.success(request, 'Este historial que desea manipular fue eliminado o no existe', extra_tags='alert-danger')
 			return redirect('content_user:user_configuration_history', pk=self.kwargs['id_exercise_det'])
 
-		users = CustomUser.objects.filter(history_det__id = history_det.id)
+		users = CustomUser.objects.filter(lesson_det__id = history_det.id)
 
 		context = {
 						'history_det': history_det,
@@ -164,7 +168,7 @@ class UserConfigurationDeleteHistoryView(View):
 			return redirect('admin_login:login_admin')
 			
 		try:
-			history_det = History_det.objects.get(pk=self.kwargs['id_history'])
+			history_det = Lesson_det.objects.get(pk=self.kwargs['id_history'])
 		except History_det.DoesNotExist:
 			messages.success(request, 'Este historial que desea manipular fue eliminado o no existe', extra_tags='alert-danger')
 			return redirect('content_user:user_configuration_history', pk=self.kwargs['id_exercise_det'])

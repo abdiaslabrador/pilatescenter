@@ -6,8 +6,7 @@ from django.http import  HttpResponse
 from apps.plan.models import Plan
 from apps.exercise.models import Exercise
 from apps.exercise_det.models import Exercise_det, update_resumen
-from apps.lesson_det.models import Lesson_det 
-from apps.history_det.models import History_det
+from apps.lesson_det.models import Lesson_det
 from .models import CustomUser
 
 #views
@@ -217,12 +216,12 @@ class ResetUsersView(View):
 		exercise = Exercise.objects.get(pk=self.kwargs['pk'])
 				
 		#esto es para verificar que no hayan usuarios con clases programadas para hacer el reinicio
-		lessons = Lesson_det.objects.filter(
+		lessons = Lesson_det.objects.filter(	
+												reset= False,
 												id_exercise_fk=exercise
 											).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson")
 		for lesson in lessons:
 			if lesson.id_user_fk.all().count() > 0: #obtengo todos los usurios de la clase y pregunto is es mayor a 0
-				print(lesson.id)
 				messages.success(self.request, 'Hay almenos una clase con usuarios dentro. No se puede reinicar un ejercicio con usuarios en clases', extra_tags='alert-danger')
 				return redirect('exercise:list_exercise')
 
@@ -332,22 +331,6 @@ class UserConfigurationSawLessonView(View):
 		lesson.lesson_status = Lesson_det.FINISHED
 		lesson.save()
 		update_resumen(lesson)#this function updates the "summary" of the exercise related to the lesson, and is located in model of the exercise_det app
-
-		#Se crea el historial
-		history_obj = History_det.objects.create(
-													cant_max = lesson.cant_max,
-													cant_in = lesson.cant_in,
-													quota = lesson.quota,
-													day_lesson = lesson.day_lesson,
-													hour_chance = lesson.hour_chance,
-													hour_lesson = lesson.hour_lesson,
-													hour_end = lesson.hour_end, 
-													id_exercise_fk = lesson.id_exercise_fk
-												)
-
-		#Se añaden las personas de la clase vista al historial
-		for users_in_lesson in lesson.id_user_fk.all():
-			history_obj.id_user_fk.add(users_in_lesson)
 
 		return redirect('content_user:user_configuration_class', pk=self.kwargs['id_exercise_det'])
 		
@@ -516,7 +499,7 @@ class UserConfigurationHistoryView(View):
 		
 		if form.is_valid():
 			
-			histories = History_det.objects.filter( 
+			histories = Lesson_det.objects.filter( 
 														id_exercise_fk=exercise_det.id_exercise_fk.id, 
 														id_user_fk=user_to_modific.id,
 														day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
@@ -534,7 +517,7 @@ class UserConfigurationHistoryView(View):
 		else:
 			print(form.errors.as_data)
 			print("something happened")
-			histories = History_det.objects.filter(
+			histories = Lesson_det.objects.filter(
 													id_exercise_fk=exercise_det.id_exercise_fk.id,
 													id_user_fk=user_to_modific.id
 												   ).order_by("day_lesson", "hour_lesson")
@@ -554,7 +537,8 @@ class UserConfigurationHistoryView(View):
 
 		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
-		histories = History_det.objects.filter(
+		histories = Lesson_det.objects.filter(
+												lesson_status=Lesson_det.FINISHED,
 												id_exercise_fk=exercise_det.id_exercise_fk.id, 
 												id_user_fk=user_to_modific.id
 											  ).order_by("day_lesson", "hour_lesson")

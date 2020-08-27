@@ -56,13 +56,12 @@ INSTALLED_APPS = [
     'apps.exercise',
     'apps.exercise_det',
     'apps.lesson_det',
-    'apps.history_det',
     'apps.user_site.user_login',
     'apps.user_site.user_home',
     'apps.user_site.user_lesson_list',
     'apps.user_site.user_profile',
 ]
-# 'apps.exercise_det',
+# 'apps.history_det',
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',

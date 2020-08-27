@@ -38,7 +38,7 @@ class Lesson_det(models.Model):
 	visible = models.BooleanField(default=True)
 	enable 	= models.BooleanField(default=False)
 
-	saw 	= models.BooleanField(default=False)
+	reset = models.BooleanField(default=False)
 
 	day_lesson 	= models.DateField(null=True, blank=True)
 	hour_chance =  models.TimeField(null=True, blank=True)
@@ -55,6 +55,5 @@ class Lesson_det(models.Model):
 	def custom_update_lesson(self):
 		self.cant_in = self.id_user_fk.count()
 		self.quota = self.cant_max - self.cant_in
-		print("este es el estado de saw: " + str(self.saw))
 		self.save()
 

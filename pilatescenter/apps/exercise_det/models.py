@@ -32,39 +32,35 @@ class Exercise_det(models.Model):
 			Aquí yo obtengo todas las clases que han sido vista por este usuario,
 		 	luego de obtenerlo lo saco de las clases vistas
 		"""
-		saw_lessons = Lesson_det.objects.filter(
-													lesson_status = Lesson_det.FINISHED,
-													id_exercise_fk= self.id_exercise_fk,
-													id_user_fk= self.id_user_fk
-												)
-		for saw_lesson in saw_lessons:
-			saw_lesson.id_user_fk.remove(self.id_user_fk)
-
 		self.total_days = self.id_plan_fk.total_days
 		self.enable_lessons = self.id_plan_fk.total_days
 
-		self.saw_lessons = Lesson_det.objects.filter(
-														lesson_status = Lesson_det.FINISHED,
-														id_exercise_fk= self.id_exercise_fk,
-														id_user_fk= self.id_user_fk
-													).count()
+		Lesson_det.objects.filter(
+									reset= False,
+									lesson_status = Lesson_det.FINISHED,
+									id_exercise_fk= self.id_exercise_fk,
+									id_user_fk= self.id_user_fk
+								).update(reset=True)
+		self.saw_lessons = 0
+							
 		self.bag = 0
 
 		self.oportunities = self.id_plan_fk.oportunities
 		self.scheduled_lessons = Lesson_det.objects.filter(
-															id_exercise_fk= self.id_exercise_fk,
-															id_user_fk= self.id_user_fk
+																reset= False,
+																id_exercise_fk= self.id_exercise_fk,
+																id_user_fk= self.id_user_fk
 														   ).exclude(lesson_status = Lesson_det.FINISHED).count()
 		self.save()
 
-		#si existen clases vistas y sin personas, en esta operación eliminamos esas lecciones
-		saw_lessons = Lesson_det.objects.filter(
-													lesson_status = Lesson_det.FINISHED,
-													id_exercise_fk= self.id_exercise_fk
-												)
-		for saw_lesson in saw_lessons:
-			if saw_lesson.id_user_fk.all().count() == 0:
-				saw_lesson.delete()
+		# si existen clases vistas y sin personas, en esta operación eliminamos esas lecciones
+		# saw_lessons = Lesson_det.objects.filter(
+		# 											lesson_status = Lesson_det.FINISHED,
+		# 											id_exercise_fk= self.id_exercise_fk
+		# 										)
+		# for saw_lesson in saw_lessons:
+		# 	if saw_lesson.id_user_fk.all().count() == 0:
+		# 		saw_lesson.delete()
 
 
 
@@ -137,7 +133,12 @@ def asign_exercise_after_user_created(sender, instance, created, *args, **kwargs
 				not_one_plan = Plan.objects.create(name= "ninguno")
 
 			for i in exercises:
-				Exercise_det.objects.create(name=i.name, id_plan_fk=not_one_plan, id_exercise_fk=i, id_user_fk=instance)
+				Exercise_det.objects.create(
+												name=i.name,
+												id_plan_fk=not_one_plan,
+												id_exercise_fk=i,
+												id_user_fk=instance
+											)
 signals.post_save.connect(asign_exercise_after_user_created, sender=CustomUser)
 
 
@@ -149,11 +150,11 @@ def update_lesson_m2m_post_add(sender, instance, action="post_add", *args, **kwa
 	"""Después de que añado un usuario a una clase, actualizo su resumen"""
 	if action == "post_add":
 		id_user_fk=list(kwargs["pk_set"])
-		user_exercise_det = Exercise_det.objects.get(id_exercise_fk= instance.id_exercise_fk, id_user_fk= id_user_fk[0])
+		user_exercise_det = Exercise_det.objects.get( id_exercise_fk= instance.id_exercise_fk, id_user_fk= id_user_fk[0])
 		
 		# #Esta el la cantidad de clases programadas del usuario
-		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(id_exercise_fk= instance.id_exercise_fk, id_user_fk= id_user_fk[0]).exclude(lesson_status = Lesson_det.FINISHED).count()
-		user_exercise_det.saw_lessons = Lesson_det.objects.filter(id_exercise_fk= instance.id_exercise_fk, id_user_fk= id_user_fk[0]).exclude( lesson_status = Lesson_det.FINISHED).count()
+		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= id_user_fk[0]).exclude(lesson_status = Lesson_det.FINISHED).count()
+		user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= id_user_fk[0], lesson_status = Lesson_det.FINISHED).count()
 		user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
 		user_exercise_det.save()
 
@@ -167,10 +168,10 @@ def update_lesson_m2m_pre_remove(sender, instance, action="pre_remove", *args, *
 	if action == "pre_remove":
 		id_user_fk=list(kwargs["pk_set"])#este es la id del usuario pasado por parametros en el "remove()"
 
-		user_exercise_det = Exercise_det.objects.get(id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= id_user_fk[0])
+		user_exercise_det = Exercise_det.objects.get( id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= id_user_fk[0])
 		#Esta el la cantidad de clases programadas del usuario
-		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= id_user_fk[0]).exclude(id=instance.id).exclude( lesson_status = Lesson_det.FINISHED).count()
-		user_exercise_det.saw_lessons = Lesson_det.objects.filter(id_exercise_fk= instance.id_exercise_fk, id_user_fk= id_user_fk[0], lesson_status = Lesson_det.FINISHED).count()
+		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= id_user_fk[0]).exclude(id=instance.id).exclude( lesson_status = Lesson_det.FINISHED).count()
+		user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= id_user_fk[0], lesson_status = Lesson_det.FINISHED).count()
 		user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
 		user_exercise_det.save()
 signals.m2m_changed.connect(update_lesson_m2m_pre_remove, sender=Lesson_det.id_user_fk.through)
@@ -209,7 +210,7 @@ def update_resumen(lesson):
 		user_exercise_det = Exercise_det.objects.get(id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user)
 
 		#Esta el la cantidad de clases programadas del usuario
-		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user).exclude(id=lesson.id).exclude( lesson_status = Lesson_det.FINISHED).count()
-		user_exercise_det.saw_lessons = Lesson_det.objects.filter(id_exercise_fk= user_exercise_det.id_exercise_fk, id_user_fk= user_exercise_det.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
+		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user).exclude(id=lesson.id).exclude( lesson_status = Lesson_det.FINISHED).count()
+		user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= user_exercise_det.id_exercise_fk, id_user_fk= user_exercise_det.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
 		user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
 		user_exercise_det.save()
