@@ -8,28 +8,38 @@ from django.db.models import signals
 class Lesson_det(models.Model):
 
 	#is the value asign here is in capital case or not, is the way that appear in the database
-	NOTONE		= 'NOTONE'
-	OPEN		= 'OPEN'
-	CLOSE		= 'CLOSE'
-	NOTCHANCE 	= 'NOTCHANCE'
-	INPROCESS 	= 'INPROCESS'
-	FINISHED 	= 'FINISHED'
+	NOTONE		= 'VACIO'
+	OPEN		= 'ABIERTO'
+	CLOSE		= 'CERRADO'
+
+	lesson_capacity_status_choices = [
+		(NOTONE, 'VACIO'),
+		(OPEN, 'ABIERTO'),
+		(CLOSE, 'CERRADO'),
+	]
+	lesson_capacity_status = models.CharField(max_length=10,choices=lesson_capacity_status_choices,default=NOTONE)
+
     
+	#--------------------------------------------
+	ENABLE		= '---'
+	NOTCHANCE 	= 'NO CHANCE'
+	INPROCESS 	= 'EN CLASE'
+	FINISHED 	= 'FINALIZADO'
 
 	lesson_status_choices = [
-		(NOTONE, 'NOTONE'),
-		(OPEN, 'OPEN'),
-		(CLOSE, 'CLOSE'),
-		(NOTCHANCE, 'NOTCHANCE'),
-		(INPROCESS, 'INPROCESS'),
-		(FINISHED, 'FINISHED'),
+		(ENABLE, '---'),
+		(NOTCHANCE, 'NO CHANCE'),
+		(INPROCESS, 'EN CLASE'),
+		(FINISHED, 'FINALIZADO'),
     ]
 
 	lesson_status = models.CharField(
 		max_length=10,
 		choices=lesson_status_choices,
-		default=NOTONE,
+		default=ENABLE,
 	)
+	#--------------------------------------------
+	
 
 	cant_max = models.IntegerField(default=0, null=True, blank=True)
 	cant_in = models.IntegerField(default=0)

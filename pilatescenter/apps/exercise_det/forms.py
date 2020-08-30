@@ -29,10 +29,10 @@ class ConfigurationUserExerciseForm(forms.ModelForm):
         total_days    = self.cleaned_data.get("total_days")
         scheduled_lessons = self.cleaned_data.get("scheduled_lessons")
         saw_lessons    = self.cleaned_data.get("saw_lessons")
-
+        bag = self.cleaned_data.get("bag")
     
 
-        if total_days < (scheduled_lessons + saw_lessons):
+        if total_days < (scheduled_lessons + saw_lessons + bag):
             
             raise forms.ValidationError("La cantidad de días disponibles no puede ser menor que la suma de días programados, vistos y en bolsa")
 

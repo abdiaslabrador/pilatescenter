@@ -146,6 +146,17 @@ signals.post_save.connect(asign_exercise_after_user_created, sender=CustomUser)
 #------------------------------------------------------------------------------------------
 #lesson signals 
 #------------------------------------------------------------------------------------------
+
+def postSaveLesson(sender, instance,  *args, **kwargs):
+	if instance.cant_in == 0:
+		instance.lesson_capacity_status= instance.NOTONE
+	elif instance.cant_in == instance.cant_max:
+		instance.lesson_capacity_status = Lesson_det.CLOSE
+	elif instance.cant_in > 0 and instance.cant_in < instance.cant_max:
+		instance.lesson_capacity_status = Lesson_det.OPEN
+
+signals.pre_save.connect(postSaveLesson, sender=Lesson_det)
+
 def update_lesson_m2m_post_add(sender, instance, action="post_add", *args, **kwargs):
 	"""Después de que añado un usuario a una clase, actualizo su resumen"""
 	if action == "post_add":
@@ -159,6 +170,12 @@ def update_lesson_m2m_post_add(sender, instance, action="post_add", *args, **kwa
 		user_exercise_det.save()
 
 		instance.custom_update_lesson()
+		if instance.cant_in < instance.cant_max:
+			instance.lesson_capacity_status = Lesson_det.OPEN
+			instance.save()
+		elif instance.cant_in == instance.cant_max:
+			instance.lesson_capacity_status = Lesson_det.CLOSE
+			instance.save()
 
 signals.m2m_changed.connect(update_lesson_m2m_post_add, sender=Lesson_det.id_user_fk.through)
 
@@ -180,7 +197,13 @@ def update_lesson_m2m_post_remove(sender, instance, action="post_remove", *args,
 	"""Actualizo el la lección"""
 	if action == "post_remove":
 		instance.custom_update_lesson()
-		
+		if instance.cant_in == 0:
+			instance.lesson_capacity_status = Lesson_det.NOTONE
+			instance.save()
+		else:
+			instance.lesson_capacity_status = Lesson_det.OPEN
+			instance.save()
+
 signals.m2m_changed.connect(update_lesson_m2m_post_remove, sender=Lesson_det.id_user_fk.through)
 
 
@@ -194,6 +217,10 @@ def update_lesson_m2m_post_clear(sender, instance, action="post_clear", *args, *
 	"""Actualizo  la lección"""
 	if action == "post_clear":
 		instance.custom_update_lesson()
+		
+		instance.lesson_capacity_status = Lesson_det.NOTONE
+		instance.save()
+
 signals.m2m_changed.connect(update_lesson_m2m_post_clear, sender=Lesson_det.id_user_fk.through)
 
 #------------------------------------------------------------------------------------------

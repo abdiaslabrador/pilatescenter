@@ -20,13 +20,14 @@ def debug_task(self):
     print('Request: {0!r}'.format(self.request))
 
 app.conf.beat_schedule = {
-    'print_names': {
-        'task': 'your_name',
-        'schedule': crontab(minute='*'),
-    },
-    'print_greeting': {
-        'task': 'comida',
-        'schedule': 1,
+    # 'print_names': {
+    #     'task': 'your_name',
+    #     'schedule': crontab(minute='*'),
+    # },
+    'lesson_execute': {
+        'task': 'lessons',
+        # 'schedule': 1,
+    'schedule': crontab(minute='*'),
         'args': ('')
         # 'schedule': crontab(minute='*'),
     },

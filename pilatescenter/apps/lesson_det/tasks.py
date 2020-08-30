@@ -2,6 +2,8 @@ from __future__ import absolute_import, unicode_literals
 import random
 from celery.decorators import task
 from apps.exercise.models import Exercise
+from apps.lesson_det.models import Lesson_det
+from datetime import datetime
 
 @task(name="sum_two_numbers")
 def add(x, y):
@@ -20,7 +22,26 @@ def xsum(numbers):
 def print_name():
 	print("HOLA")
 
-@task(name="comida")
-def anoter(name='task_prueba'):
-	h = Exercise.objects.create(name= name)
-	h.save()
+@task(name="lessons")
+def run_lesson():
+
+	today = datetime.today()
+	lessons = Lesson_det.objects.filter(
+								reset= False,
+								day_lesson= today.date()
+							)
+
+	if lessons:
+		for lesson in lessons:
+			# print(lesson.hour_chance.hour == today.hour and lesson.hour_chance.minute == today.minute)
+			if lesson.hour_chance.hour == today.hour and lesson.hour_chance.minute == today.minute:
+				lesson.lesson_status = lesson.NOTCHANCE
+				lesson.save()
+			elif lesson.hour_lesson.hour == today.hour and lesson.hour_lesson.minute == today.minute:
+				lesson.lesson_status = lesson.INPROCESS
+				lesson.save()
+			elif lesson.hour_end.hour == today.hour and lesson.hour_end.minute == today.minute:
+				lesson.lesson_status = lesson.FINISHED
+				lesson.save()
+	else:
+		print("No hay lecciones")

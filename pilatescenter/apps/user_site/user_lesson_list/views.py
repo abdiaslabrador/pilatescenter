@@ -34,7 +34,8 @@ class UserLessonListView(View):
 				messages.success(self.request, 'El ejercicio fue eliminado', extra_tags='alert-danger')
 				return redirect('user_home:user_home')
 
-			lessons = Lesson_det.objects.filter(
+			lessons = Lesson_det.objects.filter(	
+													reset = False,
 													id_user_fk=request.user,
 													id_exercise_fk=self.kwargs['id_exercise'],
 												).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson")
@@ -100,7 +101,8 @@ class UserInBagView(View):
 
 class UserBagView(View):
 	"""
-		
+		Aquí hago unos filtros para obtener las clases donde el usuario no está y tampoco esté 
+		llena, y que estas clases estén a unos ciertos días hacia adelante.
 	"""
 	template_name='user_site/lesson_list/bag/bag.html'
 	context = {}
@@ -111,6 +113,7 @@ class UserBagView(View):
 			return redirect('user_login:user_login_form')
 		else:
 			today = datetime.today()
+			
 			today_delta = timedelta(days = 5)
 			plus_days = today + today_delta
 
@@ -123,8 +126,9 @@ class UserBagView(View):
 			if self.exercise_det.bag > 0:
 
 				days_already_have = Lesson_det.objects.filter(	
+																reset=False,
 																id_user_fk=request.user.id,
-													).exclude(lesson_status = Lesson_det.FINISHED).values('day_lesson')
+															).exclude(lesson_status = Lesson_det.FINISHED).values('day_lesson')
 
 				user_days_already_have=[]
 				for day in days_already_have:
@@ -132,10 +136,12 @@ class UserBagView(View):
 				
 				
 				unfiltered_lessons = Lesson_det.objects.filter(
-														id_exercise_fk=self.exercise_det.id_exercise_fk,
-														cant_in__lt=F('cant_max'),
-														day_lesson__range=(today, plus_days),
-													).exclude(id_user_fk__id=request.user.id).exclude( lesson_status = Lesson_det.FINISHED).order_by("day_lesson") 
+																reset=False,
+																id_exercise_fk=self.exercise_det.id_exercise_fk,
+																lesson_status = Lesson_det.ENABLE,
+																cant_in__lt=F('cant_max'),
+																day_lesson__range=(today, plus_days),
+															).exclude(cant_in=0).exclude(id_user_fk__id=request.user.id).order_by("day_lesson") 
 				lessons = []
 				for unfiltered_lesson in unfiltered_lessons:
 					if unfiltered_lesson.day_lesson.strftime("%A") not in user_days_already_have:
@@ -187,7 +193,7 @@ class UserBagDaySelectedView(View):
 				exercise_det.save()
 				lesson.id_user_fk.add(user)
 
-				messages.success(self.request, 'Has agragado con exito la clase', extra_tags='alert-success')
+				messages.success(self.request, 'Has agregado con exito la clase', extra_tags='alert-success')
 
 				return redirect('user_lesson:lesson_list', id_exercise=lesson.id_exercise_fk.id)
 			else:

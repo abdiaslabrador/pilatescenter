@@ -57,7 +57,7 @@
                       <td>{{lesson.id_exercise_fk.name}}</td>
 
                        <!-- Boton de que permite eliminar la leccion-->
-                       {% if exercise_det.oportunities > 0 %}
+                       {% if exercise_det.oportunities > 0 and lesson.lesson_status == lesson.ENABLE%}
                       <td> 
                         <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#bolsa{{lesson.id}}">Reservar
                         </button>
@@ -84,7 +84,7 @@
                       </td>
                       {%else%}
                       <td>
-                      ---
+                      {{lesson.lesson_status}}
                       </td>
                       {%endif%}
                   </tr>

@@ -132,7 +132,8 @@ class ListLessonView(View):
 
 		if form.is_valid():
 			exercise=Exercise.objects.get(id = self.kwargs['pk'])
-			lessons = Lesson_det.objects.filter(
+			lessons = Lesson_det.objects.filter(	
+													reset = False,
 												    id_exercise_fk=exercise,
 												    day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
 												    
@@ -148,7 +149,7 @@ class ListLessonView(View):
 			print(form.errors.as_data)
 			print("something happened")
 			exercise=Exercise.objects.get(id = self.kwargs['pk'])
-			lessons = Lesson_det.objects.filter(id_exercise_fk=exercise).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")	
+			lessons = Lesson_det.objects.filter(reset = False, id_exercise_fk=exercise).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")	
 			context = {
 							'exercise':exercise,
 							'lessons':lessons,
@@ -164,7 +165,7 @@ class ListLessonView(View):
 
 		form = SearchClassesForm()
 		exercise=Exercise.objects.get(id = self.kwargs['pk'])
-		lessons = Lesson_det.objects.filter(id_exercise_fk=exercise).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")	
+		lessons = Lesson_det.objects.filter(reset = False, id_exercise_fk=exercise).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")	
 		context = {
 						'exercise':exercise,
 						'lessons':lessons,
@@ -197,8 +198,6 @@ class UpdateLessonView(View):
 			#if the new size of cant_max is less than can_in i delete  all users in the class to re-asign the 'cant_max' of the lesson. 
 			if lesson.cant_max < lesson.cant_in:
 				lesson.id_user_fk.clear() #after I reassign them the number of lessons they have scheduled regardless of the current lesson. I clean the users that are inside
-				lesson.lesson_status = Lesson_det.NOTONE
-				lesson.save()
 			return redirect('lesson:update_lesson', pk=lesson.id)
 		
 		return render(request, self.template_name, {'form':form})
@@ -287,12 +286,7 @@ class AddToLessonView(View):
 			#me aseguro que la cantidad de persona en la clase sea menor que la permitida
 			if lesson.cant_in < lesson.cant_max:
 				lesson.id_user_fk.add(user)#añado el usuario a la clase
-				if lesson.cant_in < lesson.cant_max:
-					lesson.lesson_status = Lesson_det.OPEN
-					lesson.save()
-				elif lesson.cant_in == lesson.cant_max:
-					lesson.lesson_status = Lesson_det.CLOSE
-					lesson.save()
+				
 		else:
 			#mensajes que paso en el template
 			if Lesson_det.objects.filter(id=lesson.id, id_user_fk=user).count() > 0: #si el usuario está en la clase
@@ -331,9 +325,7 @@ class TakeOutToLessonView(View):
 			#me aseguro que hayan usuarios en la clase
 			if lesson.id_user_fk.count() > 0:
 				lesson.id_user_fk.remove(user)#saco al usuario
-				if lesson.cant_in == 0:
-					lesson.lesson_status = Lesson_det.NOTONE
-					lesson.save()
+
 		return redirect('lesson:update_lesson', pk=lesson.id)
 
 
