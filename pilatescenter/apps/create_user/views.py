@@ -206,7 +206,7 @@ class ResetUsersView(View):
 	"""
 		here i reset all users when  the button is pressed that had the exercise specified
 		The condition to reset a user is: a user cannot has at least one lesson scheduled
-	 """
+	"""
 	def get(self, request, *args, **kwargs):
 
 		#validacion de que sea un superusuario
@@ -226,7 +226,7 @@ class ResetUsersView(View):
 				return redirect('exercise:list_exercise')
 
 		#obtengo todos los exercise_det de los usuarios con el respectivo ejercicio que se puedan reiniciar
-		exercises_det = Exercise_det.objects.filter(id_exercise_fk=exercise).filter(reset=True)
+		exercises_det = Exercise_det.objects.filter(id_exercise_fk=exercise)
 		for exercise_det in exercises_det:
 			exercise_det.resetter()
 

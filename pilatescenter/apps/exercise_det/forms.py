@@ -96,7 +96,7 @@ class ConfigurationUserResetForm(forms.ModelForm):
         id_user_fk    = self.cleaned_data.get("id_user_fk")
         id_exercise_fk = self.cleaned_data.get("id_exercise_fk")
 
-        cant_lesson_scheduled = Lesson_det.objects.filter(id_exercise_fk= id_exercise_fk.id, id_user_fk= id_user_fk.id, saw= False).count()
+        cant_lesson_scheduled = Lesson_det.objects.filter(reset = False, id_exercise_fk= id_exercise_fk.id, id_user_fk= id_user_fk.id).exclude(lesson_status = Lesson_det.FINISHED).count()
         if reset == False:
             if cant_lesson_scheduled > 0:
                 #el error de abajo no sale porque tube que marañar con un mensaje de aviso de boostrap

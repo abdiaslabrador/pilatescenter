@@ -29,29 +29,61 @@ class Exercise_det(models.Model):
 
 	def resetter(self):
 		"""
-			Aquí yo obtengo todas las clases que han sido vista por este usuario,
-		 	luego de obtenerlo lo saco de las clases vistas
+
 		"""
-		self.total_days = self.id_plan_fk.total_days
-		self.enable_lessons = self.id_plan_fk.total_days
+		if self.reset == True:
+			self.total_days = self.id_plan_fk.total_days
+			self.enable_lessons = self.id_plan_fk.total_days
 
-		Lesson_det.objects.filter(
-									reset= False,
-									lesson_status = Lesson_det.FINISHED,
-									id_exercise_fk= self.id_exercise_fk,
-									id_user_fk= self.id_user_fk
-								).update(reset=True)
-		self.saw_lessons = 0
-							
-		self.bag = 0
+			Lesson_det.objects.filter(
+										reset= False,
+										lesson_status = Lesson_det.FINISHED,
+										id_exercise_fk= self.id_exercise_fk,
+										id_user_fk= self.id_user_fk
+									).update(reset=True)
+			self.saw_lessons = 0
+								
+			self.bag = 0
 
-		self.oportunities = self.id_plan_fk.oportunities
-		self.scheduled_lessons = Lesson_det.objects.filter(
-																reset= False,
-																id_exercise_fk= self.id_exercise_fk,
-																id_user_fk= self.id_user_fk
-														   ).exclude(lesson_status = Lesson_det.FINISHED).count()
-		self.save()
+			self.oportunities = self.id_plan_fk.oportunities
+			self.scheduled_lessons = Lesson_det.objects.filter(
+																	reset= False,
+																	id_exercise_fk= self.id_exercise_fk,
+																	id_user_fk= self.id_user_fk
+															   ).exclude(lesson_status = Lesson_det.FINISHED).count()
+			self.save()
+		else:
+
+			self.total_days = self.enable_lessons + self.bag
+			not_one_plan= None
+
+			try:
+				not_one_plan = Plan.objects.get(name__iexact= "ninguno")
+			except Plan.DoesNotExist:
+				not_one_plan = Plan.objects.create(name= "ninguno")
+
+			self.id_plan_fk = not_one_plan
+
+			self.enable_lessons = self.total_days
+
+			Lesson_det.objects.filter(
+										reset= False,
+										lesson_status = Lesson_det.FINISHED,
+										id_exercise_fk= self.id_exercise_fk,
+										id_user_fk= self.id_user_fk
+									).update(reset=True)
+			self.saw_lessons = 0
+								
+			self.bag = 0
+
+			self.oportunities = self.id_plan_fk.oportunities
+			self.scheduled_lessons = Lesson_det.objects.filter(
+																	reset= False,
+																	id_exercise_fk= self.id_exercise_fk,
+																	id_user_fk= self.id_user_fk
+															   ).exclude(lesson_status = Lesson_det.FINISHED).count()
+			self.save()
+
 
 		# si existen clases vistas y sin personas, en esta operación eliminamos esas lecciones
 		# saw_lessons = Lesson_det.objects.filter(
@@ -61,9 +93,6 @@ class Exercise_det(models.Model):
 		# for saw_lesson in saw_lessons:
 		# 	if saw_lesson.id_user_fk.all().count() == 0:
 		# 		saw_lesson.delete()
-
-
-
 
 def set_plan_ninguno_after_exercise_det_deleted(sender, instance, *args, **kwargs):
     """ 
@@ -147,7 +176,7 @@ signals.post_save.connect(asign_exercise_after_user_created, sender=CustomUser)
 #lesson signals 
 #------------------------------------------------------------------------------------------
 
-def postSaveLesson(sender, instance,  *args, **kwargs):
+def preSaveLesson(sender, instance,  *args, **kwargs):
 	if instance.cant_in == 0:
 		instance.lesson_capacity_status= instance.NOTONE
 	elif instance.cant_in == instance.cant_max:
@@ -155,8 +184,13 @@ def postSaveLesson(sender, instance,  *args, **kwargs):
 	elif instance.cant_in > 0 and instance.cant_in < instance.cant_max:
 		instance.lesson_capacity_status = Lesson_det.OPEN
 
-signals.pre_save.connect(postSaveLesson, sender=Lesson_det)
+signals.pre_save.connect(preSaveLesson, sender=Lesson_det)
 
+def postSaveLesson(sender, instance, created,  *args, **kwargs):
+	update_resumen(instance)
+
+signals.post_save.connect(postSaveLesson, sender=Lesson_det)
+	
 def update_lesson_m2m_post_add(sender, instance, action="post_add", *args, **kwargs):
 	"""Después de que añado un usuario a una clase, actualizo su resumen"""
 	if action == "post_add":

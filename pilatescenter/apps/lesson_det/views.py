@@ -353,8 +353,7 @@ class SawLessonView(View):
 		lesson.save()
 		update_resumen(lesson)#this function updates the "summary" of the exercise related to the lesson
 
-		for users_in_lesson in lesson.id_user_fk.all():
-			history_obj.id_user_fk.add(users_in_lesson)
+		
 		
 
 		return redirect('lesson:list_lesson', pk=lesson.id_exercise_fk.id)
