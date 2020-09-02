@@ -36,7 +36,7 @@ class CreateLessonView(View):
 		form =  CreateLessonForm(request.POST)
 
 		if form.is_valid():
-			pk=form.cleaned_data['id_exercise_fk'].id
+			pk=self.kwargs['id_exercise']
 			year=form.cleaned_data['day_lesson'].year
 			month=form.cleaned_data['day_lesson'].month
 			day=form.cleaned_data['day_lesson'].day

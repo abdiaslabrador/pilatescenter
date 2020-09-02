@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'apps.login',
     'apps.create_user',
     'apps.plan',
+    'apps.devolution',
     'apps.exercise',
     'apps.exercise_det',
     'apps.lesson_det',

@@ -1,6 +1,7 @@
 from django.db import models
 from apps.exercise.models import Exercise
 from apps.create_user.models import CustomUser
+
 from django.db.models import signals
 
 
@@ -54,6 +55,7 @@ class Lesson_det(models.Model):
 	hour_chance =  models.TimeField(null=True, blank=True)
 	hour_lesson =  models.TimeField(null=True, blank=True)
 	hour_end 	=  models.TimeField(null=True, blank=True)
+
 
 	id_user_fk = models.ManyToManyField(CustomUser, blank=True)
 	id_exercise_fk = models.ForeignKey(Exercise, null=True, blank=True, on_delete=models.CASCADE, db_column='id_exercise_fk')

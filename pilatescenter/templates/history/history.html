@@ -14,7 +14,10 @@
 
         <div class="card-body">
           <div class="container">
-            <h3>{{history_det.day_lesson|date:"l. M d, Y"}}</h3>
+            <h3 class="text-center">Historial ID: {{history_det.id}}</h3>
+            <h5>
+              {{history_det.day_lesson|date:"l. M d, Y"}}
+            </h5>
             <h5>
               Cantidad permitida: {{history_det.cant_max}}
               Cantidad en la clase: {{history_det.cant_in}}

@@ -19,6 +19,8 @@
         {% endfor %}
       {% endif %}
 
+       <a  class="btn btn-warning create_boton "  href="{% url 'lesson:create_lesson_form' exercise.id %} ">Crear leccion</a>
+
       <H1 class="text-center">{{exercise.name|title}} - Lista de clases</H1>
         <!-- Buscador de clases -->
         <form method="post">

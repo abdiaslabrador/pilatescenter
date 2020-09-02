@@ -1,0 +1,92 @@
+{% extends "base_template/base_tamplate.html" %}
+{% load static %}
+
+{% block title %}Devoluciones no devueltas{% endblock %}
+
+  {% block content %}
+      <button id="exercise_id" hidden>{{exercise.id}}</button><!-- Esto se usa en el js de este template (abajo)-->
+      <div class="container mt-4">
+        <H1 class="text-center"></H1>
+        
+        <!-- Impresión de mensaje de error, en tal caso que hubiese -->
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+              <p>{{ message }}</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="table-responsive">
+          <table class="table panding" style="margin: 30px 0px;">
+          <thead class="thead-light">
+            <tr>
+                <th colspan="5">Lista de devoluciones no devueltas</th>
+                <th colspan="3">Escriba un id:<input type="text" id="caja" onkeyup="buscar()"></th>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Tipo</th>
+                <th>Cant</th>
+                <th colspan="3" >Acción</th>
+            </tr>
+          </thead>
+          <tbody id="contenido">
+            {% if devolutions %}
+              {% for devolution in devolutions%}
+                  <tr>
+                  <td >{{devolution.id}}</td>
+                      <td>{{devolution.day_lesson|date:"l. M d, Y"}}</td>
+                      <td>{{devolution.hour_lesson}}</td>
+                      <td>{{devolution.id_exercise_fk.name}}</td>
+                      <td>{{devolution.cant_in}}/{{devolution.cant_max}}</td>
+
+                      <td><a class="btn btn-ver" target="_blank" href="{% url 'devolution:see_notretorned_devolution' devolution.id %}">Ver</a></td>
+
+                      <!-- Boton de que permite eliminar la historia-->
+                      <td> 
+                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#notreturned{{devolution.id}}">Eliminar
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id=notreturned{{devolution.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">¿Está seguro?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <!-- <div class="modal-body">                          
+                                
+                              </div>  -->
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                <a class="btn btn-primary" href="{% url 'devolution:delete_devolution' devolution.id %}">Aceptar</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                  </tr>
+              {% endfor %}
+            {%else%}
+                  <tr>
+                    <td >No hay devoluciones</td>
+                  </tr>
+            {%endif%}
+          </tbody>
+          </table>
+          </div>
+        <br>
+          </div>
+{% endblock %}
+
+<!-- {% block custom_js %}
+  <script src="{% static 'js/history/list_history.js' %}"></script>
+{% endblock %} -->

@@ -1,0 +1,47 @@
+{% extends "base_template/base_tamplate.html" %}s
+{% load static %}
+
+{% block title %}Tipo de devoluciones{% endblock %}
+
+  {% block content %}
+      <div class="container mt-4">
+        <h1 class="text-center">Acciones</h1>
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+              <p>{{ message }}</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        
+        <div class="table-responsive">
+          <table class="table panding" style="margin: 30px 0px;">
+          <thead class="thead-light">
+            <tr>
+                <th colspan="2">Tipo de devoluciones</th>
+
+            </tr>
+            <tr>
+                <!--<th>Id</th>-->
+                <th>Opciones</th>
+                <th class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+                  <tr>
+                      <td>Echas</td>
+                      <td><a class="btn btn-ver" href="{% url 'devolution:' %}">Ver</a></td>
+                  </tr>
+                  <tr>
+                      <td>No echas</td>
+                      <td><a class="btn btn-ver" href="{% url 'devolution:' %}">Ver</a></td>
+                  </tr>
+          </tbody>
+          </table>
+          </div>
+        <br>
+          </div>
+{% endblock %}

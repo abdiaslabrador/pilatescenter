@@ -1,0 +1,37 @@
+{% extends "base_template/base_tamplate.html" %}
+{% load static %}
+
+{% block title %}Devolución no devuelta{% endblock %}
+
+
+      {% block content %}
+      <div class="container ">
+      <div class="card panding">
+        <div class="card-header">
+          <h5 class="card-title">Devolución</h5>
+        </div>
+        
+
+        <div class="card-body">
+          <div class="container">
+
+            <h3 class="text-center">Devolución "NO DEVUELTA" ID: {{devolution.id}}</h3>
+            <h5>Username: {{devolution.id_user_fk.username}}</h5>
+            <h5>{{devolution.day_lesson|date:"l. M d, Y"}}</h5>
+            <h5>
+              Cantidad permitida: {{devolution.cant_max}}
+              Cantidad en la clase: {{devolution.cant_in}}
+            </h5>
+              
+              <ul>
+                <li>ID de la lección asociada: <a href="{% url 'history:general_see_history'  lesson_retorned.id devolution.id_exercise_fk.id %}">{{lesson_retorned.id}}</a></li>
+                <li>Hora de chance: {{devolution.hour_chance}}</li>
+                <li>Hora de comienzo: {{devolution.hour_lesson}}</li>
+                <li>Hora de terminar: {{devolution.hour_end}}</li>
+              </ul>
+
+          </div>
+        </div>
+    </div>
+    </div>
+    {% endblock %}

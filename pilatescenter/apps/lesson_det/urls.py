@@ -4,7 +4,7 @@ from . import views
 app_name='lesson'
 
 urlpatterns = [
-	path('create_lesson/', views.CreateLessonView.as_view(), name='create_lesson_form'),
+	path('create_lesson/<int:id_exercise>', views.CreateLessonView.as_view(), name='create_lesson_form'),
 	path('busqueda/<int:pk>/<int:year>/<int:month>/<int:day>/', views.CreateLessonSearchView.as_view(), name='create_lesson_form_search'),
 	path('list_lesson_exercise_action/', views.ListLessonExerciseActionView.as_view(), name='list_lesson_exercise_action'),
 	path('list_lesson/<int:pk>/', views.ListLessonView.as_view(), name='list_lesson'),

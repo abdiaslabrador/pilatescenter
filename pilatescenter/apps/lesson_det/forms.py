@@ -7,7 +7,7 @@ from apps.exercise.models import Hour, Exercise
 #lesson
 #------------------------------------------------------------------------------------------
 class CreateLessonForm(forms.Form):
-	id_exercise_fk =forms.ModelChoiceField(label = "Tipo de ejercicio:", required=True, queryset=Exercise.objects.all())
+	
 	day_lesson = forms.DateField(label = "Día:", required=True)
 	
 
