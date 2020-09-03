@@ -5,7 +5,7 @@
 
   {% block content %}
       <div class="container mt-4">
-        <h1 class="text-center">Acciones</h1>
+        <h1 class="text-center">Devoluciones</h1>
         {% if messages %}
         {% for message in messages %}
         <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
@@ -30,15 +30,16 @@
                 <th class="text-center">Acción</th>
             </tr>
           </thead>
-          <tbody>
-                  <tr>
-                      <td>Echas</td>
-                      <td><a class="btn btn-ver" href="{% url 'devolution:' %}">Ver</a></td>
-                  </tr>
+          <tbody> 
                   <tr>
                       <td>No echas</td>
-                      <td><a class="btn btn-ver" href="{% url 'devolution:' %}">Ver</a></td>
+                      <td><a class="btn btn-ver" href="{% url 'devolution:users_notreturned_devolution' %}">Ver</a></td>
                   </tr>
+                  <tr>
+                      <td>Echas</td>
+                      <td><a class="btn btn-ver" href="{% url 'devolution:users_returned_devolution' %}">Ver</a></td>
+                  </tr>
+                  
           </tbody>
           </table>
           </div>

@@ -1,0 +1,73 @@
+{% extends "base_template/base_tamplate.html" %}
+{% load static %}
+
+{% block title %}Devoluciones{% endblock %}
+
+
+{% block content %}
+        <button id="boolean" hidden>active</button> <!-- esto es para js -->
+        <button id="adminuser_id" hidden>{{user.id}}</button> <!-- esto es para js -->
+
+        <div class="container mt-4" >
+        <h1 class="text-center">Lista de usuarios con devoluciones devueltas</h1>
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+              <p>{{ message }}</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+      
+        
+        <div class="table-responsive">
+        <table  class="table panding" style="margin: 30px 0px;">
+          <thead class="thead-light">
+            <tr>
+                <th colspan="5">Lista de usuarios devoluciones echas</th>
+                <th colspan="2"><input type="text" id="caja" onkeyup="buscar()"></th>
+            </tr>
+            <tr>
+                <!--<th>Id</th>-->
+                <th>Username</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>c.i</th>
+                <th colspan="3" class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="contenido">
+            {%if devolutions%}
+                {% for devolution in devolutions%}
+                <tr>
+                  <td hidden>{{devolution.id_user_fk.id}}</td>
+                  <td>{{devolution.id_user_fk.username}}</td>
+                  <td>{{devolution.id_user_fk.first_name}}</td>
+                  <td>{{devolution.id_user_fk.last_name}}</td>
+                  <td>{{devolution.id_user_fk.ci}}</td>
+
+                  
+                  <td><a class="btn btn-ver"  href="{% url 'devolution:returned_list_devolution' devolution.id_user_fk.id %}">Devueltas</a></td>
+                    
+
+                </tr>
+                {% endfor %}
+              {%else%}  
+              <tr>
+                <td>No hay usuarios con devoluciones</td>
+              </tr>
+              {%endif%}
+          </tbody>
+          </table>
+          </div>
+          </div>
+{% endblock %}
+
+
+<!-- {% block custom_js %}
+  <script src="{% static 'js/users/usuarios_activos_bloqueados.js' %}"></script>
+{% endblock %}
+ -->

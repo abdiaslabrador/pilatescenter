@@ -21,7 +21,7 @@ class DevolutionDecideView(View):
 
 #devolution user list
 class DevolutionNotReturnedUsersView(View):
-	template_name= 'devolution/devolution_users_list.html'
+	template_name= 'devolution/notreturned_users_list.html'
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
@@ -50,6 +50,46 @@ class NotReturnedListView(View):
 
 		devolutions = Devolution.objects.filter(	
 													returned = False,
+													id_user_fk = self.kwargs['id_user']
+			 									)
+
+		context={	
+					'devolutions':devolutions,
+				}
+
+		return render(request, self.template_name, context)
+
+#devolution user list
+class DevolutionReturnedUsersView(View):
+	template_name= 'devolution/returned_users_list.html'
+
+	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
+		devolutions = Devolution.objects.filter(	
+													returned = True,
+			 									).exclude(id_user_fk = None).order_by('id_user_fk__username').distinct('id_user_fk__username')
+
+		context={	
+					'devolutions':devolutions,
+				}
+
+		return render(request, self.template_name, context)
+
+
+#devolution list
+class ReturnedListView(View):
+	template_name= 'devolution/devolution_returned_table.html'
+
+	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
+		devolutions = Devolution.objects.filter(	
+													returned = True,
 													id_user_fk = self.kwargs['id_user']
 			 									)
 
@@ -100,7 +140,7 @@ class DevolutionDeleteView(View):
 			
 		devolution.delete()
 
-		return redirect('devolution:devolution_users_list')
+		return redirect('devolution:decide_devolution')
 
 #devolution update
 class UpdateDevolutionView(View):

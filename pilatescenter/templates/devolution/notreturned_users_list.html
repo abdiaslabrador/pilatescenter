@@ -9,6 +9,7 @@
         <button id="adminuser_id" hidden>{{user.id}}</button> <!-- esto es para js -->
 
         <div class="container mt-4" >
+        <h1 class="text-center">Lista de usuarios con devoluciones no devueltas</h1>
         {% if messages %}
         {% for message in messages %}
         <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
@@ -48,8 +49,7 @@
                   <td>{{devolution.id_user_fk.last_name}}</td>
                   <td>{{devolution.id_user_fk.ci}}</td>
 
-                  <td><a class="btn btn-ver"  href="{% url 'devolution:devolution_notreturned' devolution.id_user_fk.id %}">No devueltas</a></td>
-                  <td><a class="btn btn-ver"  href="#">Devueltas</a></td>
+                  <td><a class="btn btn-ver"  href="{% url 'devolution:notreturned_list_devolution' devolution.id_user_fk.id %}">No devueltas</a></td>
                     
 
                 </tr>
