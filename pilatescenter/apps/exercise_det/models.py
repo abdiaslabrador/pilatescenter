@@ -3,12 +3,13 @@ from apps.plan.models import Plan
 from apps.exercise.models import Exercise, Day
 from apps.lesson_det.models import Lesson_det
 from apps.create_user.models import CustomUser
+from apps.devolution.models import Devolution
 from django.db.models import signals
 
 
 class Exercise_det(models.Model):
 	name  =	models.CharField(max_length=64)
-
+	devolutions = models.IntegerField(default=0)
 	total_days	 = models.IntegerField(default=0)
 
 	enable_lessons 		= models.IntegerField(default=0)
@@ -20,7 +21,7 @@ class Exercise_det(models.Model):
 
 	reset = models.BooleanField(default=True)
 
-	id_plan_fk 	   = models.ForeignKey(Plan, null=True, blank=True, on_delete=models.CASCADE, db_column='id_plan_fk')
+	id_plan_fk 	   = models.ForeignKey(Plan,  on_delete=models.CASCADE, db_column='id_plan_fk')
 	id_exercise_fk = models.ForeignKey(Exercise, null=True, blank=True, on_delete=models.CASCADE, db_column='id_exercise_fk')
 	id_user_fk 	   = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.CASCADE, db_column='id_customuser_fk')
 
@@ -31,6 +32,14 @@ class Exercise_det(models.Model):
 		"""
 
 		"""
+		self.devolutions = Devolution.objects.filter(	
+														
+														returned = False,
+														id_user_fk=self.id,
+														id_lesson_fk = None
+													).count()
+
+		
 		if self.reset == True:
 			self.total_days = self.id_plan_fk.total_days
 			self.enable_lessons = self.id_plan_fk.total_days
@@ -171,6 +180,56 @@ def asign_exercise_after_user_created(sender, instance, created, *args, **kwargs
 signals.post_save.connect(asign_exercise_after_user_created, sender=CustomUser)
 
 
+#------------------------------------------------------------------------------------------
+#devolution signals 
+#------------------------------------------------------------------------------------------
+def update_devolution_m2m_post_add(sender, instance, action="post_add", *args, **kwargs):
+	"""Después de que añado un usuario a una clase, actualizo su resumen"""
+	if action == "post_add":
+
+		id_lesson_fk=list(kwargs["pk_set"])
+		lesson = Lesson_det.objects.get(id = id_lesson_fk[0])
+		lesson.custom_update_lesson()
+
+		exercise_det = Exercise_det.objects.get(
+												   id_user_fk= instance.id_user_fk,
+												   id_exercise_fk= instance.id_exercise_fk
+												)
+		
+		
+		exercise_det.devolutions = Devolution.objects.filter(
+																id_lesson_fk = None,
+																returned = False,
+																id_user_fk = instance.id_user_fk
+												).count()
+		exercise_det.save()
+
+
+signals.m2m_changed.connect(update_devolution_m2m_post_add, sender=Devolution.id_lesson_fk.through)
+
+
+def update_devolution_m2m_post_remove(sender, instance, action="post_remove", *args, **kwargs):
+	"""Actualizo el la lección"""
+	if action == "post_remove":
+		id_lesson_fk=list(kwargs["pk_set"])
+		lesson = Lesson_det.objects.get(id = id_lesson_fk[0])
+		lesson.custom_update_lesson()
+		
+		exercise_det = Exercise_det.objects.get(
+												   id_user_fk= instance.id_user_fk,
+												   id_exercise_fk= instance.id_exercise_fk
+												)
+		
+		
+		exercise_det.devolutions = Devolution.objects.filter(
+																id_lesson_fk = None,
+																returned = False,
+																id_user_fk = instance.id_user_fk
+												).count()
+		
+		exercise_det.save()		
+
+signals.m2m_changed.connect(update_devolution_m2m_post_remove, sender=Devolution.id_lesson_fk.through)
 
 #------------------------------------------------------------------------------------------
 #lesson signals 

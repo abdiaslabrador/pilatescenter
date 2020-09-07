@@ -14,6 +14,8 @@ urlpatterns = [
 	path('returned_list/<int:id_user>/', views.ReturnedListView.as_view(), name='returned_list_devolution'),
 	path('see_returned/<int:id_devolution>/', views.DevolutionSeeView.as_view(template_name= 'devolution/devolution_returned.html'), name='devolution_see_returned'),
 
-	path('delete/<int:id_devolution>', views.DevolutionDeleteView.as_view(), name='delete_devolution'),
+	path('delete/<int:id_devolution>/', views.DevolutionDeleteView.as_view(), name='delete_devolution'),
 	path('update_devolution/<int:id_lesson>/', views.UpdateDevolutionView.as_view(), name='update_devolution'),
+	path('add_to_devolution/<int:id_lesson>/<int:id_user>/', views.AddToDevolutionView.as_view(), name='add_to_devolution'),
+	path('takeout_to_devolution/<int:id_lesson>/<int:id_user>/', views.TakeOutToDevolutionView.as_view(), name='takeout_to_devolution'),
 ]	

@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from apps.exercise.models import Exercise, Hour
 from apps.exercise_det.models import Exercise_det, update_resumen
 from apps.create_user.models import CustomUser
+from apps.devolution.models import Devolution
 from .models import Lesson_det
 
 #views
@@ -218,17 +219,31 @@ class UpdateLessonView(View):
 			return redirect('lesson:list_lesson_exercise_action')
 
 
-		users_in_lesson = CustomUser.objects.filter(is_active=True, lesson_det__id=lesson.id).order_by('username') 
+		#usuarios que están en la clase
+		users_in_lesson = CustomUser.objects.filter(
+														is_active=True, 
+														lesson_det__id=lesson.id
+													).order_by('username')
+		#usuarios que están en devoluciones
+		users_devolution = CustomUser.objects.filter(
+														devolution__id_lesson_fk__id=lesson.id
+													)
+
+		users_list = users_in_lesson
+		users_list = users_list.union(users_devolution).values('id')
+
 		all_users = CustomUser.objects.filter(
 			 									is_active = True,
 			 									exercise_det__id_exercise_fk=lesson.id_exercise_fk,
 			 									exercise_det__reset=True
-			 								  ).order_by('username')
+			 								  ).order_by('username').exclude(id__in=users_list)
+
 		form = UpdateLessonForm(instance=lesson)
 
 		context={	
 					'lesson':lesson,
 					'users_in_lesson':users_in_lesson,
+					'users_devolution':users_devolution,
 					'all_users': all_users,
 					'form':form,
 				}
@@ -265,7 +280,7 @@ class AddToLessonView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('user_exercise_det:login_admin')
 
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
@@ -277,15 +292,29 @@ class AddToLessonView(View):
 			messages.success(request, 'La clase ya fue vista', extra_tags='alert-danger')
 			return redirect('lesson:list_lesson_exercise_action')
 
-		user = CustomUser.objects.get(id=self.kwargs['id_user']) #obtengo el usuario a agregar a la clase
+		try:
+			user = CustomUser.objects.get(id=self.kwargs['id_user'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado', extra_tags='alert-danger')
+			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
 
-		another_user = Exercise_det.objects.get(id_exercise_fk=lesson.id_exercise_fk, id_user_fk=user)
+		user_exercise_det = Exercise_det.objects.get(id_exercise_fk=lesson.id_exercise_fk, id_user_fk=user)
 
 		#me aseguro que el usuario no esté en la clase (si no hago esto cuando le de al botón añadir le quita 1 en programadas)
-		if Lesson_det.objects.filter(id=lesson.id, id_user_fk=user).count() == 0 and another_user.enable_lessons > 0: 
-			#me aseguro que la cantidad de persona en la clase sea menor que la permitida
-			if lesson.cant_in < lesson.cant_max:
-				lesson.id_user_fk.add(user)#añado el usuario a la clase
+		if Lesson_det.objects.filter(id=lesson.id, id_user_fk=user).count() == 0 and user_exercise_det.enable_lessons > 0: 
+			#busca los usuarios que está relacionados con la devolución
+			user_devolution = CustomUser.objects.filter(
+															devolution__id_lesson_fk__id=lesson.id,
+														).filter(id=user.id).count()
+
+			
+			if user_devolution == 0:
+				#me aseguro que la cantidad de persona en la clase sea menor que la permitida
+				if lesson.cant_in < lesson.cant_max:
+					lesson.id_user_fk.add(user)#añado el usuario a la clase
+			else:
+				messages.success(request, 'El usuario ""{}"" ya está en devoluciones'.format(user.username), extra_tags='alert-warning')	
+
 				
 		else:
 			#mensajes que paso en el template
@@ -293,7 +322,7 @@ class AddToLessonView(View):
 				messages.success(request, 'El usuario ""{}"" ya está en la clase'.format(user.username), extra_tags='alert-warning')
 				
 
-			elif another_user.enable_lessons == 0: #si el usuario no tiene clases disponibles
+			elif user_exercise_det.enable_lessons == 0: #si el usuario no tiene clases disponibles
 				messages.success(request, 'El usuario ""{}"" no tiene días disponibles'.format(user.username), extra_tags='alert-warning')
 				
 			
@@ -328,6 +357,43 @@ class TakeOutToLessonView(View):
 
 		return redirect('lesson:update_lesson', pk=lesson.id)
 
+class TakeOutToDevolutionView(View):
+	"""
+		
+	"""
+	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
+		try:
+			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
+		except Lesson_det.DoesNotExist:
+			messages.success(request, 'La clase que desea manipular fue eliminada o no existe', extra_tags='alert-danger')
+			return redirect('lesson:list_lesson_exercise_action')
+
+		if lesson.lesson_status == Lesson_det.FINISHED:
+			messages.success(request, 'La clase ya fue vista', extra_tags='alert-danger')
+			return redirect('lesson:list_lesson_exercise_action')
+
+		try:
+			CustomUser.objects.get(id=self.kwargs['id_user'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado', extra_tags='alert-danger')
+			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
+
+		devolution = Devolution.objects.filter( 
+											 	id_user_fk = self.kwargs['id_user'],
+											 	id_lesson_fk=self.kwargs['id_lesson']
+											   ).first()
+
+		if devolution == None:
+			messages.success(request, 'El usuario no está', extra_tags='alert-danger')
+			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
+
+		devolution.id_lesson_fk.remove(lesson)
+
+		return redirect('lesson:update_lesson', pk=lesson.id)
 
 class SawLessonView(View):
 	"""
@@ -352,9 +418,6 @@ class SawLessonView(View):
 		lesson.lesson_status = Lesson_det.FINISHED
 		lesson.save()
 		update_resumen(lesson)#this function updates the "summary" of the exercise related to the lesson
-
-		
-		
 
 		return redirect('lesson:list_lesson', pk=lesson.id_exercise_fk.id)
 

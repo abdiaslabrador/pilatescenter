@@ -9,6 +9,7 @@ class ConfigurationUserExerciseForm(forms.ModelForm):
     class Meta:
         model = Exercise_det
         fields = (
+                    "devolutions",
         			"total_days",
         			"oportunities",
         			"enable_lessons",
@@ -19,6 +20,7 @@ class ConfigurationUserExerciseForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['devolutions'].widget.attrs.update({'readonly': 'readonly',  'min':0, 'max':28})
         self.fields['scheduled_lessons'].widget.attrs.update({'readonly': 'readonly',  'min':0, 'max':28})
         self.fields['enable_lessons'].widget.attrs.update({'readonly': 'readonly',  'min':0, 'max':28})
         self.fields['saw_lessons'].widget.attrs.update({'readonly': 'readonly',  'min':0, 'max':28})

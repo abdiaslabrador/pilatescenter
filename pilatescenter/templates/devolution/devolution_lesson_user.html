@@ -1,0 +1,107 @@
+{% extends "base_template/base_tamplate.html" %}s
+{% load static %}
+
+{% block title %}Clases acciones{% endblock %}
+
+  {% block content %}
+      <div class="container mt-4">
+        <div class="card panding">
+
+          <div class="card-header">
+          <div class="card-title">
+              <div class="d-flex justify-content-around">
+                <div >
+                    <STRONG>USUARIOS EN LA CLASE</STRONG>
+                </div>
+              </div>
+           </div> 
+            <div class="card-title">
+              <div class="d-flex justify-content-around">
+                <div >
+                    Cantidad max:{{lesson.cant_max}}
+                </div>
+                <div >
+                  En la clase:{{lesson.cant_in}}
+                </div>
+                <div>
+                  Cupos:{{lesson.quota}}
+                </div>
+                <div>
+                  <a href="{% url 'lesson:update_lesson' lesson.id %}">Finalizar</a>
+                </div>
+              </div>
+             </div>
+          </div>
+
+
+          <!-- El mensaje -->
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+              <p>{{ message }}</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endfor %}
+      {% endif %}
+
+          <div class="card-body">
+
+            {% for user in users_in_lesson%}
+             <p><strong>Username:</strong> <a href="{% url 'content_user:modific_user_form' user.id %}">{{user.username}}</a>  <strong>Nombre:</strong> {{user.first_name}}   <strong>Apellido:</strong> {{user.last_name}}   <strong>C.I:</strong> {{user.ci}}<a class="btn btn-danger"   href="{% url 'lesson:takeout_to_lesson' lesson.id user.id %}">Quitar</a></p>
+             
+            {% endfor %}
+          </div>
+
+          <div class="card-header" >
+            <h5 class="card-title">Devoluciones</h5>
+          </div>
+
+          <div class="card-body">
+            {% for user in users_devolution %}
+             <p><strong>Username:</strong> <a href="{% url 'content_user:modific_user_form' user.id %}">{{user.username}}</a>  <strong>Nombre:</strong> {{user.first_name}}   <strong>Apellido:</strong> {{user.last_name}}   <strong>C.I:</strong> {{user.ci}}<a class="btn btn-danger"   href="{% url 'devolution:takeout_to_devolution' lesson.id user.id %}">Quitar</a></p>
+             
+            {% endfor %}
+          </div>
+      </div>
+
+        <div class="table-responsive">
+        <table  class="table panding" style="margin: 30px 0px;">
+          <thead class="thead-light">
+            <tr>
+              <th colspan="7"><small class="form-text text-muted">La búsqueda se hace en usuarios con la opción de <strong>"REINICIAR ACTIVA"</strong></small></th>
+              
+
+            </tr>
+            <tr>
+                <th colspan="5">Usuarios con devoluciones</th>
+                <th colspan="2"><input type="text" id="caja" onkeyup="buscar()"></th>
+            </tr>
+            <tr>
+                <!--<th>Id</th>-->
+                <th>Username</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>c.i</th>
+                <th colspan="3" class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="contenido">
+                {% for user in all_users%}
+                <tr>
+                  <td hidden>{{user.id}}</td>
+                  <td>{{user.username}}</td>
+                  <td>{{user.first_name}}</td>
+                  <td>{{user.last_name}}</td>
+                  <td>{{user.ci}}</td>
+
+                    <td><a class="btn btn-success"  href="{% url 'devolution:add_to_devolution' lesson.id user.id %}">Añadir</a></td>
+                </tr>
+                {% endfor %}
+          </tbody>
+          </table>
+        <br>
+          </div>
+          </div>
+{% endblock %}

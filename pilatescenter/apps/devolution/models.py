@@ -12,7 +12,6 @@ class Devolution(models.Model):
 	hour_lesson =  models.TimeField(null=True, blank=True)
 	hour_end 	=  models.TimeField(null=True, blank=True)
 
-	selected = models.BooleanField(default=False)
 	returned = models.BooleanField(default=False)
 
 	cant_max = models.IntegerField(default=0, null=True, blank=True)

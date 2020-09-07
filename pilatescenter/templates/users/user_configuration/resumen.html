@@ -52,6 +52,13 @@
   <form method="post">
     {% csrf_token %}
     {{form.non_field_errors}}
+
+    <div class="row">
+      <label for="{{form.devolutions.id_for_label}}">Devoluciones:
+      {{form.devolutions}}
+      </label>
+    </div>
+
     <div class="row">
       <label for="{{form.total_days.id_for_label}}">Tolta de dias:
       <input type="number" name="{{form.total_days.name}}"  min=0 max=28 value="{{form.total_days.value}}" id="{{form.total_days.id_for_label}}" {%if exercise_det.reset == False %} readonly="readonly" {%endif%} required>
@@ -61,7 +68,7 @@
       <label for="{{form.enable_lessons.id_for_label}}">Disponibles:
       {{form.enable_lessons}}
       </label>
-      </div>
+    </div>
     <div class="row">
       <label for="{{form.saw_lessons.id_for_label}}">Vistas:
       {{form.saw_lessons}}

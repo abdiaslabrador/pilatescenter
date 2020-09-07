@@ -65,7 +65,12 @@ class Lesson_det(models.Model):
 
 	#here i refresh the lesson status
 	def custom_update_lesson(self):
-		self.cant_in = self.id_user_fk.count()
+		cant_users_devolution = CustomUser.objects.filter(	
+															devolution__returned = False,
+															devolution__id_lesson_fk__id=self.id
+														 ).count()
+				
+		self.cant_in = self.id_user_fk.count() + cant_users_devolution
 		self.quota = self.cant_max - self.cant_in
 		self.save()
 
