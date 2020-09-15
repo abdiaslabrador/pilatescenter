@@ -37,13 +37,39 @@ function Main()
             <td>${lesson.hour_lesson}</td>
             <td>${lesson.type}</td>
             <td>${lesson.cant_max}</td>
+
+            <td> 
+                <button type="button" class="btn btn-primary" data-toggle="modal"data-target="#return{{history.id}}">Devolver
+                </button>
+                <!-- Modal -->
+                <div class="modal fade" id=return{{history.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">¿Está seguro que quieres devolver la lección?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <!-- <div class="modal-body">                          
+                        
+                      </div>  -->
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <a class="btn btn-primary" href="/lesson/return_lesson/${lesson.id}/">Aceptar</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </td>
+
             <td><a class="btn btn-ver" target="_blank" href="/history/general_see_history/${lesson.id}/${exercise_id.innerHTML}">Ver</a></td>
 
             <td> 
-                <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar${lesson.id}">Eliminar
+                <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#delete_history${lesson.id}">Eliminar
                 </button>
                 <!-- Modal -->
-                <div class="modal fade" id=eliminar${lesson.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal fade" id=delete_history${lesson.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
                       <div class="modal-header">

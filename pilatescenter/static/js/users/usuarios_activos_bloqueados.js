@@ -62,10 +62,10 @@ function Main()
                 <td><a class="btn btn-primary"  href="/users/modific_user/${user.id}/">Actualizar</a></td>
                 <td><a class="btn btn-bloquear" style="color: white;" href="/users/lock_user/${user.id}/">Bloquear</a></td>
                 <td>
-                    <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar${user.id}">
+                    <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#delete_active_user${user.id}">
                       Eliminar
                     </button>
-                    <div class="modal fade" id=eliminar${user.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal fade" id=delete_active_user${user.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                       <div class="modal-dialog" role="document">
                         <div class="modal-content">
                           <div class="modal-header">
@@ -112,10 +112,10 @@ function Main()
             <td>${user.ci}</td>
             <td><a class="btn btn-success"  href="/users/unlock_user/${user.id}/">Desbloquear</a></td>
             <td>
-                <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar${user.id}">
+                <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#delete_deactive_user${user.id}">
                   Eliminar
                 </button>
-                <div class="modal fade" id=eliminar${user.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal fade" id=delete_deactive_user${user.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
                       <div class="modal-header">

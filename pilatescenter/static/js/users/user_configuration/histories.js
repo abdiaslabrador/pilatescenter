@@ -39,10 +39,10 @@ function Main()
             <td><a class="btn btn-ver" target="_blank" href="/history/see_history/${lesson.id}/${exercise_id.innerHTML}">Ver</a></td>
 
             <td> 
-                <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar${lesson.id}">Eliminar
+                <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#user_delete_history${lesson.id}">Eliminar
                 </button>
                 <!-- Modal -->
-                <div class="modal fade" id=eliminar${lesson.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal fade" id=user_delete_history${lesson.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
                       <div class="modal-header">

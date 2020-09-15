@@ -1,7 +1,7 @@
 {% extends "base_template/base_tamplate.html" %}
 {% load static %}
 
-{% block title %}Devoluciones devueltas{% endblock %}
+{% block title %}Devoluciones no devueltas{% endblock %}
 
   {% block content %}
       <button id="exercise_id" hidden>{{exercise.id}}</button><!-- Esto se usa en el js de este template (abajo)-->
@@ -24,15 +24,14 @@
           <table class="table panding" style="margin: 30px 0px;">
           <thead class="thead-light">
             <tr>
-                <th colspan="5">Lista de devoluciones devueltas</th>
-                <th colspan="3">Escriba un id:<input type="text" id="caja" onkeyup="buscar()"></th>
+                <th colspan="7">Lista de devoluciones no devueltas</th>
             </tr>
             <tr>
                 <th>Id</th>
                 <th>Fecha</th>
                 <th>Hora</th>
                 <th>Tipo</th>
-                <th>Cant</th>
+                <th>Estado</th>
                 <th colspan="3" >Acción</th>
             </tr>
           </thead>
@@ -44,16 +43,19 @@
                       <td>{{devolution.day_lesson|date:"l. M d, Y"}}</td>
                       <td>{{devolution.hour_lesson}}</td>
                       <td>{{devolution.id_exercise_fk.name}}</td>
-                      <td>{{devolution.cant_in}}/{{devolution.cant_max}}</td>
-
-                      <td><a class="btn btn-ver" target="_blank" href="{% url 'devolution:devolution_see_returned' devolution.id %}">Ver</a></td>
+                      {%if devolution.id_lesson_fk.all.first == None %}
+                        <td>Libre</td>
+                      {%else%}
+                        <td>Seleccionada</td>
+                      {%endif%}
+                      <td><a class="btn btn-ver" target="_blank" href="{% url 'devolution:devolution_see_notreturned' devolution.id %}">Ver</a></td>
 
                       <!-- Boton de que permite eliminar la historia-->
                       <td> 
-                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#notreturned{{devolution.id}}">Eliminar
+                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#devolution_notreturned{{devolution.id}}">Eliminar
                         </button>
                         <!-- Modal -->
-                        <div class="modal fade" id=notreturned{{devolution.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal fade" id=devolution_notreturned{{devolution.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                           <div class="modal-dialog" role="document">
                             <div class="modal-content">
                               <div class="modal-header">
@@ -86,7 +88,3 @@
         <br>
           </div>
 {% endblock %}
-
-<!-- {% block custom_js %}
-  <script src="{% static 'js/history/list_history.js' %}"></script>
-{% endblock %} -->

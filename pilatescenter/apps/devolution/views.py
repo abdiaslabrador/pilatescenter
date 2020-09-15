@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from apps.devolution.models import Devolution
 from apps.create_user.models import CustomUser
+from apps.exercise_det.models import Exercise_det
 from apps.lesson_det.models import Lesson_det
+
 from django.views import View
 from django.contrib import messages
 
@@ -43,7 +45,7 @@ class DevolutionNotReturnedUsersView(View):
 
 #devolution list
 class NotReturnedListView(View):
-	template_name= 'devolution/devolution_notreturned_table.html'
+	template_name= 'devolution/devolution_notreturned_list.html'
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
@@ -52,7 +54,7 @@ class NotReturnedListView(View):
 
 		devolutions = Devolution.objects.filter(	
 													returned = False,
-													id_user_fk = self.kwargs['id_user']
+													id_user_fk = self.kwargs['id_user'],
 			 									).order_by("day_lesson", "hour_lesson")
 
 		context={	
@@ -83,7 +85,7 @@ class DevolutionReturnedUsersView(View):
 
 #devolution list
 class ReturnedListView(View):
-	template_name= 'devolution/devolution_returned_table.html'
+	template_name= 'devolution/devolution_returned_list.html'
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
@@ -118,11 +120,10 @@ class DevolutionSeeView(View):
 			messages.success(request, 'La devolucion que desea manipular fue eliminada o no existe', extra_tags='alert-danger')
 			return redirect('devolution:devolution_users_list')
 			
-		lesson_retorned=devolution.id_lesson_fk.all()[0]
+		# lesson_retorned=devolution.id_lesson_fk.all()[0]
 
 		context={	
-					'devolution':devolution,
-					'lesson_retorned':lesson_retorned,
+					'devolution':devolution
 				}
 
 		return render(request, self.template_name, context)
@@ -168,8 +169,9 @@ class UpdateDevolutionView(View):
 														lesson_det__id=lesson.id
 													).order_by('username')
 		#usuarios que están en devoluciones
-		users_devolution = CustomUser.objects.filter(
-														devolution__id_lesson_fk__id=lesson.id
+		users_devolution = CustomUser.objects.filter(	
+														is_active=True,
+														devolution__id_lesson_fk__id=lesson.id,
 													)
 
 		#hago esta igualación para no afectar a los usuarios que están en la clase
@@ -182,18 +184,24 @@ class UpdateDevolutionView(View):
 		"""
 		users_list = users_list.union(users_devolution).values('id')
 		
-		all_users = CustomUser.objects.filter(
-			 									is_active = True,
-			 									exercise_det__id_exercise_fk=lesson.id_exercise_fk,
-			 									exercise_det__reset=True,
-			 									devolution__id_lesson_fk = None,
-			 									devolution__returned = False,
-			 								  ).order_by('username').distinct('username').exclude(id__in=users_list)
+		devolutions = Devolution.objects.filter(
+			 									returned = False,
+			 									id_lesson_fk = None,
+			 									id_exercise_fk = lesson.id_exercise_fk,
+			 								  ).order_by('id_user_fk__username').distinct('id_user_fk__username').exclude(id_user_fk__id__in=users_list)
+
+		# all_users = CustomUser.objects.filter(
+		# 	 									is_active = True,
+		# 	 									exercise_det__id_exercise_fk=lesson.id_exercise_fk,
+		# 	 									exercise_det__reset=True,
+		# 	 									devolution__id_lesson_fk = None,
+		# 	 									devolution__returned = False,
+		# 	 								  ).order_by('username').distinct('username').exclude(id__in=users_list)
 
 		context={	
 					'lesson': lesson,
 					'users_in_lesson': users_in_lesson,
-					'all_users': all_users,
+					'devolutions': devolutions,
 					'users_devolution': users_devolution,
 				}
 
@@ -231,6 +239,7 @@ class AddToDevolutionView(View):
 			obtengo la única validación que hay  aúnque la relación que hay es many to many solo hay una
 			lección relacionada a la devolucíón
 		"""
+
 		devolution = Devolution.objects.filter(
 												returned = False,
 												id_user_fk = self.kwargs['id_user'],
@@ -241,8 +250,28 @@ class AddToDevolutionView(View):
 			messages.success(request, 'El usuario no tiene devoluciones', extra_tags='alert-danger')
 			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
 
-		if lesson.cant_in < lesson.cant_max:
-			devolution.id_lesson_fk.add(lesson)
+		user_exercise_det = Exercise_det.objects.get(id_exercise_fk=lesson.id_exercise_fk, id_user_fk=self.kwargs['id_user'])
+
+		no_in_class = Lesson_det.objects.filter(id=lesson.id, id_user_fk=self.kwargs['id_user']).count() == 0
+		no_in_devolution = Devolution.objects.filter(id_lesson_fk=lesson.id, id_user_fk=self.kwargs['id_user']).count() == 0
+		has_devolution = user_exercise_det.devolutions > 0
+
+		
+		if no_in_class and no_in_devolution and has_devolution:
+			if lesson.cant_in < lesson.cant_max:
+				devolution.id_lesson_fk.add(lesson)
+
+		elif no_in_class == False:
+			messages.success(request, 'El está en la clase', extra_tags='alert-danger')
+			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
+
+		elif no_in_devolution == False:
+			messages.success(request, 'El está en las devoluciones', extra_tags='alert-danger')
+			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
+
+		elif has_devolution == False:		
+			messages.success(request, 'El usuario no tiene bien el contador de devoluciones', extra_tags='alert-danger')
+			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
 
 		return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
 
@@ -278,7 +307,7 @@ class TakeOutToDevolutionView(View):
 											   ).first()
 
 		if devolution == None:
-			messages.success(request, 'El usuario no está', extra_tags='alert-danger')
+			messages.success(request, 'El usuario no están', extra_tags='alert-danger')
 			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
 
 		devolution.id_lesson_fk.remove(lesson)

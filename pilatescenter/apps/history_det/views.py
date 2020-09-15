@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from apps.exercise.models import Exercise
 from apps.create_user.models import CustomUser
 from apps.lesson_det.models import Lesson_det
+from apps.devolution.models import Devolution
 
 
 #views
@@ -130,15 +131,17 @@ class GeneralSeeHistoryView(View):
 
 		try:
 			history_det = Lesson_det.objects.get(pk=self.kwargs['id_history'])
-		except Lesson.DoesNotExist:
+		except Lesson_det.DoesNotExist:
 			messages.success(request, 'Este historial que desea manipular fue eliminado o no existe', extra_tags='alert-danger')
 			return redirect('history:list_history', id_exercise=self.kwargs['id_exercise'])
 
-		users = CustomUser.objects.filter(lesson_det__id = history_det.id)
+		users_in_lesson = CustomUser.objects.filter(lesson_det__id = history_det.id)
+		devolutions = Devolution.objects.filter(id_lesson_fk__id=history_det.id)
 
 		context = {
 						'history_det': history_det,
-						'users': users,
+						'users_in_lesson': users_in_lesson,
+						'devolutions':devolutions,
 				   }
 		return render(request,'history/history.html', context)
 

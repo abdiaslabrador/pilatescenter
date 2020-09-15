@@ -38,10 +38,10 @@ function Main()
             <td>${lesson.type}</td>
             <td>${lesson.cant_max}</td>
             <td> 
-                <button type="button" class="btn btn-success" data-toggle="modal"data-target="#vista${lesson.id}">Vista
+                <button type="button" class="btn btn-success" data-toggle="modal"data-target="#saw_lesson${lesson.id}">Vista
                 </button>
                 <!-- Modal -->
-                <div class="modal fade" id=vista${lesson.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal fade" id=saw_lesson${lesson.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
                       <div class="modal-header">
@@ -65,10 +65,10 @@ function Main()
             <td><a class="btn btn-primary"   href="/lesson/update_lesson/${lesson.id}/">Actualizar</a></td>
 
             <td> 
-                <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar${lesson.id}">Eliminar
+                <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#delete_lesson${lesson.id}">Eliminar
                 </button>
                 <!-- Modal -->
-                <div class="modal fade" id=eliminar${lesson.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal fade" id=delete_lesson${lesson.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
                       <div class="modal-header">

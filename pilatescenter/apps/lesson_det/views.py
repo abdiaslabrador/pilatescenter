@@ -300,31 +300,30 @@ class AddToLessonView(View):
 
 		user_exercise_det = Exercise_det.objects.get(id_exercise_fk=lesson.id_exercise_fk, id_user_fk=user)
 
-		#me aseguro que el usuario no esté en la clase (si no hago esto cuando le de al botón añadir le quita 1 en programadas)
-		if Lesson_det.objects.filter(id=lesson.id, id_user_fk=user).count() == 0 and user_exercise_det.enable_lessons > 0: 
-			#busca los usuarios que está relacionados con la devolución
-			user_devolution = CustomUser.objects.filter(
-															devolution__id_lesson_fk__id=lesson.id,
-														).filter(id=user.id).count()
+		#verifico que el usuario a agregar no esté en la clase
+		no_in_class = Lesson_det.objects.filter(id=lesson.id, id_user_fk=self.kwargs['id_user']).count() == 0
 
-			
-			if user_devolution == 0:
-				#me aseguro que la cantidad de persona en la clase sea menor que la permitida
-				if lesson.cant_in < lesson.cant_max:
-					lesson.id_user_fk.add(user)#añado el usuario a la clase
-			else:
-				messages.success(request, 'El usuario ""{}"" ya está en devoluciones'.format(user.username), extra_tags='alert-warning')	
+		#verifico que el usuario no esté en las devoluciones
+		no_in_devolution = Devolution.objects.filter(id_lesson_fk=lesson.id, id_user_fk=self.kwargs['id_user']).count() == 0
 
-				
-		else:
-			#mensajes que paso en el template
-			if Lesson_det.objects.filter(id=lesson.id, id_user_fk=user).count() > 0: #si el usuario está en la clase
-				messages.success(request, 'El usuario ""{}"" ya está en la clase'.format(user.username), extra_tags='alert-warning')
-				
+		#verifico que el usuario tenga días disponibles, si no hago esto le resta uno a los días disponibles y coloca en negativo
+		has_lesson = user_exercise_det.enable_lessons > 0
 
-			elif user_exercise_det.enable_lessons == 0: #si el usuario no tiene clases disponibles
-				messages.success(request, 'El usuario ""{}"" no tiene días disponibles'.format(user.username), extra_tags='alert-warning')
-				
+		if no_in_class and no_in_devolution and has_lesson:
+			if lesson.cant_in < lesson.cant_max:
+				lesson.id_user_fk.add(user)#añado el usuario a la clase
+
+
+		elif no_in_class == False:
+			messages.success(request, 'El usuario ""{}"" ya está en la clase'.format(user.username), extra_tags='alert-warning')
+
+		elif no_in_devolution == False:				
+			messages.success(request, 'El usuario ""{}"" ya está en devoluciones'.format(user.username), extra_tags='alert-warning')	
+
+		elif user_exercise_det.enable_lessons == 0:
+			messages.success(request, 'El usuario ""{}"" no tiene días disponibles'.format(user.username), extra_tags='alert-warning')
+		
+		
 			
 		return redirect('lesson:update_lesson', pk=lesson.id)
 
@@ -385,7 +384,7 @@ class TakeOutToDevolutionView(View):
 		devolution = Devolution.objects.filter( 
 											 	id_user_fk = self.kwargs['id_user'],
 											 	id_lesson_fk=self.kwargs['id_lesson']
-											   ).first()
+												).first()
 
 		if devolution == None:
 			messages.success(request, 'El usuario no está', extra_tags='alert-danger')
@@ -417,7 +416,15 @@ class SawLessonView(View):
 
 		lesson.lesson_status = Lesson_det.FINISHED
 		lesson.save()
-		update_resumen(lesson)#this function updates the "summary" of the exercise related to the lesson
+
+		associated_devolution = lesson.devolution_set.all().first()
+
+		if associated_devolution != None:
+			associated_devolution.returned = True
+			associated_devolution.save()
+
+
+		# update_resumen(lesson)#this function updates the "summary" of the exercise related to the lesson
 
 		return redirect('lesson:list_lesson', pk=lesson.id_exercise_fk.id)
 
@@ -446,3 +453,58 @@ class DeleteLessonView(View):
 		lesson.delete()
 
 		return redirect('lesson:list_lesson', pk=exercise_id)
+
+
+class DevolutionLessonView(View):
+	"""
+		Here i create a devolution when the button is pressed
+	"""
+	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
+		lesson = None
+		
+
+		try:
+			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
+		except Lesson_det.DoesNotExist:
+			messages.success(request, 'La clase que desea manipular fue eliminada o no existe', extra_tags='alert-danger')
+			return redirect('history:list_history', id_exercise=lesson.id_exercise_fk.id)
+		
+		if Devolution.objects.filter(id_lesson_before = lesson.id).count() > 0:
+			messages.success(request, 'Ya ha sido creada la devolución de esta clase', extra_tags='alert-danger')
+			return redirect('history:list_history', id_exercise=lesson.id_exercise_fk.id)
+
+		if lesson.lesson_status == Lesson_det.FINISHED:
+						
+			#usuarios de la clase
+			users = lesson.id_user_fk.all()
+
+			#usuarios en la devolucion
+			users = users.union(CustomUser.objects.filter(devolution__id_lesson_fk= lesson.id))
+			
+			for user in users: 
+				devolution = Devolution.objects.create(
+
+											id_exercise_fk = lesson.id_exercise_fk,
+
+											day_lesson = lesson.day_lesson,
+											hour_chance = lesson.hour_chance,
+											hour_lesson = lesson.hour_lesson,
+											hour_end = lesson.hour_end,
+
+											cant_max = lesson.cant_max, 
+											cant_in = lesson.cant_in,
+
+											id_user_fk = user
+											)
+
+				devolution.id_lesson_before = lesson.id
+				devolution.save()
+				messages.success(request, 'Se han creado con exito las devoluciones', extra_tags='alert-success')
+		else:
+			messages.success(request, 'La clase que quiere manipular no está en modo finalizado', extra_tags='alert-danger')
+
+		return redirect('history:list_history', id_exercise=lesson.id_exercise_fk.id)

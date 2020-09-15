@@ -34,10 +34,10 @@
                   <td>{{user.ci}}</td>
                   <td><a class="btn btn-success" href="{% url 'content_user:unlock_user' user.id %}">Desbloquear</a></td>
                   <td> 
-                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar{{user.id}}">Eliminar
+                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#delete_deactive_user{{user.id}}">Eliminar
                         </button>
                         <!-- Modal -->
-                        <div class="modal fade" id=eliminar{{user.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal fade" id=delete_deactive_user{{user.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                           <div class="modal-dialog" role="document">
                             <div class="modal-content">
                               <div class="modal-header">

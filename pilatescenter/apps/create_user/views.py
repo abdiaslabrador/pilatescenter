@@ -7,6 +7,7 @@ from apps.plan.models import Plan
 from apps.exercise.models import Exercise
 from apps.exercise_det.models import Exercise_det, update_resumen
 from apps.lesson_det.models import Lesson_det
+from apps.devolution.models import Devolution
 from .models import CustomUser
 
 #views
@@ -381,7 +382,15 @@ class UserConfigurationResumenView(View):
 				form.save()
 				
 				user_exercise_det = Exercise_det.objects.get(id_exercise_fk= exercise_det.id_exercise_fk, id_user_fk= user_to_modific)
-				# #Esta el la cantidad de clases programadas del usuario
+				
+
+				user_exercise_det.devolutions = Devolution.objects.filter(	
+														returned = False,
+														id_user_fk = user_to_modific,
+														id_lesson_fk = None,
+														id_exercise_fk= exercise_det.id_exercise_fk,
+													).count()
+
 				user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(	
 																					reset=False,
 																					id_exercise_fk= exercise_det.id_exercise_fk,

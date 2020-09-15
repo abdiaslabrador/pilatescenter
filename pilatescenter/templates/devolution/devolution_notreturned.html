@@ -24,11 +24,15 @@
             </h5>
               
               <ul>
-                <li>ID de la lección asociada: <a href="{% url 'history:general_see_history'  lesson_retorned.id devolution.id_exercise_fk.id %}">{{lesson_retorned.id}}</a></li>
+                <li>Devolución de la lección N°: <a href="{% url 'history:general_see_history'  devolution.id_lesson_before  devolution.id_exercise_fk.id %}">{{devolution.id_lesson_before}}</a></li>
                 <li>Hora de chance: {{devolution.hour_chance}}</li>
                 <li>Hora de comienzo: {{devolution.hour_lesson}}</li>
                 <li>Hora de terminar: {{devolution.hour_end}}</li>
               </ul>
+
+              {%if devolution.id_lesson_fk.all.first != None %}
+                <h5>A sido seleccionada por el la lección N°: <a href="{% url 'history:general_see_history'  devolution.id_lesson_fk.all.first.id  devolution.id_exercise_fk.id %}">{{devolution.id_lesson_fk.all.first.id}}</a></h5>
+              {%endif%}
 
           </div>
         </div>

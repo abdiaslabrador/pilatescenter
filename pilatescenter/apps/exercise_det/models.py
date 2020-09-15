@@ -35,8 +35,9 @@ class Exercise_det(models.Model):
 		self.devolutions = Devolution.objects.filter(	
 														
 														returned = False,
-														id_user_fk=self.id,
-														id_lesson_fk = None
+														id_user_fk=self.id_user_fk.id,
+														id_lesson_fk = None,
+														id_exercise_fk= self.id_exercise_fk,
 													).count()
 
 		
@@ -189,21 +190,40 @@ def update_devolution_m2m_post_add(sender, instance, action="post_add", *args, *
 
 		id_lesson_fk=list(kwargs["pk_set"])
 		lesson = Lesson_det.objects.get(id = id_lesson_fk[0])
-		lesson.custom_update_lesson()
+		
+		#actualización del resumen de la lección
+		cant_users_devolution = CustomUser.objects.filter(	
+															devolution__id_lesson_fk__id=lesson.id
+														 ).count()
+		
+		lesson.cant_in = lesson.id_user_fk.count() + cant_users_devolution
+		lesson.quota = lesson.cant_max - lesson.cant_in
 
-		exercise_det = Exercise_det.objects.get(
+
+		if lesson.cant_in < lesson.cant_max:
+			lesson.lesson_capacity_status = Lesson_det.OPEN
+			lesson.save()
+		elif lesson.cant_in == lesson.cant_max:
+			lesson.lesson_capacity_status = Lesson_det.CLOSE
+			lesson.save()
+
+		user_exercise_det = Exercise_det.objects.get(
 												   id_user_fk= instance.id_user_fk,
 												   id_exercise_fk= instance.id_exercise_fk
 												)
 		
 		
-		exercise_det.devolutions = Devolution.objects.filter(
+		user_exercise_det.devolutions = Devolution.objects.filter(
 																id_lesson_fk = None,
 																returned = False,
-																id_user_fk = instance.id_user_fk
+																id_user_fk = instance.id_user_fk,
+																id_exercise_fk= instance.id_exercise_fk,
 												).count()
-		exercise_det.save()
 
+		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= instance.id_user_fk).exclude( lesson_status = Lesson_det.FINISHED).count()
+		user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= instance.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
+		user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
+		user_exercise_det.save()
 
 signals.m2m_changed.connect(update_devolution_m2m_post_add, sender=Devolution.id_lesson_fk.through)
 
@@ -212,29 +232,166 @@ def update_devolution_m2m_post_remove(sender, instance, action="post_remove", *a
 	"""Actualizo el la lección"""
 	if action == "post_remove":
 		id_lesson_fk=list(kwargs["pk_set"])
-		lesson = Lesson_det.objects.get(id = id_lesson_fk[0])
-		lesson.custom_update_lesson()
+
+		lesson_is_null = False
+
+		try:
+			lesson = Lesson_det.objects.get(id = id_lesson_fk[0])
+		except Lesson_det.DoesNotExist:
+			lesson_is_null = True
 		
-		exercise_det = Exercise_det.objects.get(
+		if lesson_is_null == False:  
+			#actualización del resumen de la lección
+			cant_users_devolution = CustomUser.objects.filter(	
+																devolution__id_lesson_fk__id=lesson.id
+															 ).count()
+			
+			lesson.cant_in = lesson.id_user_fk.count() + cant_users_devolution
+			lesson.quota = lesson.cant_max - lesson.cant_in
+
+
+			if lesson.cant_in < lesson.cant_max:
+				lesson.lesson_capacity_status = Lesson_det.OPEN
+				lesson.save()
+			elif lesson.cant_in == lesson.cant_max:
+				lesson.lesson_capacity_status = Lesson_det.CLOSE
+				lesson.save()
+			
+		user_exercise_det = Exercise_det.objects.get(
 												   id_user_fk= instance.id_user_fk,
 												   id_exercise_fk= instance.id_exercise_fk
 												)
 		
 		
-		exercise_det.devolutions = Devolution.objects.filter(
+		user_exercise_det.devolutions = Devolution.objects.filter(
 																id_lesson_fk = None,
 																returned = False,
-																id_user_fk = instance.id_user_fk
+																id_user_fk = instance.id_user_fk,
+																id_exercise_fk= instance.id_exercise_fk,
 												).count()
 		
-		exercise_det.save()		
+		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= instance.id_user_fk).exclude( lesson_status = Lesson_det.FINISHED).count()
+		user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= instance.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
+		user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
+		user_exercise_det.save()
 
 signals.m2m_changed.connect(update_devolution_m2m_post_remove, sender=Devolution.id_lesson_fk.through)
+
+
+def preDevolutionDelete(sender, instance, *args, **kwargs):
+	""" 
+		Esto hace que al eliminar un plan no elimine el Exercise_det asociado,
+		asignandole el plan ninguno.
+	"""
+	lesson = instance.id_lesson_fk.all().first()
+
+	if lesson != None:
+		cant_users_devolution = CustomUser.objects.filter(	
+															devolution__id_lesson_fk__id=lesson.id
+														 ).exclude(devolution__id = instance.id).count()
+		
+		lesson.cant_in = lesson.id_user_fk.count() + cant_users_devolution
+		lesson.quota = lesson.cant_max - lesson.cant_in
+		lesson.save()
+
+	user_exercise_det = Exercise_det.objects.get(
+											   id_user_fk= instance.id_user_fk,
+											   id_exercise_fk= instance.id_exercise_fk
+											)
+		
+		
+	user_exercise_det.devolutions = Devolution.objects.filter(
+															id_lesson_fk = None,
+															returned = False,
+															id_user_fk = instance.id_user_fk,
+															id_exercise_fk= instance.id_exercise_fk,
+												).exclude(id = instance.id).count()
+
+	user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= instance.id_user_fk).exclude( lesson_status = Lesson_det.FINISHED).count()
+	user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= instance.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
+	user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
+	user_exercise_det.save()
+
+
+signals.pre_delete.connect(preDevolutionDelete, sender=Devolution)
+
+def postDevolutionDelete(sender, instance, *args, **kwargs):
+	""" 
+		Esto hace que al eliminar un plan no elimine el Exercise_det asociado,
+		asignandole el plan ninguno.
+	"""
+		
+	user_exercise_det = Exercise_det.objects.get(
+											   id_user_fk= instance.id_user_fk,
+											   id_exercise_fk= instance.id_exercise_fk
+											)
+		
+		
+	user_exercise_det.devolutions = Devolution.objects.filter(
+															id_lesson_fk = None,
+															returned = False,
+															id_user_fk = instance.id_user_fk,
+															id_exercise_fk= instance.id_exercise_fk,
+												).count()
+
+	user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= instance.id_user_fk).exclude( lesson_status = Lesson_det.FINISHED).count()
+	user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= instance.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
+	user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
+	user_exercise_det.save()
+
+
+signals.post_delete.connect(postDevolutionDelete, sender=Devolution)
+
+def postDevolutionSave(sender, instance, *args, **kwargs):
+	""" 
+		Esto hace que al eliminar un plan no elimine el Exercise_det asociado,
+		asignandole el plan ninguno.
+	"""
+	lesson = instance.id_lesson_fk.all().first()
+	if lesson != None:
+		#actualización del resumen de la lección
+		cant_users_devolution = CustomUser.objects.filter(	
+															devolution__id_lesson_fk__id=lesson.id
+														 ).count()
+		
+		lesson.cant_in = lesson.id_user_fk.count() + cant_users_devolution
+		lesson.quota = lesson.cant_max - lesson.cant_in
+
+		print("post_save devolution :   ",lesson.cant_in)
+
+		if lesson.cant_in < lesson.cant_max:
+			lesson.lesson_capacity_status = Lesson_det.OPEN
+			lesson.save()
+		elif lesson.cant_in == lesson.cant_max:
+			lesson.lesson_capacity_status = Lesson_det.CLOSE
+			lesson.save()
+	else:
+
+		user_exercise_det = Exercise_det.objects.get(
+												   id_user_fk= instance.id_user_fk,
+												   id_exercise_fk= instance.id_exercise_fk
+												)
+			
+			
+		user_exercise_det.devolutions = Devolution.objects.filter(
+																	id_lesson_fk = None,
+																	returned = False,
+																	id_user_fk = instance.id_user_fk,
+																	id_exercise_fk= instance.id_exercise_fk,
+													).count()
+			
+		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= instance.id_user_fk).exclude( lesson_status = Lesson_det.FINISHED).count()
+		user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= instance.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
+		user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
+		user_exercise_det.save()
+
+
+signals.post_save.connect(postDevolutionSave, sender=Devolution)
+
 
 #------------------------------------------------------------------------------------------
 #lesson signals 
 #------------------------------------------------------------------------------------------
-
 def preSaveLesson(sender, instance,  *args, **kwargs):
 	if instance.cant_in == 0:
 		instance.lesson_capacity_status= instance.NOTONE
@@ -245,24 +402,139 @@ def preSaveLesson(sender, instance,  *args, **kwargs):
 
 signals.pre_save.connect(preSaveLesson, sender=Lesson_det)
 
+
 def postSaveLesson(sender, instance, created,  *args, **kwargs):
-	update_resumen(instance)
+
+	#Los usuarios de la leccion
+	print("post_save:   ",instance.cant_in)
+
+	users_in_instance = instance.id_user_fk.all()	
+	for user in users_in_instance:
+		user_exercise_det = Exercise_det.objects.get(id_exercise_fk= instance.id_exercise_fk, id_user_fk= user)
+
+		#Esta el la cantidad de clases programadas del usuario
+		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(
+															reset=False,
+                                                            id_exercise_fk= instance.id_exercise_fk, 
+                                                            id_user_fk= user,
+                                                          ).exclude(lesson_status = Lesson_det.FINISHED).count()
+
+		user_exercise_det.devolutions = Devolution.objects.filter(
+																	id_lesson_fk = None,
+																	returned = False,
+																	id_user_fk = user_exercise_det.id_user_fk,
+																	id_exercise_fk= instance.id_exercise_fk,
+													).count()
+
+		user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= user_exercise_det.id_exercise_fk, id_user_fk= user_exercise_det.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
+		user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
+		user_exercise_det.save()	
+
 
 signals.post_save.connect(postSaveLesson, sender=Lesson_det)
+
+
+def preDeleteLesson(sender, instance,  *args, **kwargs):
+
+	users_in_lesson = CustomUser.objects.filter(	
+													lesson_det__id=instance.id
+									 			)
+	for user in users_in_lesson:
+		instance.id_user_fk.remove(user)
+
+	users_in_devolutions = CustomUser.objects.filter(	
+														devolution__id_lesson_fk__id=instance.id
+									 				).order_by("username").distinct("username")
+
+	for user in users_in_devolutions:
+		exercise_det = Exercise_det.objects.get(
+												   id_user_fk= user,
+												   id_exercise_fk= instance.id_exercise_fk
+												)
+
+		devolution = Devolution.objects.filter(				
+													returned = False,
+													id_user_fk = user,
+													id_lesson_fk = instance.id,
+													id_exercise_fk= instance.id_exercise_fk,
+												).first()
+
+		devolution.id_lesson_fk.remove(instance)
+
+signals.pre_delete.connect(preDeleteLesson, sender=Lesson_det)
+
 	
 def update_lesson_m2m_post_add(sender, instance, action="post_add", *args, **kwargs):
 	"""Después de que añado un usuario a una clase, actualizo su resumen"""
 	if action == "post_add":
 		id_user_fk=list(kwargs["pk_set"])
-		user_exercise_det = Exercise_det.objects.get( id_exercise_fk= instance.id_exercise_fk, id_user_fk= id_user_fk[0])
-		
-		# #Esta el la cantidad de clases programadas del usuario
-		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= id_user_fk[0]).exclude(lesson_status = Lesson_det.FINISHED).count()
-		user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= id_user_fk[0], lesson_status = Lesson_det.FINISHED).count()
-		user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
-		user_exercise_det.save()
 
-		instance.custom_update_lesson()
+		for user in id_user_fk:			
+			user_exercise_det = Exercise_det.objects.get( id_exercise_fk= instance.id_exercise_fk, id_user_fk= user)
+			
+			#actualización del resumen del usuario
+			user_exercise_det.devolutions = Devolution.objects.filter(
+																	id_lesson_fk = None,
+																	returned = False,
+																	id_user_fk = user_exercise_det.id_user_fk,
+																	id_exercise_fk= instance.id_exercise_fk,
+													).count()
+
+			user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= user).exclude(lesson_status = Lesson_det.FINISHED).count()
+			user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= user, lesson_status = Lesson_det.FINISHED).count()
+			user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
+			user_exercise_det.save()
+
+		#actualización del resumen de la lección
+		users_devolution = CustomUser.objects.filter(	
+															devolution__id_lesson_fk__id=instance.id
+														 ).count()
+
+
+		instance.cant_in = instance.id_user_fk.count() + users_devolution
+		instance.quota = instance.cant_max - instance.cant_in
+
+
+		if instance.cant_in < instance.cant_max:
+			instance.lesson_capacity_status = Lesson_det.OPEN
+			instance.save()
+		elif instance.cant_in == instance.cant_max:
+			instance.lesson_capacity_status = Lesson_det.CLOSE
+			instance.save()
+		
+signals.m2m_changed.connect(update_lesson_m2m_post_add, sender=Lesson_det.id_user_fk.through)
+
+
+def update_lesson_m2m_post_remove(sender, instance, action="post_remove", *args, **kwargs):
+	"""Actualizo el la lección"""
+	if action == "post_remove":
+		id_user_fk=list(kwargs["pk_set"])#este es la id del usuario pasado por parametros en el "remove()"
+
+		for user in id_user_fk:			
+			user_exercise_det = Exercise_det.objects.get( id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= user)
+			#Esta el la cantidad de clases programadas del usuario
+			user_exercise_det.devolutions = Devolution.objects.filter(
+																		id_lesson_fk = None,
+																		returned = False,
+																		id_user_fk = user_exercise_det.id_user_fk,
+																		id_exercise_fk= instance.id_exercise_fk,
+																	).count()
+
+			user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= user).exclude( lesson_status = Lesson_det.FINISHED).count()
+			user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= user, lesson_status = Lesson_det.FINISHED).count()
+			user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
+			user_exercise_det.save()
+
+		#actualización del resumen de la lección
+		cant_users_devolution = CustomUser.objects.filter(	
+														
+															devolution__id_lesson_fk__id=instance.id
+														 ).count()
+		
+		instance.cant_in = instance.id_user_fk.count() + cant_users_devolution
+		instance.quota = instance.cant_max - instance.cant_in
+
+
 		if instance.cant_in < instance.cant_max:
 			instance.lesson_capacity_status = Lesson_det.OPEN
 			instance.save()
@@ -270,46 +542,25 @@ def update_lesson_m2m_post_add(sender, instance, action="post_add", *args, **kwa
 			instance.lesson_capacity_status = Lesson_det.CLOSE
 			instance.save()
 
-signals.m2m_changed.connect(update_lesson_m2m_post_add, sender=Lesson_det.id_user_fk.through)
-
-
-def update_lesson_m2m_pre_remove(sender, instance, action="pre_remove", *args, **kwargs):
-	"""Antes de que eliminar un usuario a una clase, actualizo su resumen"""
-	if action == "pre_remove":
-		id_user_fk=list(kwargs["pk_set"])#este es la id del usuario pasado por parametros en el "remove()"
-
-		user_exercise_det = Exercise_det.objects.get( id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= id_user_fk[0])
-		#Esta el la cantidad de clases programadas del usuario
-		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= id_user_fk[0]).exclude(id=instance.id).exclude( lesson_status = Lesson_det.FINISHED).count()
-		user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= id_user_fk[0], lesson_status = Lesson_det.FINISHED).count()
-		user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
-		user_exercise_det.save()
-signals.m2m_changed.connect(update_lesson_m2m_pre_remove, sender=Lesson_det.id_user_fk.through)
-
-def update_lesson_m2m_post_remove(sender, instance, action="post_remove", *args, **kwargs):
-	"""Actualizo el la lección"""
-	if action == "post_remove":
-		instance.custom_update_lesson()
-		if instance.cant_in == 0:
-			instance.lesson_capacity_status = Lesson_det.NOTONE
-			instance.save()
-		else:
-			instance.lesson_capacity_status = Lesson_det.OPEN
-			instance.save()
-
 signals.m2m_changed.connect(update_lesson_m2m_post_remove, sender=Lesson_det.id_user_fk.through)
 
 
 def update_lesson_m2m_pre_clear(sender, instance, action="pre_clear", *args, **kwargs):
 	"""Actualizo el resnumen"""
-	if action == "pre_clear":
+	if action == "pre_clear":	
 		update_resumen(instance)
 signals.m2m_changed.connect(update_lesson_m2m_pre_clear, sender=Lesson_det.id_user_fk.through)
 
 def update_lesson_m2m_post_clear(sender, instance, action="post_clear", *args, **kwargs):
 	"""Actualizo  la lección"""
 	if action == "post_clear":
-		instance.custom_update_lesson()
+
+		cant_users_devolution = CustomUser.objects.filter(	
+															devolution__id_lesson_fk__id=instance.id
+														 ).count()
+		
+		instance.cant_in = instance.id_user_fk.count() + cant_users_devolution
+		instance.quota = instance.cant_max - instance.cant_in
 		
 		instance.lesson_capacity_status = Lesson_det.NOTONE
 		instance.save()
@@ -330,6 +581,13 @@ def update_resumen(lesson):
 		user_exercise_det = Exercise_det.objects.get(id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user)
 
 		#Esta el la cantidad de clases programadas del usuario
+		user_exercise_det.devolutions = Devolution.objects.filter(
+																	id_lesson_fk = None,
+																	returned = False,
+																	id_user_fk = user_exercise_det.id_user_fk,
+																	id_exercise_fk= instance.id_exercise_fk,
+													).count()
+
 		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user).exclude(id=lesson.id).exclude( lesson_status = Lesson_det.FINISHED).count()
 		user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= user_exercise_det.id_exercise_fk, id_user_fk= user_exercise_det.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
 		user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)

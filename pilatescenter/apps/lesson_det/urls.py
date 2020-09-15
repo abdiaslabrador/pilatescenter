@@ -13,6 +13,6 @@ urlpatterns = [
 	path('takeout_to_lesson/<int:id_lesson>/<int:id_user>/', views.TakeOutToLessonView.as_view(), name='takeout_to_lesson'),
 	path('takeout_to_devolution/<int:id_lesson>/<int:id_user>/', views.TakeOutToDevolutionView.as_view(), name='takeout_to_devolution'),
 	path('sawlesson/<int:id_lesson>/', views.SawLessonView.as_view(), name='sawlesson'),
-	path('delete_lesson/<int:id_lesson>/', views.DeleteLessonView.as_view(), name='delete_lesson')
-	
+	path('delete_lesson/<int:id_lesson>/', views.DeleteLessonView.as_view(), name='delete_lesson'),
+	path('return_lesson/<int:id_lesson>/', views.DevolutionLessonView.as_view(), name='return_lesson')
 ]	

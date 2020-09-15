@@ -88,13 +88,13 @@
             </tr>
           </thead>
           <tbody id="contenido">
-                {% for user in all_users%}
+                {% for devolution in devolutions%}
                 <tr>
-                  <td hidden>{{user.id}}</td>
-                  <td>{{user.username}}</td>
-                  <td>{{user.first_name}}</td>
-                  <td>{{user.last_name}}</td>
-                  <td>{{user.ci}}</td>
+                  <td hidden>{{devolution.id_user_fk.id}}</td>
+                  <td>{{devolution.id_user_fk.username}}</td>
+                  <td>{{devolution.id_user_fk.first_name}}</td>
+                  <td>{{devolution.id_user_fk.last_name}}</td>
+                  <td>{{devolution.id_user_fk.ci}}</td>
 
                     <td><a class="btn btn-success"  href="{% url 'devolution:add_to_devolution' lesson.id user.id %}">Añadir</a></td>
                 </tr>

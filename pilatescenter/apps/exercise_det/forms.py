@@ -64,7 +64,8 @@ class ConfigurationUserChangePlanForm(forms.ModelForm):
         cant_lesson_scheduled = Lesson_det.objects.filter(
                                                             id_exercise_fk= id_exercise_fk.id, 
                                                             id_user_fk= id_user_fk.id,
-                                                          ).exclude(lesson_status = Lesson_det.FINISHED).count()
+                                                          ).exclude(reset=True).exclude(lesson_status = Lesson_det.FINISHED).count()
+
 
         if cant_lesson_scheduled > 0:
             #el error de abajo no sale porque tube que marañar con un mensaje de aviso de boostrap

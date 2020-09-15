@@ -7,6 +7,8 @@ from apps.lesson_det.models import Lesson_det
 
 class Devolution(models.Model):
 
+	id_lesson_before = models.IntegerField(default=0)
+	
 	day_lesson 	= models.DateField(null=True, blank=True)
 	hour_chance =  models.TimeField(null=True, blank=True)
 	hour_lesson =  models.TimeField(null=True, blank=True)

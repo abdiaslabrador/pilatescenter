@@ -68,15 +68,42 @@
                       <td>{{history.hour_lesson}}</td>
                       <td>{{history.id_exercise_fk.name}}</td>
                       <td>{{history.cant_in}}/{{history.cant_max}}</td>
+
+                      <!-- Boton de que permite devolver la historia-->
+                      <td> 
+                        <button type="button" class="btn btn-primary" data-toggle="modal"data-target="#return{{history.id}}">Devolver
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id=return{{history.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">¿Está seguro que quieres devolver la lección?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <!-- <div class="modal-body">                          
+                                
+                              </div>  -->
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                <a class="btn btn-primary" href="{% url 'lesson:return_lesson' history.id %}">Aceptar</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
                       <td><a class="btn btn-ver" target="_blank" href="{% url 'history:general_see_history' history.id exercise.id %}">Ver</a></td>
 
 
                       <!-- Boton de que permite eliminar la historia-->
                       <td> 
-                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#eliminar{{history.id}}">Eliminar
+                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#delete_history{{history.id}}">Eliminar
                         </button>
                         <!-- Modal -->
-                        <div class="modal fade" id=eliminar{{history.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal fade" id=delete_history{{history.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                           <div class="modal-dialog" role="document">
                             <div class="modal-content">
                               <div class="modal-header">
