@@ -13,7 +13,8 @@
         </div>
 
         <div class="card-body">
-        	Ejercicio: {{exercise_det.id_exercise_fk.name}}
+        	Ejercicio: <strong>{{exercise_det.id_exercise_fk.name}}</strong>
+          <h6>DEVOLUCIONES: {{exercise_det.devolutions}}</h6>
         	<ul>
         		<li>Plan: {{exercise_det.id_plan_fk.name}}</li>
         		<li>Total de clases: {{exercise_det.total_days}}</li>

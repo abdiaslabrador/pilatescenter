@@ -27,7 +27,7 @@ app.conf.beat_schedule = {
     'lesson_execute': {
         'task': 'lessons',
         # 'schedule': 1,
-    'schedule': crontab(minute='*'),
+        'schedule': crontab(minute='*'),
         'args': ('')
         # 'schedule': crontab(minute='*'),
     },

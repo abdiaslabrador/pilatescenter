@@ -3,24 +3,25 @@ import random
 from celery.decorators import task
 from apps.exercise.models import Exercise
 from apps.lesson_det.models import Lesson_det
+from apps.devolution.models import Devolution
 from datetime import datetime
 
-@task(name="sum_two_numbers")
-def add(x, y):
-    return x + y
+# @task(name="sum_two_numbers")
+# def add(x, y):
+#     return x + y
 
-@task(name="multiply_two_numbers")
-def mul(x, y):
-    total = x * (y * random.randint(3, 100))
-    return total
+# @task(name="multiply_two_numbers")
+# def mul(x, y):
+#     total = x * (y * random.randint(3, 100))
+#     return total
 
-@task(name="sum_list_numbers")
-def xsum(numbers):
-    return sum(numbers)
+# @task(name="sum_list_numbers")
+# def xsum(numbers):
+#     return sum(numbers)
 
-@task(name="saludo")
-def print_name():
-	print("HOLA")
+# @task(name="saludo")
+# def print_name():
+# 	print("HOLA")
 
 @task(name="lessons")
 def run_lesson():
@@ -41,7 +42,15 @@ def run_lesson():
 				lesson.lesson_status = lesson.INPROCESS
 				lesson.save()
 			elif lesson.hour_end.hour == today.hour and lesson.hour_end.minute == today.minute:
+
 				lesson.lesson_status = lesson.FINISHED
 				lesson.save()
+
+				associated_devolution = lesson.devolution_set.all().first()
+
+				if associated_devolution != None:
+					associated_devolution.returned = True
+					associated_devolution.save()
+
 	else:
 		print("No hay lecciones")
