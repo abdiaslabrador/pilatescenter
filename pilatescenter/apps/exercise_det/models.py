@@ -357,7 +357,7 @@ def postDevolutionSave(sender, instance, *args, **kwargs):
 		lesson.cant_in = lesson.id_user_fk.count() + cant_users_devolution
 		lesson.quota = lesson.cant_max - lesson.cant_in
 
-		print("post_save devolution :   ",lesson.cant_in)
+		
 
 		if lesson.cant_in < lesson.cant_max:
 			lesson.lesson_capacity_status = Lesson_det.OPEN
@@ -406,7 +406,7 @@ signals.pre_save.connect(preSaveLesson, sender=Lesson_det)
 def postSaveLesson(sender, instance, created,  *args, **kwargs):
 
 	#Los usuarios de la leccion
-	print("post_save:   ",instance.cant_in)
+	
 
 	users_in_instance = instance.id_user_fk.all()	
 	for user in users_in_instance:

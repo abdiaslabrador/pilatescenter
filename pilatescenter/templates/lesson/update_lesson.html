@@ -143,7 +143,7 @@
 
 	        <div class="card-body">
 	        	{% for user in users_devolution %}
-	        	 <p><strong>Username:</strong> <a href="{% url 'content_user:modific_user_form' user.id %}">{{user.username}}</a>  <strong>Nombre:</strong> {{user.first_name}}   <strong>Apellido:</strong> {{user.last_name}}   <strong>C.I:</strong> {{user.ci}}<a class="btn btn-danger"   href="{% url 'lesson:takeout_to_devolution' lesson.id user.id %}">Quitar</a></p>
+	        	 <p><strong>Username:</strong> <a href="{% url 'content_user:modific_user_form' user.id %}">{{user.username}}</a>  <strong>Nombre:</strong> {{user.first_name}}   <strong>Apellido:</strong> {{user.last_name}}   <strong>C.I:</strong> {{user.ci}}<a class="btn btn-danger"   href="{% url 'lesson:takeout_users_in_devolution' lesson.id user.id %}">Quitar</a></p>
 	        	 
 	        	{% endfor %}
 	      	</div>

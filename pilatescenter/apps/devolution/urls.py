@@ -18,4 +18,5 @@ urlpatterns = [
 	path('update_devolution/<int:id_lesson>/', views.UpdateDevolutionView.as_view(), name='update_devolution'),
 	path('add_to_devolution/<int:id_lesson>/<int:id_user>/', views.AddToDevolutionView.as_view(), name='add_to_devolution'),
 	path('takeout_to_devolution/<int:id_lesson>/<int:id_user>/', views.TakeOutToDevolutionView.as_view(), name='takeout_to_devolution'),
+	path('takeout_users_in_class/<int:id_lesson>/<int:id_user>/', views.TakeOutToUsersLessonView.as_view(), name='takeout_users_in_class')
 ]	

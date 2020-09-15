@@ -55,7 +55,7 @@ class NotReturnedListView(View):
 		devolutions = Devolution.objects.filter(	
 													returned = False,
 													id_user_fk = self.kwargs['id_user'],
-			 									).order_by("day_lesson", "hour_lesson")
+			 									).order_by("id_exercise_fk__name", "day_lesson", "hour_lesson")
 
 		context={	
 					'devolutions':devolutions,
@@ -95,7 +95,7 @@ class ReturnedListView(View):
 		devolutions = Devolution.objects.filter(	
 													returned = True,
 													id_user_fk = self.kwargs['id_user']
-			 									).order_by("day_lesson", "hour_lesson")
+			 									).order_by("id_exercise_fk__name", "day_lesson", "hour_lesson")
 
 		context={	
 					'devolutions':devolutions,
@@ -185,6 +185,8 @@ class UpdateDevolutionView(View):
 		users_list = users_list.union(users_devolution).values('id')
 		
 		devolutions = Devolution.objects.filter(
+												id_user_fk__is_active = True,
+												id_user_fk__exercise_det__reset=True,
 			 									returned = False,
 			 									id_lesson_fk = None,
 			 									id_exercise_fk = lesson.id_exercise_fk,
@@ -243,7 +245,8 @@ class AddToDevolutionView(View):
 		devolution = Devolution.objects.filter(
 												returned = False,
 												id_user_fk = self.kwargs['id_user'],
-												id_lesson_fk = None
+												id_lesson_fk = None,
+												id_exercise_fk = lesson.id_exercise_fk,
 											   ).order_by("day_lesson", "hour_lesson").first()
 
 		if devolution == None:
@@ -311,5 +314,34 @@ class TakeOutToDevolutionView(View):
 			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
 
 		devolution.id_lesson_fk.remove(lesson)
+
+		return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
+
+class TakeOutToUsersLessonView(View):
+	"""
+		
+	"""
+	def get(self, request, *args, **kwargs):
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
+		try:
+			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
+		except Lesson_det.DoesNotExist:
+			messages.success(request, 'La clase que desea manipular fue eliminada o no existe', extra_tags='alert-danger')
+			return redirect('lesson:list_lesson_exercise_action')
+
+		if lesson.lesson_status == Lesson_det.FINISHED:
+			messages.success(request, 'La clase ya fue vista', extra_tags='alert-danger')
+			return redirect('lesson:list_lesson_exercise_action')
+
+		user = CustomUser.objects.get(id=self.kwargs['id_user'])
+		
+		#me aseguro que el usuario esté en la clase (por seguridad) (esta query es m2m)
+		if Lesson_det.objects.filter(id=lesson.id, id_user_fk=user).count() > 0:
+			#me aseguro que hayan usuarios en la clase
+			if lesson.id_user_fk.count() > 0:
+				lesson.id_user_fk.remove(user)#saco al usuario
 
 		return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])

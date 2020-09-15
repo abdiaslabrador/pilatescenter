@@ -356,7 +356,7 @@ class TakeOutToLessonView(View):
 
 		return redirect('lesson:update_lesson', pk=lesson.id)
 
-class TakeOutToDevolutionView(View):
+class TakeOutToUsersDevolutionView(View):
 	"""
 		
 	"""
@@ -384,10 +384,10 @@ class TakeOutToDevolutionView(View):
 		devolution = Devolution.objects.filter( 
 											 	id_user_fk = self.kwargs['id_user'],
 											 	id_lesson_fk=self.kwargs['id_lesson']
-												).first()
+											   ).first()
 
 		if devolution == None:
-			messages.success(request, 'El usuario no está', extra_tags='alert-danger')
+			messages.success(request, 'El usuario no están', extra_tags='alert-danger')
 			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
 
 		devolution.id_lesson_fk.remove(lesson)

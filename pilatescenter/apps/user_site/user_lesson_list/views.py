@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-
 from apps.create_user.models import CustomUser
 from apps.lesson_det.models import Lesson_det
 from apps.exercise_det.models import Exercise_det
+from apps.devolution.models import Devolution
 from django.views import View
 from .forms import SearchLessonForm
 from django.contrib import messages
@@ -34,6 +34,12 @@ class UserLessonListView(View):
 				messages.success(self.request, 'El ejercicio fue eliminado', extra_tags='alert-danger')
 				return redirect('user_home:user_home')
 
+			devolutions = Devolution.objects.filter(
+														returned = False,
+														id_user_fk=request.user,
+														id_exercise_fk=self.kwargs['id_exercise'],
+													).exclude(id_lesson_fk = None)
+
 			lessons = Lesson_det.objects.filter(	
 													reset = False,
 													id_user_fk=request.user,
@@ -41,6 +47,7 @@ class UserLessonListView(View):
 												).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson")
 			self.context ={
 							'lessons':lessons,
+							'devolutions':devolutions,
 							'exercise_det':self.exercise_det,
 					  	   }
 
@@ -130,6 +137,16 @@ class UserBagView(View):
 																id_user_fk=request.user.id,
 															).exclude(lesson_status = Lesson_det.FINISHED).values('day_lesson')
 
+				devolutions_days = Lesson_det.objects.filter(
+															devolution__returned = False,
+															devolution__id_user_fk=request.user,
+															devolution__id_exercise_fk=self.exercise_det.id_exercise_fk,
+														)
+
+				#unión de los días de las lecciones y de los días de devoluciones del usuario
+				days_already_have = days_already_have.union(devolutions_days)
+				
+
 				user_days_already_have=[]
 				for day in days_already_have:
 					user_days_already_have.append(day['day_lesson'].strftime("%A"))
@@ -199,79 +216,3 @@ class UserBagDaySelectedView(View):
 			else:
 				messages.success(self.request, 'No tiene clases en reserva', extra_tags='alert-danger')
 				return redirect('user_lesson:lesson_list', id_exercise=lesson.id_exercise_fk.id)
-
-
-# class UserBagSearchView(View):
-# 	"""
-# 		this class gives a form to the user for later looks lessons asociated for date selected. 
-# 		Remember: I need to change this
-# 	"""
-# 	template_name='user_site/lesson_list/bag/search_lesson.html'
-# 	context = {}
-
-# 	def post(self, request, *args, **kwargs):
-# 		form =  SearchLessonForm(request.POST)
-# 		if form.is_valid():
-# 			day=form.cleaned_data['day']
-# 			day.name = day.name.lower()
-# 			return redirect('user_lesson:bag', name_day=day.name, id_exercise_det=self.kwargs['id_exercise_det'])
-# 		else:
-# 			print(form.errors.as_data)
-# 			print("something happened")
-# 		return render(request, self.template_name, {'form':form})
-
-# 	def get(self, request, *args, **kwargs):
-# 		if request.user.is_anonymous:
-# 			return redirect('user_login:user_login_form')
-# 		else:
-# 			exercise_det = Exercise_det.objects.get(id=self.kwargs['id_exercise_det'])
-# 			if exercise_det.bag > 0:
-# 				form = SearchLessonForm()
-# 				exercise_det = self.kwargs['id_exercise_det']
-# 				self.context ={
-# 							'form':form,
-# 					  	  }
-# 				return render(request, self.template_name, self.context)
-# 			else:
-# 				messages.success(self.request, 'No tiene clases en reserva', extra_tags='alert-danger')
-# 				return redirect('user_lesson:lesson_list', id_exercise=exercise_det.id_exercise_fk.id)
-			
-		
-
-# class UserBagView(View):
-# 	"""
-# 		i obtain the day for the date passed by the url. I make a translate, from spanish days to  english  days for later can make a filter 
-# 		and show to the user the enable dates in that day.
-# 	"""
-# 	template_name='user_site/lesson_list/bag/bag.html'
-# 	context = {}
-
-# 	def get(self, request, *args, **kwargs):
-# 		if request.user.is_anonymous:
-# 			return redirect('user_login:user_login_form')
-# 		else:
-# 			exercise_det = Exercise_det.objects.get(id=self.kwargs['id_exercise_det'])
-# 			if exercise_det.bag > 0:
-# 				week_days = {"domingo":"Sunday", "lunes":"Monday", "martes":"Tuesday", "miercoles":"Wednesday", "jueves":"Thursday", "viernes":"Friday", "sabado":"Saturday"}
-# 				translate_spanish_to_english= week_days[self.kwargs['name_day']]
-# 				lessons = []
-# 				exercise_det = Exercise_det.objects.get(id=self.kwargs['id_exercise_det'])
-
-# 				lessons_to_analize = Lesson_det.objects.filter(
-# 														saw = False, 
-# 														id_exercise_fk=exercise_det.id_exercise_fk,
-# 														cant_in__lt=F('cant_max'),
-# 													).exclude(id_user_fk__id=request.user.id).order_by("day_lesson")
-# 				for lesson in lessons_to_analize:
-# 					if translate_spanish_to_english == lesson.day_lesson.strftime("%A"):
-# 						lessons.append(lesson)
-
-				
-# 				self.context ={
-# 								'lessons':lessons,
-# 							   }
-
-# 				return render(request, self.template_name, self.context)
-# 			else:
-# 				messages.success(self.request, 'No tiene clases en reserva', extra_tags='alert-danger')
-# 				return redirect('user_lesson:lesson_list', id_exercise=exercise_det.id_exercise_fk.id)

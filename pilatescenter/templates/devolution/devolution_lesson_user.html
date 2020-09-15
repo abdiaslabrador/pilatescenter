@@ -49,7 +49,7 @@
           <div class="card-body">
 
             {% for user in users_in_lesson%}
-             <p><strong>Username:</strong> <a href="{% url 'content_user:modific_user_form' user.id %}">{{user.username}}</a>  <strong>Nombre:</strong> {{user.first_name}}   <strong>Apellido:</strong> {{user.last_name}}   <strong>C.I:</strong> {{user.ci}}<a class="btn btn-danger"   href="{% url 'lesson:takeout_to_lesson' lesson.id user.id %}">Quitar</a></p>
+             <p><strong>Username:</strong> <a href="{% url 'content_user:modific_user_form' user.id %}">{{user.username}}</a>  <strong>Nombre:</strong> {{user.first_name}}   <strong>Apellido:</strong> {{user.last_name}}   <strong>C.I:</strong> {{user.ci}}<a class="btn btn-danger"   href="{% url 'devolution:takeout_users_in_class' lesson.id user.id %}">Quitar</a></p>
              
             {% endfor %}
           </div>
@@ -70,13 +70,7 @@
         <table  class="table panding" style="margin: 30px 0px;">
           <thead class="thead-light">
             <tr>
-              <th colspan="7"><small class="form-text text-muted">La búsqueda se hace en usuarios con la opción de <strong>"REINICIAR ACTIVA"</strong></small></th>
-              
-
-            </tr>
-            <tr>
                 <th colspan="5">Usuarios con devoluciones</th>
-                <th colspan="2"><input type="text" id="caja" onkeyup="buscar()"></th>
             </tr>
             <tr>
                 <!--<th>Id</th>-->
@@ -94,9 +88,9 @@
                   <td>{{devolution.id_user_fk.username}}</td>
                   <td>{{devolution.id_user_fk.first_name}}</td>
                   <td>{{devolution.id_user_fk.last_name}}</td>
-                  <td>{{devolution.id_user_fk.ci}}</td>
+                  <td>{{devolution.id_exercise_fk.name}}</td>
 
-                    <td><a class="btn btn-success"  href="{% url 'devolution:add_to_devolution' lesson.id user.id %}">Añadir</a></td>
+                    <td><a class="btn btn-success"  href="{% url 'devolution:add_to_devolution' lesson.id devolution.id_user_fk.id %}">Añadir</a></td>
                 </tr>
                 {% endfor %}
           </tbody>
