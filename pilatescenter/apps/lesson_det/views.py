@@ -417,9 +417,9 @@ class SawLessonView(View):
 		lesson.lesson_status = Lesson_det.FINISHED
 		lesson.save()
 
-		associated_devolution = lesson.devolution_set.all().first()
+		associated_devolutions = lesson.devolution_set.all()
 
-		if associated_devolution != None:
+		for associated_devolution in associated_devolutions:
 			associated_devolution.returned = True
 			associated_devolution.save()
 
@@ -503,7 +503,8 @@ class DevolutionLessonView(View):
 
 				devolution.id_lesson_before = lesson.id
 				devolution.save()
-				messages.success(request, 'Se han creado con exito las devoluciones', extra_tags='alert-success')
+			
+			messages.success(request, 'Se han creado con exito las devoluciones', extra_tags='alert-success')
 		else:
 			messages.success(request, 'La clase que quiere manipular no está en modo finalizado', extra_tags='alert-danger')
 

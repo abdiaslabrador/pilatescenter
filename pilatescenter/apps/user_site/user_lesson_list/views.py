@@ -38,13 +38,13 @@ class UserLessonListView(View):
 														returned = False,
 														id_user_fk=request.user,
 														id_exercise_fk=self.kwargs['id_exercise'],
-													).exclude(id_lesson_fk = None)
+													).exclude(id_lesson_fk = None).order_by("day_lesson", "hour_lesson")
 
 			lessons = Lesson_det.objects.filter(	
 													reset = False,
 													id_user_fk=request.user,
 													id_exercise_fk=self.kwargs['id_exercise'],
-												).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson")
+												).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")
 			self.context ={
 							'lessons':lessons,
 							'devolutions':devolutions,
@@ -86,6 +86,7 @@ class UserInBagView(View):
 	exercise_det = None
 
 	def get(self, request, *args, **kwargs):
+
 		if request.user.is_anonymous:
 			return redirect('user_login:user_login_form')
 		else:
@@ -95,14 +96,24 @@ class UserInBagView(View):
 				messages.success(self.request, 'El ejercicio fue eliminado', extra_tags='alert-danger')
 				return redirect('user_home:user_home')
 
-			if self.exercise_det.oportunities > 0:
+			
+			
+			try:
+				lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
+			except Lesson_det.DoesNotExist:
+				messages.success(request, 'La clase que desea manipular fue eliminada o no existe', extra_tags='alert-danger')
+				return redirect('user_lesson:lesson_list', id_exercise=self.exercise_det.id_exercise_fk.id)
+
+
+
+			if self.exercise_det.oportunities > 0 and lesson.lesson_status == lesson.ENABLE:
 				self.exercise_det.oportunities-=1				
 				self.exercise_det.bag+=1
 				self.exercise_det.save()
-				lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
 				lesson.id_user_fk.remove(request.user)
 			else:
-				messages.success(self.request, 'No tienes oportunidades para reprogramar', extra_tags='alert-danger')
+				messages.success(self.request, 'No tienes oportunidades para reprogramar o la clase ya no está disponible', extra_tags='alert-danger')
+
 			return redirect('user_lesson:lesson_list', id_exercise=self.exercise_det.id_exercise_fk.id)	
 		
 
@@ -138,10 +149,10 @@ class UserBagView(View):
 															).exclude(lesson_status = Lesson_det.FINISHED).values('day_lesson')
 
 				devolutions_days = Lesson_det.objects.filter(
-															devolution__returned = False,
-															devolution__id_user_fk=request.user,
-															devolution__id_exercise_fk=self.exercise_det.id_exercise_fk,
-														)
+																devolution__returned = False,
+																devolution__id_user_fk=request.user,
+																devolution__id_exercise_fk=self.exercise_det.id_exercise_fk,
+															)
 
 				#unión de los días de las lecciones y de los días de devoluciones del usuario
 				days_already_have = days_already_have.union(devolutions_days)
@@ -197,14 +208,15 @@ class UserBagDaySelectedView(View):
 
 			#validacion de que la clase todavía se pueda ver
 			if lesson.cant_in == lesson.cant_max or lesson.lesson_status == Lesson_det.FINISHED:
-				messages.success(self.request, 'La lección ya fu vista o ya está llena', extra_tags='alert-warning')
+				messages.success(self.request, 'La lección ya fue vista o ya está llena', extra_tags='alert-warning')
 				return redirect('user_lesson:lesson_list', id_exercise= lesson.id_exercise_fk.id)
+
 
 			exercise_det = Exercise_det.objects.get(
 														id_user_fk=request.user,
 														id_exercise_fk=lesson.id_exercise_fk,
 													)
-
+			#aquí añado al usuario en  la clase que seleccionó
 			if exercise_det.bag > 0:
 				exercise_det.bag-=1
 				exercise_det.save()

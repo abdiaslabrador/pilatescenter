@@ -46,25 +46,16 @@ class ListHistoryView(View):
 		if form.is_valid():
 			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
 
-			histories_qs1  = Lesson_det.objects.filter(	
-														reset = True,
+			histories  = Lesson_det.objects.filter(		
 														id_exercise_fk=exercise,
-														day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
-													   )
-
-			histories_qs2  = Lesson_det.objects.filter(	
 														lesson_status = Lesson_det.FINISHED,
-														id_exercise_fk=exercise,
 														day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
-												   		)
+												   	).order_by("day_lesson", "hour_lesson")
 
-			histories_qs1= histories_qs1.union(histories_qs2).order_by("day_lesson", "hour_lesson")
-
-			print(histories_qs1)
 			context = {	
 						'form':form,
 						'exercise':exercise,
-						'histories':histories_qs1,
+						'histories':histories,
 				       }
 			# return HttpResponse("<h1>Todo ok</h1>")
 			return render(request, self.template_name, context)
@@ -73,21 +64,14 @@ class ListHistoryView(View):
 			print("something happened")
 			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
 
-			histories_qs1  = Lesson_det.objects.filter(	
-														reset = True,
-														id_exercise_fk=exercise,
-													   )
-
-			histories_qs2  = Lesson_det.objects.filter(	
-														lesson_status = Lesson_det.FINISHED,
-														id_exercise_fk=exercise,
-												   		)
-
-			histories_qs1= histories_qs1.union(histories_qs2).order_by("day_lesson", "hour_lesson")
+			histories  = Lesson_det.objects.filter(	
+													id_exercise_fk=exercise,
+													lesson_status = Lesson_det.FINISHED,
+											   		).order_by("day_lesson", "hour_lesson")
 			context = {		
 							'form':form,
 							'exercise':exercise,
-							'histories':histories_qs1,
+							'histories':histories,
 					  }
 
 		return render(request, self.template_name, context)
@@ -100,22 +84,17 @@ class ListHistoryView(View):
 		form = SearchClassesForm()
 		exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
 
-		histories_qs1  = Lesson_det.objects.filter(	
-													reset = True,
-													id_exercise_fk=exercise,
-												   )
 
-		histories_qs2  = Lesson_det.objects.filter(	
+		histories = Lesson_det.objects.filter(		
+													id_exercise_fk=exercise,
 													lesson_status = Lesson_det.FINISHED,
-													id_exercise_fk=exercise,
-											   		)
+											   ).order_by("day_lesson", "hour_lesson")
 
-		histories_qs1= histories_qs1.union(histories_qs2).order_by("day_lesson", "hour_lesson")
 
 		context = {		
 						'form':form,
 						'exercise':exercise,
-						'histories':histories_qs1,
+						'histories':histories,
 				  }
 
 		return render(request, self.template_name, context)
@@ -183,11 +162,13 @@ class UserConfigurationSeeHistoryView(View):
 			messages.success(request, 'Este historial que desea manipular fue eliminado o no existe', extra_tags='alert-danger')
 			return redirect('content_user:user_configuration_history', pk=self.kwargs['id_exercise_det'])
 
-		users = CustomUser.objects.filter(lesson_det__id = history_det.id)
+		users_in_lesson = CustomUser.objects.filter(lesson_det__id = history_det.id)
+		devolutions = Devolution.objects.filter(id_lesson_fk__id=history_det.id)
 
 		context = {
 						'history_det': history_det,
-						'users': users,
+						'users_in_lesson': users_in_lesson,
+						'devolutions':devolutions,
 				   }
 		return render(request,'history/history.html', context)
 

@@ -220,11 +220,21 @@ class ResetUsersView(View):
 		lessons = Lesson_det.objects.filter(	
 												reset= False,
 												id_exercise_fk=exercise
-											).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson")
-		for lesson in lessons:
-			if lesson.id_user_fk.all().count() > 0: #obtengo todos los usurios de la clase y pregunto is es mayor a 0
-				messages.success(self.request, 'Hay almenos una clase con usuarios dentro. No se puede reinicar un ejercicio con usuarios en clases', extra_tags='alert-danger')
-				return redirect('exercise:list_exercise')
+											).exclude(lesson_status = Lesson_det.FINISHED).exclude(id_user_fk = None).count()
+
+		if lessons > 0:
+			messages.success(self.request, 'Hay almenos una clase con usuarios dentro. No se puede reinicar un ejercicio con usuarios en clases', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
+
+		#esto es para verificar que no hayan devoluciones en clases, para poder hacer el reinicio
+		devolutions = Devolution.objects.filter(	
+												returned= False,
+												id_exercise_fk=exercise
+											).exclude(id_lesson_fk = None).count()
+
+		if devolutions > 0:
+			messages.success(self.request, 'Hay almenos una clase con devoluciones dentro. No se puede reiniciar un ejercicio con usuarios en la clase', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
 
 		#obtengo todos los exercise_det de los usuarios con el respectivo ejercicio que se puedan reiniciar
 		exercises_det = Exercise_det.objects.filter(id_exercise_fk=exercise)
@@ -512,53 +522,38 @@ class UserConfigurationHistoryView(View):
 		
 		if form.is_valid():
 
-			histories_qs1  = Lesson_det.objects.filter(	
-													reset = True,
-													id_exercise_fk=exercise_det.id_exercise_fk.id,
-													id_user_fk=user_to_modific.id,
-													day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
-												   )
-
-			histories_qs2  = Lesson_det.objects.filter(	
+			histories  = Lesson_det.objects.filter(	
 													lesson_status = Lesson_det.FINISHED,
 													id_exercise_fk=exercise_det.id_exercise_fk.id,
 													id_user_fk=user_to_modific.id,
 													day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
 												   )
 
-			histories_qs1 = histories_qs1.union(histories_qs2).order_by("day_lesson", "hour_lesson")
-
 			context = {
 						'form':form,
 						'user_to_modific': user_to_modific,
 						'exercise_det' : exercise_det,
-						'histories':histories_qs1,
+						'histories':histories,
 				       }
 			# return HttpResponse("<h1>Todo ok</h1>")
 			return render(request, self.template_name, context)
 		else:
 			print(form.errors.as_data)
 			print("something happened")
-			histories_qs1  = Lesson_det.objects.filter(	
-													reset = True,
-													id_exercise_fk=exercise_det.id_exercise_fk.id,
-													id_user_fk=user_to_modific.id
-												   )
 
-			histories_qs2  = Lesson_det.objects.filter(	
-													lesson_status = Lesson_det.FINISHED,
-													id_exercise_fk=exercise_det.id_exercise_fk.id,
-													id_user_fk=user_to_modific.id
-												   )
-
-			histories_qs1 = histories_qs1.union(histories_qs2).order_by("day_lesson", "hour_lesson")
+			histories  = Lesson_det.objects.filter(	
+												lesson_status = Lesson_det.FINISHED,
+												id_exercise_fk=exercise_det.id_exercise_fk.id,
+												id_user_fk=user_to_modific.id
+											   ).order_by("day_lesson", "hour_lesson")
 
 			context = {	
 						'form':form,
 						'user_to_modific': user_to_modific,
 						'exercise_det' : exercise_det,
-						'histories':histories_qs1,
+						'histories':histories,
 				       }
+
 		return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
@@ -568,27 +563,28 @@ class UserConfigurationHistoryView(View):
 
 		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
 		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
-		histories_qs1  = Lesson_det.objects.filter(	
-													reset = True,
-													id_exercise_fk=exercise_det.id_exercise_fk.id,
-													id_user_fk=user_to_modific.id
-												   )
 
-		histories_qs2  = Lesson_det.objects.filter(	
+		histories_lesson  = Lesson_det.objects.filter(	
 												lesson_status = Lesson_det.FINISHED,
 												id_exercise_fk=exercise_det.id_exercise_fk.id,
 												id_user_fk=user_to_modific.id
 											   )
 
-		histories_qs1= histories_qs1.union(histories_qs2).order_by("day_lesson", "hour_lesson")
-		print(histories_qs1)
+		histories_devolution = Lesson_det.objects.filter(	
+													devolution__id_user_fk__id =  user_to_modific.id,
+													id_exercise_fk = exercise_det.id_exercise_fk.id,
+													lesson_status = Lesson_det.FINISHED,
+											   )
+
+		histories_lesson = histories_lesson.union(histories_devolution)
+
 		form =  SearchClassesForm()
 
 		context = {
 						'form':form,
 						'user_to_modific': user_to_modific,
 						'exercise_det' : exercise_det,
-						'histories':histories_qs1,
+						'histories':histories_lesson,
 				   }
 		return render(request, self.template_name, context)
 

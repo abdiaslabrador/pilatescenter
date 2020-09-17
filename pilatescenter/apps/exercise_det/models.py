@@ -585,7 +585,7 @@ def update_resumen(lesson):
 																	id_lesson_fk = None,
 																	returned = False,
 																	id_user_fk = user_exercise_det.id_user_fk,
-																	id_exercise_fk= instance.id_exercise_fk,
+																	id_exercise_fk= user_exercise_det.id_exercise_fk,
 													).count()
 
 		user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user).exclude(id=lesson.id).exclude( lesson_status = Lesson_det.FINISHED).count()

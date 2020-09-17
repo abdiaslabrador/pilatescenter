@@ -9,6 +9,7 @@ from django.db.models import signals
 class Lesson_det(models.Model):
 
 	#is the value asign here is in capital case or not, is the way that appear in the database
+	#-------lesson status------------------------
 	NOTONE		= 'VACIO'
 	OPEN		= 'ABIERTO'
 	CLOSE		= 'CERRADO'
@@ -21,7 +22,7 @@ class Lesson_det(models.Model):
 	lesson_capacity_status = models.CharField(max_length=10,choices=lesson_capacity_status_choices,default=NOTONE)
 
     
-	#--------------------------------------------
+	#--------lesson capacity----------------------
 	ENABLE		= '---'
 	NOTCHANCE 	= 'NO CHANCE'
 	INPROCESS 	= 'EN CLASE'

@@ -50,11 +50,17 @@
           <tbody>
               {% for devolution in devolutions%}
                   <tr>
-                  <td >{{devolution.id_lesson_fk.first.id}}</td>
+                      <td >{{devolution.id_lesson_fk.first.id}}</td>
                       <td>{{devolution.id_lesson_fk.first.day_lesson|date:"l. M d, Y"}}</td>
                       <td>{{devolution.id_lesson_fk.first.hour_lesson}}</td>
                       <td>{{devolution.id_exercise_fk.name}}</td>                       
-                      <td>---</td>
+
+                      {% if devolution.id_lesson_fk.first.lesson_status == devolution.id_lesson_fk.first.INPROCESS %}s
+                        <td>{{devolution.id_lesson_fk.first.INPROCESS}}</td>
+                      {%else%}
+                        <td>---</td>
+                      {%endif%}
+
                   </tr>
               {% endfor %}            
           </tbody>
