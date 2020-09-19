@@ -34,12 +34,13 @@ class UserLessonListView(View):
 				messages.success(self.request, 'El ejercicio fue eliminado', extra_tags='alert-danger')
 				return redirect('user_home:user_home')
 
+			#schuduled devolution lessons
 			devolutions = Devolution.objects.filter(
 														returned = False,
 														id_user_fk=request.user,
 														id_exercise_fk=self.kwargs['id_exercise'],
 													).exclude(id_lesson_fk = None).order_by("day_lesson", "hour_lesson")
-
+			#schuduled  lessons
 			lessons = Lesson_det.objects.filter(	
 													reset = False,
 													id_user_fk=request.user,
@@ -95,8 +96,6 @@ class UserInBagView(View):
 			except Exercise_det.DoesNotExist:
 				messages.success(self.request, 'El ejercicio fue eliminado', extra_tags='alert-danger')
 				return redirect('user_home:user_home')
-
-			
 			
 			try:
 				lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
@@ -105,7 +104,7 @@ class UserInBagView(View):
 				return redirect('user_lesson:lesson_list', id_exercise=self.exercise_det.id_exercise_fk.id)
 
 
-
+			#I make sure that the user has oportunities and the lesson a selected is in enable status
 			if self.exercise_det.oportunities > 0 and lesson.lesson_status == lesson.ENABLE:
 				self.exercise_det.oportunities-=1				
 				self.exercise_det.bag+=1
@@ -130,8 +129,10 @@ class UserBagView(View):
 		if request.user.is_anonymous:
 			return redirect('user_login:user_login_form')
 		else:
-			today = datetime.today()
 			
+			#Aqui se asigna la cantidad de día que se van a sumar al día actual. Luego se le muestra al usuario
+			#la cantidad de días disponible diacuerdo a este intervalo.
+			today = datetime.today()
 			today_delta = timedelta(days = 5)
 			plus_days = today + today_delta
 
@@ -152,17 +153,19 @@ class UserBagView(View):
 																devolution__returned = False,
 																devolution__id_user_fk=request.user,
 																devolution__id_exercise_fk=self.exercise_det.id_exercise_fk,
-															)
 
-				#unión de los días de las lecciones y de los días de devoluciones del usuario
+															).exclude(devolution__id_lesson_fk = None)
+
+				#unión de las lecciones y devoluciones del usuario
 				days_already_have = days_already_have.union(devolutions_days)
 				
-
+				#De las lecciones escojidas creo una lista e inserto los nombres de sus días de la unión
 				user_days_already_have=[]
 				for day in days_already_have:
-					user_days_already_have.append(day['day_lesson'].strftime("%A"))
+					if day['day_lesson'].strftime("%A") not in user_days_already_have:
+						user_days_already_have.append(day['day_lesson'].strftime("%A"))
 				
-				
+				#obtengo las lecciones con evaluadas en los requisitos y en el intervalo puesto				
 				unfiltered_lessons = Lesson_det.objects.filter(
 																reset=False,
 																id_exercise_fk=self.exercise_det.id_exercise_fk,
@@ -170,6 +173,9 @@ class UserBagView(View):
 																cant_in__lt=F('cant_max'),
 																day_lesson__range=(today, plus_days),
 															).exclude(cant_in=0).exclude(id_user_fk__id=request.user.id).order_by("day_lesson") 
+				
+				#prosigo a comparar los nombres los días de las fechas de las lecciones obtenidas con los nombres de los días
+				#que ya el usuario tenía programado
 				lessons = []
 				for unfiltered_lesson in unfiltered_lessons:
 					if unfiltered_lesson.day_lesson.strftime("%A") not in user_days_already_have:

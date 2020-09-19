@@ -9,12 +9,14 @@ urlpatterns = [
 	path('update_exercise/<int:pk>/', views.UpdateExerciseView.as_view(), name='update_exercise_form'),
 	path('delete_exercise/<int:pk>/', views.DeleteExerciseView.as_view(), name='delete_exercise'),
 	path('see_exercise/<int:pk>/', views.See.as_view(), name='see_exercise'),
-	path('list_day/<int:pk>/', views.ListDayView.as_view(), name='list_day'),
-	path('create_day/<int:pk>/', views.CreateDayView.as_view(), name='create_day'),
-	path('delete_day/<int:pk>/<int:id_day>/', views.DeleteDayView.as_view(), name='delete_day'),
-	path('list_hour/<int:pk>/<int:id_day>/', views.ListHourView.as_view(), name='list_hour'),
-	path('create_hour/<int:pk>/<int:id_day>/', views.CreateHourView.as_view(), name='create_hour'),
-	path('update_hour/<int:pk>/<int:id_day>/', views.UpdateHourView.as_view(), name='update_hour'),
-	path('delete_hour/<int:pk>/<int:id_day>/', views.DeleteHourView.as_view(), name='delete_hour'),
+
+	path('list_day/<int:id_exercise>/', views.ListDayView.as_view(), name='list_day'),
+	path('create_day/<int:id_exercise>/', views.CreateDayView.as_view(), name='create_day'),
+	path('delete_day/<int:id_exercise>/<int:id_day>/', views.DeleteDayView.as_view(), name='delete_day'),
+
+	path('list_hour/<int:id_exercise>/<int:id_day>/', views.ListHourView.as_view(), name='list_hour'),
+	path('create_hour/<int:id_exercise>/<int:id_day>/', views.CreateHourView.as_view(), name='create_hour'),
+	path('update_hour/<int:id_exercise>/<int:id_hour>/<int:id_day>/', views.UpdateHourView.as_view(), name='update_hour'),
+	path('delete_hour/<int:id_exercise>/<int:id_hour>/<int:id_day>/', views.DeleteHourView.as_view(), name='delete_hour'),
 	
 ]

@@ -59,100 +59,6 @@ class ListUserView(View):
 
 		return render(request, self.template_name, context)
 
-#Creating a user
-def create_user(request):
-	"""this form creates a user which has a signal in exercise_det model"""
-	if request.method == 'POST':
-		form = UserCreationForm(request.POST)
-		if form.is_valid():
-			form.save()
-			print("ES VALIDO!")
-			return redirect('content_user:list_user')
-		else:
-			print("es invalido chao!")
-	else:
-		#validacion de que sea un superusuario
-		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
-		form = UserCreationForm()
-
-	return render(request,'users/create_user.html', {'form':form})
-
-#Updating a user
-def modific_user(request, pk):
-	"""
-		this  form  modifies a user. In the below of the page is presented
-		all exercise that the business offer.
-	"""
-	user=CustomUser.objects.get(pk=pk)
-	exercises_det = Exercise_det.objects.filter(id_user_fk = user).order_by('name')
-
-	if request.method == 'GET':
-		#validacion de que sea un superusuario
-		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
-
-		form = UserUpdateForm(instance=user, initial={'primarykey': user.pk})#i use the primary key to validate the username modificated whit the other usernames registered
-
-	else:
-		form = UserUpdateForm(request.POST, instance=user)
-		if form.is_valid():
-			form.save()
-			# print("ES VALIDO!")
-			return redirect('content_user:list_user')
-		# else: #si el formuñario no esválido, esto es para pruebas
-		# 	# print("NO es invalido chao!")
-		# 	return render(request,'users/modific_user.html', {'form':form})
-	contexto={
-				'form':form,
-				'exercises_det_list': exercises_det,
-				'user_to_modific':user,
-			 }
-	return render(request,'users/modific_user.html', contexto)
-
-#deleting a user
-class DeleteUserView(View):
-	"""
-		This function deletes the user when the delete button in the list of user is pressed.
-		The condition to delete a user is: a user cannot has a least one lesson scheduled
-	"""
-	def get(self, request, *args, **kwargs):
-
-		#validacion de que sea un superusuario
-		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
-
-		user = CustomUser.objects.get(pk=self.kwargs['pk'])
-
-		if Lesson_det.objects.filter(id_user_fk= user).exclude(lesson_status = Lesson_det.FINISHED).count() > 0:
-			messages.success(self.request, 'No se puede eliminar un usuario con clases programadas', extra_tags='alert-danger')
-			return redirect('content_user:list_user')
-
-		user.delete()
-		return redirect('content_user:list_user')
-
-#Changing the user password
-def change_password_user(request, pk):
-	"""This form is located inside of the modific user part"""
-	user=CustomUser.objects.get(pk=pk)
-	if request.method == 'POST':
-		form = ChangePasswordForm(request.POST)
-		if form.is_valid():
-			# print("ES VALIDO!" + " " + form.cleaned_data['password'])
-			user.set_password(form.cleaned_data['password'])
-			user.save()
-			return redirect('content_user:list_user')
-		# else:
-			# print("NO es invalido chao!")
-	else:
-		#validacion de que sea un superusuario
-		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
-
-		form = ChangePasswordForm()
-	return render(request,'users/change_password_user.html', {'form':form})
-
-
 class ListLockedUserView(View):
 	"""here i show all the locked users"""
 	template_name = 'users/locked_users.html'
@@ -178,7 +84,11 @@ class LockUserView(View):
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-		user = CustomUser.objects.get(pk=self.kwargs['pk'])
+		try:
+			user = CustomUser.objects.get(id = self.kwargs['pk'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_locked_user')
 
 		if Lesson_det.objects.filter(id_user_fk= user).exclude(lesson_status = Lesson_det.FINISHED).count() > 0:
 			messages.success(self.request, 'No se puede bloquear un usuario con clases programadas', extra_tags='alert-danger')
@@ -196,10 +106,126 @@ class  UnlockUserView(View):
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-		user = CustomUser.objects.get(pk=self.kwargs['pk'])
+		try:
+			user = CustomUser.objects.get(id = self.kwargs['pk'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_locked_user')
+
 		user.is_active=True
 		user.save()
 		return redirect('content_user:list_locked_user')
+
+
+#Creating a user
+def create_user(request):
+	"""this form creates a user which has a signal in exercise_det model"""
+	if request.method == 'POST':
+		form = UserCreationForm(request.POST)
+		if form.is_valid():
+			form.save()
+			print("ES VALIDO!")
+			return redirect('content_user:list_user')
+		else:
+			print("es invalido chao!")
+	else:
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+		form = UserCreationForm()
+
+	return render(request,'users/create_user.html', {'form':form})
+
+#Updating a user
+def modific_user(request, pk):
+	"""
+		this  form  modifies a user. In the below of the page is presented
+		all exercise that the business offer.
+	"""
+	try:
+		user=CustomUser.objects.get(pk=pk)
+	except CustomUser.DoesNotExist:
+		messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
+		return redirect('content_user:list_user')
+		
+	exercises_det = Exercise_det.objects.filter(id_user_fk = user).order_by('name')
+
+	if request.method == 'GET':
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
+		form = UserUpdateForm(instance=user, initial={'primarykey': user.pk})#i use the primary key to validate the username modificated whit the other usernames registered
+
+	else:
+		form = UserUpdateForm(request.POST, instance=user)
+		if form.is_valid():
+			form.save()
+			# print("ES VALIDO!")
+			return redirect('content_user:list_user')
+		# else: #si el formuñario no esválido, esto es para pruebas
+		# 	# print("NO es invalido chao!")
+		# 	return render(request,'users/modific_user.html', {'form':form})
+	contexto={
+				'form':form,
+				'exercises_det_list': exercises_det,
+				'user_to_modific':user,
+			 }
+	return render(request,'users/modific_user.html', contexto)
+
+#Changing the user password
+def change_password_user(request, pk):
+	"""This form is located inside of the modific user part"""
+	
+	try:
+		user=CustomUser.objects.get(pk=pk)
+	except CustomUser.DoesNotExist:
+		messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
+		return redirect('content_user:list_user')
+
+	if request.method == 'POST':
+		form = ChangePasswordForm(request.POST)
+		if form.is_valid():
+			# print("ES VALIDO!" + " " + form.cleaned_data['password'])
+			user.set_password(form.cleaned_data['password'])
+			user.save()
+			return redirect('content_user:list_user')
+		# else:
+			# print("NO es invalido chao!")
+	else:
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
+		form = ChangePasswordForm()
+	return render(request,'users/change_password_user.html', {'form':form})
+
+
+#deleting a user
+class DeleteUserView(View):
+	"""
+		This function deletes the user when the delete button in the list of user is pressed.
+		The condition to delete a user is: a user cannot has a least one lesson scheduled
+	"""
+	def get(self, request, *args, **kwargs):
+
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('admin_login:login_admin')
+
+		try:
+			user = CustomUser.objects.get(pk=self.kwargs['pk'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'EL usuario fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')
+
+		if Lesson_det.objects.filter(id_user_fk= user).exclude(lesson_status = Lesson_det.FINISHED).count() > 0:
+			messages.success(self.request, 'No se puede eliminar un usuario con clases programadas', extra_tags='alert-danger')
+			return redirect('content_user:list_user')
+
+		user.delete()
+		return redirect('content_user:list_user')
+
 
 
 #reset a user
@@ -213,9 +239,13 @@ class ResetUsersView(View):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
+		
+		try:
+			exercise = Exercise.objects.get(pk=self.kwargs['pk'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
 
-		exercise = Exercise.objects.get(pk=self.kwargs['pk'])
-				
 		#esto es para verificar que no hayan usuarios con clases programadas para hacer el reinicio
 		lessons = Lesson_det.objects.filter(	
 												reset= False,
@@ -257,8 +287,19 @@ class UserConfigurationClassView(View):
 	template_name= 'users/user_configuration/table_lesson.html'
 
 	def post(self, request, *args, **kwargs):
-		exercise_det=Exercise_det.objects.get(id = self.kwargs['pk'])
-		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		
+		try:
+			exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
+		except Exercise_det.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')		
+
+		try:
+			user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')
+
 		form =  SearchClassesForm(request.POST)
 
 		if form.is_valid():
@@ -302,8 +343,19 @@ class UserConfigurationClassView(View):
 			return redirect('admin_login:login_admin')
 
 		form = SearchClassesForm()
-		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
-		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+
+		try:
+			exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
+		except Exercise_det.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')		
+
+		try:
+			user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')
+
 		lessons = Lesson_det.objects.filter( 
 												reset = False,
 												id_exercise_fk=exercise_det.id_exercise_fk.id,
@@ -343,7 +395,7 @@ class UserConfigurationSawLessonView(View):
 		
 		lesson.lesson_status = Lesson_det.FINISHED
 		lesson.save()
-		update_resumen(lesson)#this function updates the "summary" of the exercise related to the lesson, and is located in model of the exercise_det app
+		# update_resumen(lesson)#this function updates the "summary" of the exercise related to the lesson, and is located in model of the exercise_det app
 
 		return redirect('content_user:user_configuration_class', pk=self.kwargs['id_exercise_det'])
 		
@@ -382,9 +434,20 @@ class UserConfigurationResumenView(View):
 	context = {}
 
 	def post(self, request, *args, **kwargs):
-		exercise_det= Exercise_det.objects.get(id=self.kwargs['pk'])
+
+		try:
+			exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
+		except Exercise_det.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')		
+
+		try:
+			user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')
+
 		form = ConfigurationUserExerciseForm(request.POST, instance=exercise_det)
-		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
 
 		#this "if" is part of a validation of reset condition of the user
 		if exercise_det.reset == True:
@@ -447,9 +510,21 @@ class UserConfigurationResumenView(View):
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
-		form 			= ConfigurationUserExerciseForm(instance=exercise_det)
-		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+
+		try:
+			exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
+		except Exercise_det.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')		
+
+		try:
+			user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')
+				
+		form = ConfigurationUserExerciseForm(instance=exercise_det)
+		
 
 		self.context = {
 							'form':form,
@@ -464,10 +539,14 @@ class UserConfigurationChangePlanView(View):
 		I make a union among the plan named "ninguno" and the especific plans
 		because the model "PLAN" have serveral plans of diferenet exercises
 	"""
-
 	def post(self, request, *args, **kwargs):
 		
-		exercise_det= Exercise_det.objects.get(id=self.kwargs['pk'])
+		try:
+			exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
+		except Exercise_det.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')
+
 		form = ConfigurationUserChangePlanForm(request.POST, instance=exercise_det)
 
 		#en el formulario verifico que no tenga clases programadas
@@ -489,7 +568,12 @@ class UserConfigurationChangePlanView(View):
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-		exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
+		try:
+			exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
+		except Exercise_det.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')		
+
 		form = ConfigurationUserChangePlanForm(instance=exercise_det)
 
 		plan_ninguno = Plan.objects.filter(name__iexact="ninguno")
@@ -499,7 +583,12 @@ class UserConfigurationChangePlanView(View):
 		plan_actual_exercise = plan_actual_exercise.union(plan_ninguno)
 
 		form.fields['id_plan_fk'].queryset = plan_actual_exercise.order_by("name")
-		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		
+		try:
+			user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')
 
 		context = {		
 						'form':form,
@@ -516,8 +605,18 @@ class UserConfigurationHistoryView(View):
 	template_name = 'users/user_configuration/table_history.html'
 
 	def post(self, request, *args, **kwargs):
-		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
-		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		try:
+			exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
+		except Exercise_det.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')		
+
+		try:
+			user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')
+
 		form =  SearchClassesForm(request.POST)
 		
 		if form.is_valid():
@@ -561,8 +660,17 @@ class UserConfigurationHistoryView(View):
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
-		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		try:
+			exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
+		except Exercise_det.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')		
+
+		try:
+			user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')
 
 		histories_lesson  = Lesson_det.objects.filter(	
 												lesson_status = Lesson_det.FINISHED,
@@ -596,8 +704,19 @@ class UserConfigurationResetView(View):
 	template_name = 'users/user_configuration/reset.html'
 
 	def post(self, request, *args, **kwargs):
-		exercise_det= Exercise_det.objects.get(id=self.kwargs['pk'])
-		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		try:
+			exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
+		except Exercise_det.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')		
+
+		try:
+			user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')
+
+
 		form = ConfigurationUserResetForm(request.POST, instance=exercise_det)
 
 		if form.is_valid():
@@ -618,9 +737,19 @@ class UserConfigurationResetView(View):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
+		
+		try:
+			exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
+		except Exercise_det.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')		
 
-		exercise_det 	= Exercise_det.objects.get(pk=self.kwargs['pk'])
-		user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		try:
+			user_to_modific = CustomUser.objects.get(exercise_det__id = self.kwargs['pk'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('content_user:list_user')
+
 		form = ConfigurationUserResetForm(instance=exercise_det)
 
 		context = {		

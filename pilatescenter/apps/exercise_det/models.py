@@ -94,16 +94,6 @@ class Exercise_det(models.Model):
 															   ).exclude(lesson_status = Lesson_det.FINISHED).count()
 			self.save()
 
-
-		# si existen clases vistas y sin personas, en esta operación eliminamos esas lecciones
-		# saw_lessons = Lesson_det.objects.filter(
-		# 											lesson_status = Lesson_det.FINISHED,
-		# 											id_exercise_fk= self.id_exercise_fk
-		# 										)
-		# for saw_lesson in saw_lessons:
-		# 	if saw_lesson.id_user_fk.all().count() == 0:
-		# 		saw_lesson.delete()
-
 def set_plan_ninguno_after_exercise_det_deleted(sender, instance, *args, **kwargs):
     """ 
 		Esto hace que al eliminar un plan no elimine el Exercise_det asociado,

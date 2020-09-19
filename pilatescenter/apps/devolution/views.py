@@ -118,9 +118,7 @@ class DevolutionSeeView(View):
 			devolution = Devolution.objects.get(id=self.kwargs['id_devolution'])
 		except Devolution.DoesNotExist:
 			messages.success(request, 'La devolucion que desea manipular fue eliminada o no existe', extra_tags='alert-danger')
-			return redirect('devolution:devolution_users_list')
-			
-		# lesson_retorned=devolution.id_lesson_fk.all()[0]
+			return redirect('devolution:decide_devolution')		
 
 		context={	
 					'devolution':devolution
@@ -139,7 +137,7 @@ class DevolutionDeleteView(View):
 			devolution = Devolution.objects.get(id=self.kwargs['id_devolution'])
 		except Devolution.DoesNotExist:
 			messages.success(request, 'La devolucion que desea manipular fue eliminada o no existe', extra_tags='alert-danger')
-			return redirect('devolution:devolution_users_list')
+			return redirect('devolution:decide_devolution')
 			
 		devolution.delete()
 
@@ -148,7 +146,9 @@ class DevolutionDeleteView(View):
 #devolution update
 class UpdateDevolutionView(View):
 	"""
-		
+		Este es la view que se muestra al entrar en una lección y luego querer añadir devoluciones.
+		muestra los usuarios que está en la clase, que esta en la clase con devoluciones y la lista de 
+		usuarios con devolciones
 	"""
 	template_name= 'devolution/devolution_lesson_user.html'
 
@@ -192,14 +192,6 @@ class UpdateDevolutionView(View):
 			 									id_exercise_fk = lesson.id_exercise_fk,
 			 								  ).order_by('id_user_fk__username').distinct('id_user_fk__username').exclude(id_user_fk__id__in=users_list)
 
-		# all_users = CustomUser.objects.filter(
-		# 	 									is_active = True,
-		# 	 									exercise_det__id_exercise_fk=lesson.id_exercise_fk,
-		# 	 									exercise_det__reset=True,
-		# 	 									devolution__id_lesson_fk = None,
-		# 	 									devolution__returned = False,
-		# 	 								  ).order_by('username').distinct('username').exclude(id__in=users_list)
-
 		context={	
 					'lesson': lesson,
 					'users_in_lesson': users_in_lesson,
@@ -211,7 +203,12 @@ class UpdateDevolutionView(View):
 
 class AddToDevolutionView(View):
 	"""
-		
+		en esta view se encarga de añadir la devolución de un usuario a una clase 
+		en el área de las devoluciones.
+		Requisitos: 
+		El usuario no puede estar en la clase.
+		El usuario no puede estar en las devoluciones
+		El usuario tiene que tener devoluciones
 	"""
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
@@ -241,7 +238,6 @@ class AddToDevolutionView(View):
 			obtengo la única validación que hay  aúnque la relación que hay es many to many solo hay una
 			lección relacionada a la devolucíón
 		"""
-
 		devolution = Devolution.objects.filter(
 												returned = False,
 												id_user_fk = self.kwargs['id_user'],
@@ -253,7 +249,11 @@ class AddToDevolutionView(View):
 			messages.success(request, 'El usuario no tiene devoluciones', extra_tags='alert-danger')
 			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
 
-		user_exercise_det = Exercise_det.objects.get(id_exercise_fk=lesson.id_exercise_fk, id_user_fk=self.kwargs['id_user'])
+		try:
+			user_exercise_det = Exercise_det.objects.get(id_exercise_fk=lesson.id_exercise_fk, id_user_fk=self.kwargs['id_user'])
+		except Exercise_det.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('lesson:list_lesson_exercise_action')
 
 		no_in_class = Lesson_det.objects.filter(id=lesson.id, id_user_fk=self.kwargs['id_user']).count() == 0
 		no_in_devolution = Devolution.objects.filter(id_lesson_fk=lesson.id, id_user_fk=self.kwargs['id_user']).count() == 0
@@ -281,7 +281,8 @@ class AddToDevolutionView(View):
 
 class TakeOutToDevolutionView(View):
 	"""
-		
+		en esta view se encarga para sacar al usuario que está en las devoluciones de una clase 
+		en el área de las devoluciones
 	"""
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
@@ -319,7 +320,7 @@ class TakeOutToDevolutionView(View):
 
 class TakeOutToUsersLessonView(View):
 	"""
-		
+		esta el la view para sacar al usuario que está en la clase en el área de las devoluciones
 	"""
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
@@ -336,7 +337,11 @@ class TakeOutToUsersLessonView(View):
 			messages.success(request, 'La clase ya fue vista', extra_tags='alert-danger')
 			return redirect('lesson:list_lesson_exercise_action')
 
-		user = CustomUser.objects.get(id=self.kwargs['id_user'])
+		try:
+			user = CustomUser.objects.get(id=self.kwargs['id_user'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado', extra_tags='alert-danger')
+			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
 		
 		#me aseguro que el usuario esté en la clase (por seguridad) (esta query es m2m)
 		if Lesson_det.objects.filter(id=lesson.id, id_user_fk=user).count() > 0:

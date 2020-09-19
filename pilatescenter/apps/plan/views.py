@@ -41,7 +41,12 @@ class CreatePlanView(View):
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-		exercise = Exercise.objects.get(id =self.kwargs["id_exercise"])
+		try:
+			exercise = Exercise.objects.get(id =self.kwargs["id_exercise"])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
+
 		form =  CreatePlanForm(initial = { 'id_exercise_fk': exercise})
 		# (form.errors.as_data)
 		return render(request, self.template_name, {'form':form})
@@ -62,7 +67,12 @@ class ListPlanView(View):
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-		exercise = Exercise.objects.get(id =self.kwargs["id_exercise"])
+		try:
+			exercise = Exercise.objects.get(id =self.kwargs["id_exercise"])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
+
 		plans = Plan.objects.filter(id_exercise_fk=exercise).order_by('name')
 
 		for plan in plans:
@@ -82,8 +92,18 @@ class UpdatePlanView(View):
 	template_name = 'plan/update_plan.html'
 	
 	def post(self, request, *args, **kwargs):
-		plan= Plan.objects.get(id=self.kwargs['pk'])
-		exercise_obj = Exercise.objects.get(plan__pk=self.kwargs['pk'])
+		try:
+			plan = Plan.objects.get(id=self.kwargs['pk'])
+		except Plan.DoesNotExist:
+			messages.success(request, 'El plan fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
+
+		try:
+			exercise_obj = Exercise.objects.get(plan__pk=self.kwargs['pk'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
+
 		form = UpdatePlanForm(request.POST, instance=plan)
 
 		if form.is_valid():
@@ -103,9 +123,21 @@ class UpdatePlanView(View):
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-		plan = Plan.objects.get(id=self.kwargs['pk'])
+		
+		try:
+			plan = Plan.objects.get(id=self.kwargs['pk'])
+		except Plan.DoesNotExist:
+			messages.success(request, 'El plan fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
+
 		form = UpdatePlanForm(instance=plan, initial={'primarykey': plan.pk})
-		exercise_obj = Exercise.objects.get(plan__pk=self.kwargs['pk'])
+		
+
+		try:
+			exercise_obj = Exercise.objects.get(plan__pk=self.kwargs['pk'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
 
 		context={
 					'name_exercise': exercise_obj.name,
@@ -119,7 +151,12 @@ class DeletePlanView(View):
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-		plan = Plan.objects.get(pk=self.kwargs['pk'])
+		try:
+			plan = Plan.objects.get(id=self.kwargs['pk'])
+		except Plan.DoesNotExist:
+			messages.success(request, 'El plan fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
+			
 		exercises_det = Exercise_det.objects.filter(id_plan_fk=plan)
 
 		for exercise_det in exercises_det:
@@ -141,6 +178,10 @@ class See(View):
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 			
-		plan = Plan.objects.get(pk=self.kwargs['pk'])
+		try:
+			plan = Plan.objects.get(id=self.kwargs['pk'])
+		except Plan.DoesNotExist:
+			messages.success(request, 'El plan fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
 		return render(request, "plan/see_plan.html", {"plan":plan})
 

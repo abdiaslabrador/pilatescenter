@@ -6,6 +6,17 @@
   {% block content %}
 
           <div class="container mt-4">
+          {% if messages %}
+            {% for message in messages %}
+            <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                  <p>{{ message }}</p>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            {% endfor %}
+          {% endif %}
+
             <a class="btn btn-warning" href="{% url 'exercise:create_day'  exercise.id %}"> Añadir día</a>
           </div>
 

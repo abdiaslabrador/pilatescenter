@@ -44,7 +44,11 @@ class ListHistoryView(View):
 		form =  SearchClassesForm(request.POST)
 
 		if form.is_valid():
-			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+			try:
+				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+			except Exercise.DoesNotExist:
+				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+				return redirect('history:list_lesson_exercise_history')
 
 			histories  = Lesson_det.objects.filter(		
 														id_exercise_fk=exercise,
@@ -62,7 +66,12 @@ class ListHistoryView(View):
 		else:
 			print(form.errors.as_data)
 			print("something happened")
-			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+			
+			try:
+				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+			except Exercise.DoesNotExist:
+				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+				return redirect('history:list_lesson_exercise_history')
 
 			histories  = Lesson_det.objects.filter(	
 													id_exercise_fk=exercise,
@@ -82,7 +91,11 @@ class ListHistoryView(View):
 			return redirect('admin_login:login_admin')
 
 		form = SearchClassesForm()
-		exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+		try:
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('history:list_lesson_exercise_history')
 
 
 		histories = Lesson_det.objects.filter(		

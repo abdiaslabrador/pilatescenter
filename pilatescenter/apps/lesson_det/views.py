@@ -43,7 +43,7 @@ class CreateLessonView(View):
 			day=form.cleaned_data['day_lesson'].day
 			# return HttpResponse("<h1>Todo ok</h1>")
 
-			return redirect('lesson:create_lesson_form_search', pk=pk, year=year, month=month,  day=day)
+			return redirect('lesson:create_lesson_form_search', id_exercise=pk, year=year, month=month,  day=day)
 		else:
 			print(form.errors.as_data)
 			print("something happened")
@@ -72,7 +72,12 @@ class CreateLessonSearchView(View):
 		
 
 		if form.is_valid():
-			exercise=Exercise.objects.get(id = self.kwargs['pk'])
+			try:
+				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+			except Exercise.DoesNotExist:
+				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+				return redirect('lesson:list_lesson_exercise_action')
+
 			Lesson_det.objects.create( 
 				 						cant_max=form.cleaned_data['cant_max'],
 				 						quota=form.cleaned_data['cant_max'],
@@ -85,7 +90,7 @@ class CreateLessonSearchView(View):
 
 			# return HttpResponse("<h1>Todo ok</h1>")
 			messages.success(request, 'La clase fue creada con éxito', extra_tags='alert-success')
-			return redirect('lesson:list_lesson', pk=exercise.id)
+			return redirect('lesson:list_lesson', id_exercise=exercise.id)
 		else:
 			print(form.errors.as_data)
 			print("something happened")
@@ -98,7 +103,12 @@ class CreateLessonSearchView(View):
 
 
 		week_days = {"Sunday":"domingo", "Monday":"lunes", "Tuesday":"martes", "Wednesday":"miercoles", "Thursday":"jueves", "Friday":"viernes", "Saturday":"sabado"}
-		exercise=Exercise.objects.get(id = self.kwargs['pk'])
+		try:
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('lesson:list_lesson_exercise_action')
+
 		fecha_object = datetime.date(self.kwargs['year'], self.kwargs['month'], self.kwargs['day'])
 		str_day = fecha_object.strftime("%A") #obtengo el día sumistrado en ingles
 
@@ -132,7 +142,12 @@ class ListLessonView(View):
 		form =  SearchClassesForm(request.POST)
 
 		if form.is_valid():
-			exercise=Exercise.objects.get(id = self.kwargs['pk'])
+			try:
+				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+			except Exercise.DoesNotExist:
+				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+				return redirect('lesson:list_lesson_exercise_action')
+
 			lessons = Lesson_det.objects.filter(	
 													reset = False,
 												    id_exercise_fk=exercise,
@@ -149,7 +164,13 @@ class ListLessonView(View):
 		else:
 			print(form.errors.as_data)
 			print("something happened")
-			exercise=Exercise.objects.get(id = self.kwargs['pk'])
+
+			try:
+				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+			except Exercise.DoesNotExist:
+				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+				return redirect('lesson:list_lesson_exercise_action')
+
 			lessons = Lesson_det.objects.filter(reset = False, id_exercise_fk=exercise).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")	
 			context = {
 							'exercise':exercise,
@@ -165,7 +186,13 @@ class ListLessonView(View):
 			return redirect('admin_login:login_admin')
 
 		form = SearchClassesForm()
-		exercise=Exercise.objects.get(id = self.kwargs['pk'])
+
+		try:
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('lesson:list_lesson_exercise_action')
+
 		lessons = Lesson_det.objects.filter(reset = False, id_exercise_fk=exercise).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")	
 		context = {
 						'exercise':exercise,
@@ -186,7 +213,11 @@ class UpdateLessonView(View):
 	# paginate_by = 1
 
 	def post(self, request, *args, **kwargs):
-		lesson = Lesson_det.objects.get(id=self.kwargs['pk'])
+		try:
+			lesson = Lesson_det.objects.get(id=self.kwargs['pk'])
+		except Lesson_det.DoesNotExist:
+			messages.success(request, 'La clase que desea manipular fue eliminada o no existe', extra_tags='alert-danger')
+			return redirect('lesson:list_lesson_exercise_action')
 
 		if lesson.lesson_status == Lesson_det.FINISHED:
 			messages.success(request, 'La clase ya fue vista', extra_tags='alert-danger')
@@ -228,7 +259,8 @@ class UpdateLessonView(View):
 		users_devolution = CustomUser.objects.filter(
 														devolution__id_lesson_fk__id=lesson.id
 													)
-
+		#declaro la variable users_list  para no afecta a los usuarios de la lección al momento de hacer la unión.
+		#ya que se necesita en el template
 		users_list = users_in_lesson
 		users_list = users_list.union(users_devolution).values('id')
 
@@ -329,7 +361,7 @@ class AddToLessonView(View):
 
 class TakeOutToLessonView(View):
 	"""
-		This class takes some out,
+		This class takes some out of lesson.
 	"""
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
@@ -346,7 +378,11 @@ class TakeOutToLessonView(View):
 			messages.success(request, 'La clase ya fue vista', extra_tags='alert-danger')
 			return redirect('lesson:list_lesson_exercise_action')
 
-		user = CustomUser.objects.get(id=self.kwargs['id_user'])
+		try:
+			user =	CustomUser.objects.get(id=self.kwargs['id_user'])
+		except CustomUser.DoesNotExist:
+			messages.success(request, 'El usuario fue eliminado', extra_tags='alert-danger')
+			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
 		
 		#me aseguro que el usuario esté en la clase (por seguridad) (esta query es m2m)
 		if Lesson_det.objects.filter(id=lesson.id, id_user_fk=user).count() > 0:
@@ -358,7 +394,7 @@ class TakeOutToLessonView(View):
 
 class TakeOutToUsersDevolutionView(View):
 	"""
-		
+		This class takes some devolution out  of the lesson
 	"""
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
@@ -413,20 +449,18 @@ class SawLessonView(View):
 			messages.success(request, 'La clase ya fue vista', extra_tags='alert-danger')
 			return redirect('lesson:list_lesson_exercise_action')
 		
-
+		#putting up the lesson en finished status
 		lesson.lesson_status = Lesson_det.FINISHED
 		lesson.save()
 
+		#obteniendo todas la devoluciones que apuntan a la lección para colocarlas como entregadas en tal caso que hayan
 		associated_devolutions = lesson.devolution_set.all()
 
 		for associated_devolution in associated_devolutions:
 			associated_devolution.returned = True
 			associated_devolution.save()
 
-
-		# update_resumen(lesson)#this function updates the "summary" of the exercise related to the lesson
-
-		return redirect('lesson:list_lesson', pk=lesson.id_exercise_fk.id)
+		return redirect('lesson:list_lesson', id_exercise=lesson.id_exercise_fk.id)
 
 class DeleteLessonView(View):
 	"""
@@ -452,7 +486,7 @@ class DeleteLessonView(View):
 		lesson.id_user_fk.clear()
 		lesson.delete()
 
-		return redirect('lesson:list_lesson', pk=exercise_id)
+		return redirect('lesson:list_lesson', id_exercise=exercise_id)
 
 
 class DevolutionLessonView(View):
@@ -501,7 +535,7 @@ class DevolutionLessonView(View):
 											id_user_fk = user
 											)
 
-				devolution.id_lesson_before = lesson.id
+				devolution.id_lesson_before = lesson.id #este es el id de la leccion que creó la devolución
 				devolution.save()
 			
 			messages.success(request, 'Se han creado con exito las devoluciones', extra_tags='alert-success')
