@@ -311,7 +311,7 @@ class TakeOutToDevolutionView(View):
 											   ).first()
 
 		if devolution == None:
-			messages.success(request, 'El usuario no están', extra_tags='alert-danger')
+			messages.success(request, 'El usuario no está', extra_tags='alert-danger')
 			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
 
 		devolution.id_lesson_fk.remove(lesson)
@@ -348,5 +348,7 @@ class TakeOutToUsersLessonView(View):
 			#me aseguro que hayan usuarios en la clase
 			if lesson.id_user_fk.count() > 0:
 				lesson.id_user_fk.remove(user)#saco al usuario
-
+		else:
+			messages.success(request, 'El usuario no está', extra_tags='alert-danger')
+			
 		return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])

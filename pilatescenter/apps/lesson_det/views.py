@@ -328,7 +328,7 @@ class AddToLessonView(View):
 			user = CustomUser.objects.get(id=self.kwargs['id_user'])
 		except CustomUser.DoesNotExist:
 			messages.success(request, 'El usuario fue eliminado', extra_tags='alert-danger')
-			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
+			return redirect('lesson:update_lesson', pk=self.kwargs['id_lesson'])
 
 		user_exercise_det = Exercise_det.objects.get(id_exercise_fk=lesson.id_exercise_fk, id_user_fk=user)
 
@@ -379,10 +379,10 @@ class TakeOutToLessonView(View):
 			return redirect('lesson:list_lesson_exercise_action')
 
 		try:
-			user =	CustomUser.objects.get(id=self.kwargs['id_user'])
+			user = CustomUser.objects.get(id=self.kwargs['id_user'])
 		except CustomUser.DoesNotExist:
 			messages.success(request, 'El usuario fue eliminado', extra_tags='alert-danger')
-			return redirect('devolution:update_devolution', id_lesson=self.kwargs['id_lesson'])
+			return redirect('lesson:update_lesson', pk=self.kwargs['id_lesson'])
 		
 		#me aseguro que el usuario esté en la clase (por seguridad) (esta query es m2m)
 		if Lesson_det.objects.filter(id=lesson.id, id_user_fk=user).count() > 0:
@@ -505,7 +505,7 @@ class DevolutionLessonView(View):
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
 		except Lesson_det.DoesNotExist:
 			messages.success(request, 'La clase que desea manipular fue eliminada o no existe', extra_tags='alert-danger')
-			return redirect('history:list_history', id_exercise=lesson.id_exercise_fk.id)
+			return redirect('lesson:list_lesson_exercise_action')
 		
 		if Devolution.objects.filter(id_lesson_before = lesson.id).count() > 0:
 			messages.success(request, 'Ya ha sido creada la devolución de esta clase', extra_tags='alert-danger')

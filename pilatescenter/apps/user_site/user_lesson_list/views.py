@@ -122,8 +122,8 @@ class UserBagView(View):
 		llena, y que estas clases estén a unos ciertos días hacia adelante.
 	"""
 	template_name='user_site/lesson_list/bag/bag.html'
-	context = {}
 	exercise_det = None
+	context = {}
 
 	def get(self, request, *args, **kwargs):
 		if request.user.is_anonymous:
@@ -184,6 +184,7 @@ class UserBagView(View):
 				
 				self.context ={
 								'lessons':lessons,
+								'exercise_det':self.exercise_det,
 							   }
 
 				return render(request, self.template_name, self.context)
@@ -214,7 +215,7 @@ class UserBagDaySelectedView(View):
 
 			#validacion de que la clase todavía se pueda ver
 			if lesson.cant_in == lesson.cant_max or lesson.lesson_status == Lesson_det.FINISHED:
-				messages.success(self.request, 'La lección ya fue vista o ya está llena', extra_tags='alert-warning')
+				messages.success(self.request, 'La lección ya fue vista o ya está llena', extra_tags='alert-danger')
 				return redirect('user_lesson:lesson_list', id_exercise= lesson.id_exercise_fk.id)
 
 

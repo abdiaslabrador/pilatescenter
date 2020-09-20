@@ -6,9 +6,17 @@
   {% block content %}
   <button id="boolean" hidden>deactive</button>
   <div class="container">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+              <p>{{ message }}</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endfor %}
+        {% endif %}
     <div class="table-responsive">
-
-
         <table class="table panding" style="margin: 30px 0px;">
           <thead class="thead-light">
             <tr>
