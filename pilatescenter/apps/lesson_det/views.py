@@ -34,7 +34,9 @@ class CreateLessonView(View):
 	template_name= 'lesson/create_lesson.html'
 
 	def post(self, request, *args, **kwargs):
+
 		form =  CreateLessonForm(request.POST)
+		id_exercise = self.kwargs['id_exercise']
 
 		if form.is_valid():
 			pk=self.kwargs['id_exercise']
@@ -47,7 +49,11 @@ class CreateLessonView(View):
 		else:
 			print(form.errors.as_data)
 			print("something happened")
-		return render(request, self.template_name, {'form':form})
+			context = {	
+						'id_exercise':id_exercise,
+						'form':form,
+					}
+		return render(request, self.template_name, context)
 
 
 	def get(self, request, *args, **kwargs):
@@ -55,8 +61,14 @@ class CreateLessonView(View):
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
+		id_exercise = self.kwargs['id_exercise']
 		form = CreateLessonForm()
-		return render(request, self.template_name, {'form':form})
+		context = {	
+						'id_exercise':id_exercise,
+						'form':form,
+					}
+
+		return render(request, self.template_name, context)
 
 class CreateLessonSearchView(View):
 	"""
@@ -68,15 +80,17 @@ class CreateLessonSearchView(View):
 	template_name= 'lesson/create_lesson_search.html'
 
 	def post(self, request, *args, **kwargs):
+		
 		form =  CreateLessonSearchForm(request.POST)
 		
+		try:
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('lesson:list_lesson_exercise_action')
 
 		if form.is_valid():
-			try:
-				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
-			except Exercise.DoesNotExist:
-				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
-				return redirect('lesson:list_lesson_exercise_action')
+			
 
 			Lesson_det.objects.create( 
 				 						cant_max=form.cleaned_data['cant_max'],
@@ -94,6 +108,10 @@ class CreateLessonSearchView(View):
 		else:
 			print(form.errors.as_data)
 			print("something happened")
+			context = {	
+						'exercise':exercise,
+						'form':form,
+					}
 		return render(request, self.template_name, {'form':form})
 
 	def get(self, request, *args, **kwargs):
@@ -115,7 +133,12 @@ class CreateLessonSearchView(View):
 		form = CreateLessonSearchForm(initial = {'exercise':exercise.name, 'day_lesson':fecha_object})
 		form.fields['hour'].queryset = Hour.objects.filter(id_day_fk__name= week_days[str_day], id_exercise_fk=exercise) #convierto el día de español seleccionado a inglés
 
-		return render(request, self.template_name, {'form':form})
+		context = {	
+						'exercise':exercise,
+						'form':form,
+					}
+
+		return render(request, self.template_name, context)
 
 class ListLessonExerciseActionView(View):
 	template_name= 'lesson/list_lesson_exercise_action.html'

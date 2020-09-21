@@ -1,4 +1,4 @@
-{% extends "base_template/base_tamplate.html" %}s
+{% extends "base_template/base_tamplate.html" %}
 {% load static %}
 
 {% block title %}Lista de horas{% endblock %}
@@ -77,6 +77,7 @@
             {%endif%}
           </tbody>
           </table>
-          </div>
+        <a  href="{% url 'exercise:list_day' exercise.id %}"><center>Ir a lista de días</center></a>
+        </div>
         <br>
   {% endblock %}

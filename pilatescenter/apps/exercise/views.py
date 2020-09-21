@@ -184,15 +184,16 @@ class CreateDayView(View):
 	def post(self, request, *args, **kwargs):
 
 		form =  CreateDayForm(request.POST)
+		try:
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
 
 		if form.is_valid():
 			form.save()
 			#after of set the hour, i set the relationship ( exercise )
-			try:
-				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
-			except Exercise.DoesNotExist:
-				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
-				return redirect('exercise:list_exercise')
+			
 
 			hour_obj = Hour.objects.latest('id')	
 			hour_obj.id_exercise_fk = exercise
@@ -202,16 +203,32 @@ class CreateDayView(View):
 		else:
 			#print(form.errors.as_data)
 			print("something happened")
-		return render(request, self.template_name, {'form':form})
+			context = {
+						'exercise':exercise,
+						'form':form,
+			}
+
+		return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
+		try:
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
+
 		form = CreateDayForm()
-					
-		return render(request, self.template_name, {'form':form})
+		
+		context = {
+						'exercise':exercise,
+						'form':form,
+		}
+
+		return render(request, self.template_name, context)
 
 class DeleteDayView(View):
 
@@ -264,16 +281,18 @@ class CreateHourView(View):
 
 	def post(self, request, *args, **kwargs):
 
+		try:
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
+			
 		form =  Create_hour(request.POST)
 
 		if form.is_valid():
 			form.save()
 			#after of set the hour, i set the relationship ( exercise and day)
-			try:
-				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
-			except Exercise.DoesNotExist:
-				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
-				return redirect('exercise:list_exercise')
+			
 
 			try:
 				day = Day.objects.get(id = self.kwargs['id_day'])
@@ -290,17 +309,35 @@ class CreateHourView(View):
 		else:
 			#print(form.errors.as_data)
 			print("something happened")
-		return render(request, self.template_name, {'form':form})
+			id_day = self.kwargs['id_day']
+			context = {	
+						'form':form,
+						'exercise':exercise,
+						'id_day':id_day
+					  }
+			return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
+		try:
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
+
 		form =  Create_hour()
+		id_day = self.kwargs['id_day']
+		print(id_day)
+
 		context = {	
 					'form':form,
+					'exercise':exercise,
+					'id_day':id_day
 				  }
+
 		return render(request, self.template_name, context)
 
 class UpdateHourView(View):
@@ -336,8 +373,9 @@ class UpdateHourView(View):
 		form = UpdateHourForm(instance=hour, initial={'primarykey': hour.pk})
 
 		context={
-
-					'form':form
+					'form':form,
+					'id_exercise':self.kwargs['id_exercise'],
+					'id_day':self.kwargs['id_day']
 				}
 		return render(request,'exercise/hour/update_hour.html', context)
 

@@ -45,7 +45,7 @@
 
 
             <div class="row">
-                <p>Este plan pertenece al ejercicio <strong>{{name_exercise}}</strong></p>
+                <p>Este plan pertenece al ejercicio <strong>{{exercise.name}}</strong></p>
                 {{form.id_exercise_fk}}<!-- i declared this variable hidden, i used this in the form.py to do a query -->
             </div>
             <br>
@@ -53,5 +53,7 @@
         </form>
       </div>
     </div>
+    <a  href="{% url 'Plan:list_plan' exercise.id %}"><center>Ir a lista de planes</center></a>
     </div>
+    <br>
     {% endblock %}

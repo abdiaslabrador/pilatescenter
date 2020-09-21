@@ -198,7 +198,11 @@ def change_password_user(request, pk):
 			return redirect('admin_login:login_admin')
 
 		form = ChangePasswordForm()
-	return render(request,'users/change_password_user.html', {'form':form})
+		context = {
+					'form':form,
+					'user':user,
+		}
+	return render(request,'users/change_password_user.html', context)
 
 
 #deleting a user

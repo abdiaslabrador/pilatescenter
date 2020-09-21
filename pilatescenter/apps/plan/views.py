@@ -23,6 +23,13 @@ class CreatePlanView(View):
 	template_name= 'plan/create_plan.html'
 
 	def post(self, request, *args, **kwargs):
+
+		try:
+			exercise = Exercise.objects.get(id =self.kwargs["id_exercise"])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('exercise:list_exercise')
+
 		form =  CreatePlanForm(request.POST)
 		if form.is_valid():
 			# if (form.cleaned_data['total_days'] % 2) == 0 :
@@ -34,7 +41,11 @@ class CreatePlanView(View):
 		else:
 			print(form.errors.as_data)
 			print("something happened")
-		return render(request, self.template_name, {'form':form})
+			context={	
+					'exercise':exercise,
+					'form':form
+				}
+		return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
@@ -49,7 +60,11 @@ class CreatePlanView(View):
 
 		form =  CreatePlanForm(initial = { 'id_exercise_fk': exercise})
 		# (form.errors.as_data)
-		return render(request, self.template_name, {'form':form})
+		context={	
+					'exercise':exercise,
+					'form':form
+				}
+		return render(request, self.template_name, context)
 
 
 class ListPlanView(View):
@@ -99,7 +114,7 @@ class UpdatePlanView(View):
 			return redirect('exercise:list_exercise')
 
 		try:
-			exercise_obj = Exercise.objects.get(plan__pk=self.kwargs['pk'])
+			exercise = Exercise.objects.get(plan__pk=self.kwargs['pk'])
 		except Exercise.DoesNotExist:
 			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
 			return redirect('exercise:list_exercise')
@@ -113,7 +128,7 @@ class UpdatePlanView(View):
 		else:
 			print("no es válido")
 			context={
-						'name_exercise': exercise_obj.name,
+						'exercise': exercise,
 						'form':form
 				}
 		return render(request, self.template_name, context)
@@ -134,13 +149,13 @@ class UpdatePlanView(View):
 		
 
 		try:
-			exercise_obj = Exercise.objects.get(plan__pk=self.kwargs['pk'])
+			exercise = Exercise.objects.get(plan__pk=self.kwargs['pk'])
 		except Exercise.DoesNotExist:
 			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
 			return redirect('exercise:list_exercise')
 
 		context={
-					'name_exercise': exercise_obj.name,
+					'exercise': exercise,
 					'form':form
 				}
 		return render(request, self.template_name, context)
