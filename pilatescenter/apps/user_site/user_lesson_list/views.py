@@ -69,6 +69,18 @@ class UserResumenView(View):
 			
 			try:
 				self.exercise_det = Exercise_det.objects.get(id=self.kwargs['id_exercise_det'])
+				self.exercise_det.devolutions = Devolution.objects.filter(
+																	id_lesson_fk = None,
+																	returned = False,
+																	id_user_fk = self.exercise_det.id_user_fk,
+																	id_exercise_fk= self.exercise_det.id_exercise_fk,
+													).count()
+
+				self.exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= self.exercise_det.id_exercise_fk, id_user_fk= self.exercise_det.id_user_fk).exclude( lesson_status = Lesson_det.FINISHED).count()
+				self.exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= self.exercise_det.id_exercise_fk, id_user_fk= self.exercise_det.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
+				self.exercise_det.enable_lessons = self.exercise_det.total_days - (self.exercise_det.saw_lessons + self.exercise_det.bag  + self.exercise_det.scheduled_lessons)
+				self.exercise_det.save()
+			
 			except Exercise_det.DoesNotExist:
 				messages.success(self.request, 'El ejercicio fue eliminado', extra_tags='alert-danger')
 				return redirect('user_home:user_home')

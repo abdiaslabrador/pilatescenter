@@ -526,7 +526,19 @@ class UserConfigurationResumenView(View):
 		except CustomUser.DoesNotExist:
 			messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
 			return redirect('content_user:list_user')
-				
+		
+		exercise_det.devolutions = Devolution.objects.filter(
+																id_lesson_fk = None,
+																returned = False,
+																id_user_fk = exercise_det.id_user_fk,
+																id_exercise_fk= exercise_det.id_exercise_fk,
+															).count()
+
+		exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= exercise_det.id_exercise_fk, id_user_fk= exercise_det.id_user_fk).exclude( lesson_status = Lesson_det.FINISHED).count()
+		exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= exercise_det.id_exercise_fk, id_user_fk= exercise_det.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
+		exercise_det.enable_lessons = exercise_det.total_days - (exercise_det.saw_lessons + exercise_det.bag  + exercise_det.scheduled_lessons)
+		exercise_det.save()
+
 		form = ConfigurationUserExerciseForm(instance=exercise_det)
 		
 
@@ -583,7 +595,7 @@ class UserConfigurationChangePlanView(View):
 		plan_ninguno = Plan.objects.filter(name__iexact="ninguno")
 		plan_actual_exercise = Plan.objects.filter(id_exercise_fk=exercise_det.id_exercise_fk)
 
-		#here i make the uniom
+		#here i make the unioN
 		plan_actual_exercise = plan_actual_exercise.union(plan_ninguno)
 
 		form.fields['id_plan_fk'].queryset = plan_actual_exercise.order_by("name")

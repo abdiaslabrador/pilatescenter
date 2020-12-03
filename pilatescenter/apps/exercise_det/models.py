@@ -570,7 +570,7 @@ def update_resumen(lesson):
 	for user in users_in_lesson:
 		user_exercise_det = Exercise_det.objects.get(id_exercise_fk= lesson.id_exercise_fk, id_user_fk= user)
 
-		#Esta el la cantidad de clases programadas del usuario
+		
 		user_exercise_det.devolutions = Devolution.objects.filter(
 																	id_lesson_fk = None,
 																	returned = False,

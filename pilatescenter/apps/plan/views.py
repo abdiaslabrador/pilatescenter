@@ -13,6 +13,8 @@ from .models import Plan
 from apps.exercise_det.models import Exercise_det
 from apps.exercise.models import Exercise
 from apps.create_user.models import CustomUser
+from apps.lesson_det.models import Lesson_det
+from apps.devolution.models import Devolution
 
 #forms that will be used
 from .forms import CreatePlanForm, UpdatePlanForm
@@ -175,6 +177,19 @@ class DeletePlanView(View):
 		exercises_det = Exercise_det.objects.filter(id_plan_fk=plan)
 
 		for exercise_det in exercises_det:
+
+			exercise_det.devolutions = Devolution.objects.filter(
+																	id_lesson_fk = None,
+																	returned = False,
+																	id_user_fk = exercise_det.id_user_fk,
+																	id_exercise_fk= exercise_det.id_exercise_fk,
+													).count()
+
+			exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= exercise_det.id_exercise_fk, id_user_fk= exercise_det.id_user_fk).exclude( lesson_status = Lesson_det.FINISHED).count()
+			exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= exercise_det.id_exercise_fk, id_user_fk= exercise_det.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
+			exercise_det.enable_lessons = exercise_det.total_days - (exercise_det.saw_lessons + exercise_det.bag  + exercise_det.scheduled_lessons)
+			exercise_det.save()
+
 			if exercise_det.scheduled_lessons > 0:	
 				messages.success(request, 'No se puede eliminar un plan con usuarios con clases programadas usando este plan.', extra_tags='alert-danger')
 				return redirect('Plan:list_plan', id_exercise=plan.id_exercise_fk.id)
