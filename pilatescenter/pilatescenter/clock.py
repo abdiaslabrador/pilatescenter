@@ -21,7 +21,7 @@ def updateTable():
     try:
 
         connection = psycopg2.connect(user="postgres",
-                                      password="adlp26185465",
+                                      password="****",
                                       host="localhost",
                                       port="5432",
                                       database="pilatescenter")
