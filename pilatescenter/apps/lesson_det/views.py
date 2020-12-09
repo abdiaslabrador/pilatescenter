@@ -77,13 +77,13 @@ class CreateManyLessonsView(View):
 	def post(self, request, *args, **kwargs):
 		form =  SearchClassesForm(request.POST)
 		
-		if form.is_valid():
+		try:
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('lesson:list_lesson_exercise_action')	
 
-			try:
-				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
-			except Exercise.DoesNotExist:
-				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
-				return redirect('lesson:list_lesson_exercise_action')	
+		if form.is_valid():
 
 			system = SystemPilates.objects.order_by('id').first()
 			if system == None:
@@ -108,11 +108,6 @@ class CreateManyLessonsView(View):
 			return redirect('lesson:list_lesson', id_exercise=self.kwargs['id_exercise'])
 		else:
 			print("something happened")
-			try:
-				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
-			except Exercise.DoesNotExist:
-				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
-				return redirect('lesson:list_lesson_exercise_action')
 
 			context = {	'exercise':exercise,
 						'form':form,}
