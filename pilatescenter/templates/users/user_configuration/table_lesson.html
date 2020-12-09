@@ -39,6 +39,7 @@
     <!-- Buscador de clases -->
         <form method="post">
           {% csrf_token %}
+          {{form.non_field_errors}}
               {{form.since.errors}}
               <div class="form-group row">
 
@@ -92,7 +93,13 @@
                   <td >{{lesson.id}}</td>
                       <td>{{lesson.day_lesson|date:"l. M d, Y"}}</td>
                       <td>{{lesson.hour_lesson}}</td>
-                      <td>{{lesson.id_exercise_fk.name}}</td>
+                      <td>
+                        {% if user_to_modific  in lesson.id_user_fk.all %}
+                          Normal
+                        {%else%}
+                          Devolución
+                        {%endif%}
+                      </td>
                       <td>{{lesson.cant_in}}/{{lesson.cant_max}}</td>
 
                       <!-- Boton de que marca la leccion como vista -->

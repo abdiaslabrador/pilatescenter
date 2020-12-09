@@ -1,0 +1,54 @@
+{% extends "base_template/base_tamplate.html" %}
+{% load static %}
+
+  {% block title %}Crear clase{% endblock %}
+
+  {% block custom_css %}
+  {% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card panding">
+    <div class="card-header" >
+      <h5 class="card-title">Creación de clases</h5>
+    </div>
+
+
+ 
+
+    <div class="card-body">
+          <div class="container">
+               <!-- Buscador de clases -->
+        <form method="post">
+          {% csrf_token %}
+              {{form.non_field_errors}}
+              {{form.since.errors}}
+              <div class="form-group row">
+
+                <label class="col-2 col-form-label" for="{{form.since.id_for_label}}">Desde:</label>
+                <div class="col-1">
+                  <input  type="date" name="{{form.since.name}}" id="form.since.id_for_label">
+                  
+                </div>  
+              </div>  
+
+              {{form.until.errors}}
+              <div class="form-group row">
+                <label class="col-2 col-form-label" for="{{form.since.id_for_label}}">Hasta:</label>
+                <div class="col-1">
+                  <input  type="date" name="{{form.until.name}}" id="form.until.id_for_label">
+                </div> 
+              </div>
+              <input class ="btn btn-primary" type="submit" value="Crear">
+        </form>
+          </div>
+        </div>
+  </div>
+  <a  href="{% url 'lesson:list_lesson' exercise.id %}"><center>Ir a lista de clases</center></a>
+  </div>
+  <br>
+{% endblock %}
+
+
+{% block custom_js %}
+{% endblock %}

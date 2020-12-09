@@ -449,7 +449,8 @@ def preDeleteLesson(sender, instance,  *args, **kwargs):
 													id_exercise_fk= instance.id_exercise_fk,
 												).first()
 
-		devolution.id_lesson_fk.remove(instance)
+		if devolution is not None:
+			devolution.id_lesson_fk.remove(instance)
 
 signals.pre_delete.connect(preDeleteLesson, sender=Lesson_det)
 

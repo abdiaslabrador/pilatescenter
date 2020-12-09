@@ -3,7 +3,18 @@ let contenido = document.querySelector('#contenido')
 
 let clase_id     = document.querySelector('#lesson_id')
 
-function Lesson(id, day_lesson, hour_lesson, type, cant_max)
+function toggle(source) {
+  checkboxes = document.getElementsByName('deleteButton');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = source.checked;
+  }
+}
+
+function enviar() {
+  document.getElementById("form_lesssons").submit();
+}
+
+function Lesson( id, day_lesson, hour_lesson, type, cant_max)
 {   
   this.id = id; 
   this.day_lesson = day_lesson;
@@ -20,8 +31,8 @@ function Main()
     this.llenar = function(){
       var rows =document.getElementsByTagName("tbody")[0].rows;
       for(var i=0;i<rows.length;i++){
-        console.log(rows[i].getElementsByTagName("td")[0].innerHTML)
-          lesson = new Lesson(rows[i].getElementsByTagName("td")[0].innerHTML, rows[i].getElementsByTagName("td")[1].innerHTML, rows[i].getElementsByTagName("td")[2].innerHTML, rows[i].getElementsByTagName("td")[3].innerHTML, rows[i].getElementsByTagName("td")[4].innerHTML  )
+        console.log(rows[i].getElementsByTagName("td")[1].innerHTML, rows[i].getElementsByTagName("td")[2].innerHTML, rows[i].getElementsByTagName("td")[3].innerHTML, rows[i].getElementsByTagName("td")[4].innerHTML, rows[i].getElementsByTagName("td")[5].innerHTML)
+          lesson = new Lesson(rows[i].getElementsByTagName("td")[1].innerHTML, rows[i].getElementsByTagName("td")[2].innerHTML, rows[i].getElementsByTagName("td")[3].innerHTML, rows[i].getElementsByTagName("td")[4].innerHTML, rows[i].getElementsByTagName("td")[5].innerHTML )
           this.lessonsBK.push(lesson)  
         }
     },
@@ -32,11 +43,13 @@ function Main()
 
             contenido.innerHTML +=`
             <tr>
+            <td><input type="checkbox" name="deleteButton" value="${lesson.id}"></td>
             <td>${lesson.id}</td>
             <td>${lesson.day_lesson}</td>
             <td>${lesson.hour_lesson}</td>
             <td>${lesson.type}</td>
             <td>${lesson.cant_max}</td>
+            
             <td> 
                 <button type="button" class="btn btn-success" data-toggle="modal"data-target="#saw_lesson${lesson.id}">Vista
                 </button>

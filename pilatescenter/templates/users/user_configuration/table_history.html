@@ -41,6 +41,7 @@
     <!-- Buscador de clases -->
         <form method="post">
           {% csrf_token %}
+          {{form.non_field_errors}}
               {{form.since.errors}}
               <div class="form-group row">
 
@@ -95,7 +96,13 @@
                   <td >{{history.id}}</td>
                       <td>{{history.day_lesson|date:"l. M d, Y"}}</td>
                       <td>{{history.hour_lesson}}</td>
-                      <td>{{history.id_exercise_fk.name}}</td>
+                      <td>
+                        {% if user_to_modific  in history.id_user_fk.all %}
+                          Normal
+                        {%else%}
+                          Devolución
+                        {%endif%}
+                      </td>
                       <td>{{history.cant_in}}/{{history.cant_max}}</td>
 
                       <!-- Boton de que permite ver la historia-->

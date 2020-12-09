@@ -8,6 +8,7 @@ from apps.exercise_det.models import Exercise_det, update_resumen
 from apps.create_user.models import CustomUser
 from apps.devolution.models import Devolution
 from .models import Lesson_det
+from apps.system.models import SystemPilates
 
 #views
 from django.views import View
@@ -20,9 +21,9 @@ from .forms import (
 
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.contrib import messages
-import datetime
+from datetime import date,timedelta
 
-
+week_days = {"Sunday":"domingo", "Monday":"lunes", "Tuesday":"martes", "Wednesday":"miercoles", "Thursday":"jueves", "Friday":"viernes", "Saturday":"sabado"}
 
 #------------------------------------------------------------------------------------------
 #lesson
@@ -39,13 +40,12 @@ class CreateLessonView(View):
 		id_exercise = self.kwargs['id_exercise']
 
 		if form.is_valid():
-			pk=self.kwargs['id_exercise']
 			year=form.cleaned_data['day_lesson'].year
 			month=form.cleaned_data['day_lesson'].month
 			day=form.cleaned_data['day_lesson'].day
 			# return HttpResponse("<h1>Todo ok</h1>")
 
-			return redirect('lesson:create_lesson_form_search', id_exercise=pk, year=year, month=month,  day=day)
+			return redirect('lesson:create_lesson_form_search', id_exercise=self.kwargs['id_exercise'], year=year, month=month,  day=day)
 		else:
 			print(form.errors.as_data)
 			print("something happened")
@@ -68,6 +68,67 @@ class CreateLessonView(View):
 						'form':form,
 					}
 
+		return render(request, self.template_name, context)
+
+class CreateManyLessonsView(View):
+
+	template_name= 'lesson/create_many_lessons.html'
+
+	def post(self, request, *args, **kwargs):
+		form =  SearchClassesForm(request.POST)
+		
+		if form.is_valid():
+
+			try:
+				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+			except Exercise.DoesNotExist:
+				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+				return redirect('lesson:list_lesson_exercise_action')	
+
+			system = SystemPilates.objects.order_by('id').first()
+			if system == None:
+				system = SystemPilates.objects.create()
+
+			for i in range((form.cleaned_data['until'] - form.cleaned_data['since']).days + 1):
+
+				#de la fecha con el nombre del día en inglés lo convierto a español
+				str_day = week_days[(form.cleaned_data['since'] + timedelta(days = i)).strftime("%A")]
+				hours = Hour.objects.filter(id_day_fk__name= str_day, id_exercise_fk=exercise)
+				for hour in hours:
+					
+					Lesson_det.objects.create(
+												day_lesson= (form.cleaned_data['since'] + timedelta(days = i)),
+												hour_chance = hour.hour_chance,
+												hour_lesson = hour.hour_lesson,
+												hour_end = hour.hour_end,
+												cant_max = system.cant_max,
+												id_exercise_fk = exercise,
+											 )
+				
+			return redirect('lesson:list_lesson', id_exercise=self.kwargs['id_exercise'])
+		else:
+			print("something happened")
+			try:
+				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+			except Exercise.DoesNotExist:
+				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+				return redirect('lesson:list_lesson_exercise_action')
+
+			context = {	'exercise':exercise,
+						'form':form,}
+			return render(request, self.template_name, context)
+
+	def get(self, request, *args, **kwargs):
+		form = SearchClassesForm()
+
+		try:
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('lesson:list_lesson_exercise_action')
+
+		context = {	'exercise':exercise,
+					'form':form,}
 		return render(request, self.template_name, context)
 
 class CreateLessonSearchView(View):
@@ -112,22 +173,20 @@ class CreateLessonSearchView(View):
 						'exercise':exercise,
 						'form':form,
 					}
-		return render(request, self.template_name, {'form':form})
+		return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
 			return redirect('admin_login:login_admin')
 
-
-		week_days = {"Sunday":"domingo", "Monday":"lunes", "Tuesday":"martes", "Wednesday":"miercoles", "Thursday":"jueves", "Friday":"viernes", "Saturday":"sabado"}
 		try:
 			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
 		except Exercise.DoesNotExist:
 			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
 			return redirect('lesson:list_lesson_exercise_action')
 
-		fecha_object = datetime.date(self.kwargs['year'], self.kwargs['month'], self.kwargs['day'])
+		fecha_object = date(self.kwargs['year'], self.kwargs['month'], self.kwargs['day'])
 		str_day = fecha_object.strftime("%A") #obtengo el día sumistrado en ingles
 
 		form = CreateLessonSearchForm(initial = {'exercise':exercise.name, 'day_lesson':fecha_object})
@@ -162,46 +221,62 @@ class ListLessonView(View):
 	context = {}
 
 	def post(self, request, *args, **kwargs):
-		form =  SearchClassesForm(request.POST)
 
-		if form.is_valid():
-			try:
-				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
-			except Exercise.DoesNotExist:
-				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
-				return redirect('lesson:list_lesson_exercise_action')
+		try:
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('lesson:list_lesson_exercise_action')
 
-			lessons = Lesson_det.objects.filter(	
-													reset = False,
-												    id_exercise_fk=exercise,
-												    day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
-												    
-												).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")	
-			context = {	
-						'exercise':exercise,
-						'lessons':lessons,
-						'form':form
-				       }
-			# return HttpResponse("<h1>Todo ok</h1>")
-			return render(request, self.template_name, context)
+		if  'since' in request.POST:
+			form =  SearchClassesForm(request.POST)
+			if form.is_valid():
+				
+
+				lessons = Lesson_det.objects.filter(	
+														reset = False,
+													    id_exercise_fk=exercise,
+													    day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
+													    
+													).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")	
+				context = {	
+							'exercise':exercise,
+							'lessons':lessons,
+							'form':form
+					       }
+				# return HttpResponse("<h1>Todo ok</h1>")
+				return render(request, self.template_name, context)
+			else:
+				print(form.errors.as_data)
+				print("something happened")
+
+				lessons = Lesson_det.objects.filter(reset = False, id_exercise_fk=exercise).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")	
+				context = {
+								'exercise':exercise,
+								'lessons':lessons,
+								'form':form
+						  }
+
+				return render(request, self.template_name, context)
+
 		else:
-			print(form.errors.as_data)
-			print("something happened")
 
-			try:
-				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
-			except Exercise.DoesNotExist:
-				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
-				return redirect('lesson:list_lesson_exercise_action')
+			form = SearchClassesForm()
+			id_lessons = request.POST.getlist('deleteButton')
+			# exercise=Lesson_det.objects.filter(id__in=deleteButton)
 
-			lessons = Lesson_det.objects.filter(reset = False, id_exercise_fk=exercise).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")	
+			for id_lesson in id_lessons:
+				if Lesson_det.objects.filter(pk=id_lesson).exists():
+					Lesson_det.objects.get(pk=id_lesson).delete()
+
+			lessons = Lesson_det.objects.filter(reset = False, id_exercise_fk=exercise).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")
 			context = {
 							'exercise':exercise,
 							'lessons':lessons,
 							'form':form
 					  }
+			return render(request, self.template_name, context)
 
-		return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
@@ -254,8 +329,39 @@ class UpdateLessonView(View):
 			if lesson.cant_max < lesson.cant_in:
 				lesson.id_user_fk.clear() #after I reassign them the number of lessons they have scheduled regardless of the current lesson. I clean the users that are inside
 			return redirect('lesson:update_lesson', pk=lesson.id)
-		
-		return render(request, self.template_name, {'form':form})
+		else:
+
+
+			#usuarios que están en la clase
+			users_in_lesson = CustomUser.objects.filter(
+															is_active=True, 
+															lesson_det__id=lesson.id
+														).order_by('username')
+			#usuarios que están en devoluciones
+			users_devolution = CustomUser.objects.filter(
+															devolution__id_lesson_fk__id=lesson.id
+														)
+			#declaro la variable users_list  para no afecta a los usuarios de la lección al momento de hacer la unión.
+			#ya que se necesita en el template
+			users_list = users_in_lesson
+			users_list = users_list.union(users_devolution).values('id')
+
+			all_users = CustomUser.objects.filter(
+				 									is_active = True,
+				 									exercise_det__id_exercise_fk=lesson.id_exercise_fk,
+				 									exercise_det__reset=True
+				 								  ).order_by('username').exclude(id__in=users_list)
+
+
+			context={	
+						'lesson':lesson,
+						'users_in_lesson':users_in_lesson,
+						'users_devolution':users_devolution,
+						'all_users': all_users,
+						'form':form,
+					}
+
+		return render(request, self.template_name, context)	
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario

@@ -313,8 +313,18 @@ class UserConfigurationClassView(View):
 													day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until']),
 												    id_exercise_fk=exercise_det.id_exercise_fk.id,
 												    id_user_fk=user_to_modific.id
-												    
-												).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")	
+												).exclude(lesson_status = Lesson_det.FINISHED)
+
+			#devoluciones del usuario
+			lesson_devolution = Lesson_det.objects.filter(
+														reset = False,
+														devolution__id_user_fk__id =  user_to_modific.id,
+														id_exercise_fk = exercise_det.id_exercise_fk.id,
+														day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until']),
+												   ).exclude(lesson_status = Lesson_det.FINISHED)
+
+			lessons = lessons.union(lesson_devolution).order_by("day_lesson", "hour_lesson")
+
 			context = {	
 						'form':form,
 						'exercise_det' : exercise_det,
@@ -331,14 +341,24 @@ class UserConfigurationClassView(View):
 			lessons = Lesson_det.objects.filter(	reset = False,
 													id_exercise_fk=exercise_det.id_exercise_fk.id, 
 													id_user_fk=user_to_modific.id
-												).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")
+												).exclude(lesson_status = Lesson_det.FINISHED)
+
+			#devoluciones del usuario
+			lesson_devolution = Lesson_det.objects.filter(
+														reset = False,
+														devolution__id_user_fk__id =  user_to_modific.id,
+														id_exercise_fk = exercise_det.id_exercise_fk.id,
+												   ).exclude(lesson_status = Lesson_det.FINISHED)
+
+			lessons = lessons.union(lesson_devolution).order_by("day_lesson", "hour_lesson")
+
 			context = {	
 						'form':form,
 						'exercise_det' : exercise_det,
 						'user_to_modific': user_to_modific,
 						'lessons':lessons,
-						
 				       }
+
 		return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
@@ -360,11 +380,19 @@ class UserConfigurationClassView(View):
 			messages.success(request, 'El usuario fue eliminado o no existe', extra_tags='alert-danger')
 			return redirect('content_user:list_user')
 
-		lessons = Lesson_det.objects.filter( 
-												reset = False,
-												id_exercise_fk=exercise_det.id_exercise_fk.id,
-												id_user_fk=user_to_modific.id
-											).exclude(lesson_status = Lesson_det.FINISHED).order_by("day_lesson", "hour_lesson")
+		lessons = Lesson_det.objects.filter(	reset = False,
+													id_exercise_fk=exercise_det.id_exercise_fk.id, 
+													id_user_fk=user_to_modific.id
+												).exclude(lesson_status = Lesson_det.FINISHED)
+
+		#devoluciones del usuario
+		lesson_devolution = Lesson_det.objects.filter(
+													reset = False,
+													devolution__id_user_fk__id =  user_to_modific.id,
+													id_exercise_fk = exercise_det.id_exercise_fk.id,
+											   ).exclude(lesson_status = Lesson_det.FINISHED)
+
+		lessons = lessons.union(lesson_devolution).order_by("day_lesson", "hour_lesson")
 
 		context = {	
 						'form':form,
@@ -637,18 +665,28 @@ class UserConfigurationHistoryView(View):
 		
 		if form.is_valid():
 
-			histories  = Lesson_det.objects.filter(	
+			histories_lesson  = Lesson_det.objects.filter(	
 													lesson_status = Lesson_det.FINISHED,
 													id_exercise_fk=exercise_det.id_exercise_fk.id,
 													id_user_fk=user_to_modific.id,
 													day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
-												   )
+												   ).order_by("-day_lesson", "-hour_lesson")
+
+			#devoluciones del usuario
+			histories_devolution = Lesson_det.objects.filter(	
+													devolution__id_user_fk__id =  user_to_modific.id,
+													id_exercise_fk = exercise_det.id_exercise_fk.id,
+													lesson_status = Lesson_det.FINISHED,
+													day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
+											   )
+
+			histories_lesson = histories_lesson.union(histories_devolution).order_by("-day_lesson", "-hour_lesson")
 
 			context = {
 						'form':form,
 						'user_to_modific': user_to_modific,
 						'exercise_det' : exercise_det,
-						'histories':histories,
+						'histories':histories_lesson,
 				       }
 			# return HttpResponse("<h1>Todo ok</h1>")
 			return render(request, self.template_name, context)
@@ -656,17 +694,26 @@ class UserConfigurationHistoryView(View):
 			print(form.errors.as_data)
 			print("something happened")
 
-			histories  = Lesson_det.objects.filter(	
+			histories_lesson  = Lesson_det.objects.filter(	
 												lesson_status = Lesson_det.FINISHED,
 												id_exercise_fk=exercise_det.id_exercise_fk.id,
 												id_user_fk=user_to_modific.id
-											   ).order_by("day_lesson", "hour_lesson")
+											   )
+
+			#devoluciones del usuario
+			histories_devolution = Lesson_det.objects.filter(	
+													devolution__id_user_fk__id =  user_to_modific.id,
+													id_exercise_fk = exercise_det.id_exercise_fk.id,
+													lesson_status = Lesson_det.FINISHED,
+											   )
+
+			histories_lesson = histories_lesson.union(histories_devolution).order_by("-day_lesson", "-hour_lesson")
 
 			context = {	
 						'form':form,
 						'user_to_modific': user_to_modific,
 						'exercise_det' : exercise_det,
-						'histories':histories,
+						'histories':histories_lesson,
 				       }
 
 		return render(request, self.template_name, context)
@@ -693,14 +740,15 @@ class UserConfigurationHistoryView(View):
 												id_exercise_fk=exercise_det.id_exercise_fk.id,
 												id_user_fk=user_to_modific.id
 											   )
-
+		
+		#devoluciones del usuario
 		histories_devolution = Lesson_det.objects.filter(	
 													devolution__id_user_fk__id =  user_to_modific.id,
 													id_exercise_fk = exercise_det.id_exercise_fk.id,
 													lesson_status = Lesson_det.FINISHED,
 											   )
 
-		histories_lesson = histories_lesson.union(histories_devolution)
+		histories_lesson = histories_lesson.union(histories_devolution).order_by("-day_lesson", "-hour_lesson")
 
 		form =  SearchClassesForm()
 

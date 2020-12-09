@@ -41,49 +41,66 @@ class ListHistoryView(View):
 	context = {}
 
 	def post(self, request, *args, **kwargs):
-		form =  SearchClassesForm(request.POST)
 
-		if form.is_valid():
-			try:
-				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
-			except Exercise.DoesNotExist:
-				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
-				return redirect('history:list_lesson_exercise_history')
+		try:
+			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
+		except Exercise.DoesNotExist:
+			messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
+			return redirect('history:list_lesson_exercise_history')
 
-			histories  = Lesson_det.objects.filter(		
-														id_exercise_fk=exercise,
-														lesson_status = Lesson_det.FINISHED,
-														day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
-												   	).order_by("day_lesson", "hour_lesson")
+		if  'since' in request.POST:
 
-			context = {	
-						'form':form,
-						'exercise':exercise,
-						'histories':histories,
-				       }
-			# return HttpResponse("<h1>Todo ok</h1>")
-			return render(request, self.template_name, context)
-		else:
-			print(form.errors.as_data)
-			print("something happened")
-			
-			try:
-				exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
-			except Exercise.DoesNotExist:
-				messages.success(request, 'El ejercicio fue eliminado o no existe', extra_tags='alert-danger')
-				return redirect('history:list_lesson_exercise_history')
+			form =  SearchClassesForm(request.POST)
+			if form.is_valid():
+				histories  = Lesson_det.objects.filter(		
+															id_exercise_fk=exercise,
+															lesson_status = Lesson_det.FINISHED,
+															day_lesson__range=(form.cleaned_data['since'],form.cleaned_data['until'])
+													   	).order_by("-day_lesson", "-hour_lesson")
 
-			histories  = Lesson_det.objects.filter(	
-													id_exercise_fk=exercise,
-													lesson_status = Lesson_det.FINISHED,
-											   		).order_by("day_lesson", "hour_lesson")
-			context = {		
+				context = {	
 							'form':form,
 							'exercise':exercise,
 							'histories':histories,
-					  }
+					       }
+				# return HttpResponse("<h1>Todo ok</h1>")
+				return render(request, self.template_name, context)
+			else:
+				print(form.errors.as_data)
+				print("something happened")
+				
+				histories  = Lesson_det.objects.filter(	
+														id_exercise_fk=exercise,
+														lesson_status = Lesson_det.FINISHED,
+												   		).order_by("-day_lesson", "-hour_lesson")
+				context = {		
+								'form':form,
+								'exercise':exercise,
+								'histories':histories,
+						  }
 
-		return render(request, self.template_name, context)
+				return render(request, self.template_name, context)
+		else:
+
+			form = SearchClassesForm()
+
+			id_lessons = request.POST.getlist('deleteButton')
+			# exercise=Lesson_det.objects.filter(id__in=deleteButton)
+
+			for id_lesson in id_lessons:
+				if Lesson_det.objects.filter(pk=id_lesson).exists():
+					Lesson_det.objects.get(pk=id_lesson).delete()
+
+			histories = Lesson_det.objects.filter(		
+													id_exercise_fk=exercise,
+													lesson_status = Lesson_det.FINISHED,
+											   ).order_by("-day_lesson", "-hour_lesson")
+			context = {		
+								'form':form,
+								'exercise':exercise,
+								'histories':histories,
+						  }
+			return render(request, self.template_name, context)
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
@@ -101,7 +118,7 @@ class ListHistoryView(View):
 		histories = Lesson_det.objects.filter(		
 													id_exercise_fk=exercise,
 													lesson_status = Lesson_det.FINISHED,
-											   ).order_by("day_lesson", "hour_lesson")
+											   ).order_by("-day_lesson", "-hour_lesson")
 
 
 		context = {		

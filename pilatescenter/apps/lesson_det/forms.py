@@ -15,7 +15,7 @@ class CreateLessonForm(forms.Form):
 class CreateLessonSearchForm(forms.Form):
 	#I create the exercise variable to show the exercise name
 	exercise = forms.CharField(label='Tipo de ejercicio',required=True, max_length=64, widget=forms.TextInput(attrs={'readonly':'readonly'}))
-	day_lesson = forms.DateField(label='Ejercicio', required=True, widget=forms.TextInput(attrs={'readonly':'readonly'}))
+	day_lesson = forms.DateField(label='Fecha', required=True, widget=forms.TextInput(attrs={'readonly':'readonly'}))
 	hour = forms.ModelChoiceField(label='Hora', required=True, queryset=Hour.objects.all())
 	cant_max = forms.IntegerField(label='Cant max',required=True, min_value=0)
 
@@ -23,6 +23,17 @@ class CreateLessonSearchForm(forms.Form):
 class SearchClassesForm(forms.Form):
 	since = forms.DateField(required=True)
 	until = forms.DateField(required=True)
+
+	def clean(self):
+		#here we have the username and the id
+		clean = super().clean()
+		since 	= self.cleaned_data.get("since")
+		until 	= self.cleaned_data.get("until")
+
+		if since is not None  and until is not None:
+			if since > until:
+				raise forms.ValidationError("'DESDE' no puede se mayor que 'HASTA'")
+			return clean
 
 class UpdateLessonForm(forms.ModelForm):
 	day_lesson = forms.DateField(label='Fecha:', required=True, widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}))
@@ -40,3 +51,18 @@ class UpdateLessonForm(forms.ModelForm):
 					'hour_end',
 					'cant_max',
 				)
+	def clean(self):
+		#here we have the username and the id
+		clean = super().clean()
+		hour_chance 	= self.cleaned_data.get("hour_chance")
+		hour_lesson 	= self.cleaned_data.get("hour_lesson")
+		hour_end 	= self.cleaned_data.get("hour_end")
+
+		
+		if not(hour_chance != hour_lesson and hour_lesson != hour_end and hour_chance != hour_end):
+			raise forms.ValidationError("Las horas no pueden ser iguales")
+		
+
+		if not (hour_chance < hour_lesson and hour_lesson < hour_end):
+			raise forms.ValidationError("Hora de chance tiene que ser menor a la hora de la clase y la hora de la clase menor a la hora de finalización.")
+		return clean

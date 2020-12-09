@@ -1,0 +1,44 @@
+{% extends "base_template/base_tamplate.html" %}
+{% load static %}
+
+  {% block title %}Crear clase{% endblock %}
+
+  {% block custom_css %}
+  {% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="card panding">
+    <div class="card-header" >
+      <h5 class="card-title">Sistema</h5>
+    </div>
+
+    <div class="card-body">
+          <div class="container">
+             <!-- El mensaje -->
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                        <p>{{ message }}</p>
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  {% endfor %}
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    {{form.non_field_errors}}
+                    {{form.as_p}}
+                    <input class ="btn btn-success" type="submit" value="Guardar">  
+                </form>
+          </div>
+        </div>
+  </div>
+  </div>
+  <br>
+{% endblock %}
+
+
+{% block custom_js %}
+{% endblock %}

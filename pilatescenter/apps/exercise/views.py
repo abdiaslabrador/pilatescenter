@@ -354,10 +354,14 @@ class UpdateHourView(View):
 			form.save()
 			# print("ES VALIDO!")
 			return redirect('exercise:list_hour', id_exercise=hour.id_exercise_fk.id, id_day=self.kwargs['id_day'])
-		# else:
-		# 	print("no es válido")
+		else:
+			context={
+					'form':form,
+					'id_exercise':self.kwargs['id_exercise'],
+					'id_day':self.kwargs['id_day']
+				}
 
-		return render(request,'exercise/hour/update_hour.html', {'form':form})
+			return render(request,'exercise/hour/update_hour.html', context)
 
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario

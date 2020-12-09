@@ -47,6 +47,7 @@
 			<div class="col-4" >
 	        <form method="post" >
 	        	{% csrf_token %}
+
 	        	{{form.day_lesson.errors}}
 
 	        	<div class="row">
@@ -54,6 +55,7 @@
 		             {{form.day_lesson}}		            
 		         </label>
 	            </div>
+	            {{form.non_field_errors}}
 	            <div class="row">
 		        	<label for="{{form.hour_chance.id_for_label}}">{{form.hour_chance.label}}
 		             {{form.hour_chance}}

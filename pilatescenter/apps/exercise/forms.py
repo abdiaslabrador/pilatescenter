@@ -95,6 +95,21 @@ class CreateDayForm(forms.ModelForm):
 					'hour_end',
 				)
 
+	def clean(self):
+		#here we have the username and the id
+		clean = super().clean()
+		hour_chance 	= self.cleaned_data.get("hour_chance")
+		hour_lesson 	= self.cleaned_data.get("hour_lesson")
+		hour_end 	= self.cleaned_data.get("hour_end")
+
+		
+		if not(hour_chance != hour_lesson and hour_lesson != hour_end and hour_chance != hour_end):
+			raise forms.ValidationError("Las horas no pueden ser iguales")
+		
+
+		if not (hour_chance < hour_lesson and hour_lesson < hour_end):
+			raise forms.ValidationError("Hora de chance tiene que ser menor a la hora de la clase y la hora de la clase menor a la hora de finalización.")
+		return clean
 #------------------------------------------------------------------------------------------
 #hour
 #------------------------------------------------------------------------------------------
@@ -112,6 +127,22 @@ class Create_hour(forms.ModelForm):
 					'hour_end',
 				)
 
+	def clean(self):
+		#here we have the username and the id
+		clean = super().clean()
+		hour_chance 	= self.cleaned_data.get("hour_chance")
+		hour_lesson 	= self.cleaned_data.get("hour_lesson")
+		hour_end 	= self.cleaned_data.get("hour_end")
+
+		
+		if not(hour_chance != hour_lesson and hour_lesson != hour_end and hour_chance != hour_end):
+			raise forms.ValidationError("Las horas no pueden ser iguales")
+		
+
+		if not (hour_chance < hour_lesson and hour_lesson < hour_end):
+			raise forms.ValidationError("Hora de chance tiene que ser menor a la hora de la clase y la hora de la clase menor a la hora de finalización.")
+		return clean
+
 class UpdateHourForm(forms.ModelForm):
 	primarykey = forms.IntegerField(widget=forms.HiddenInput())
 	
@@ -123,3 +154,19 @@ class UpdateHourForm(forms.ModelForm):
 					'hour_lesson', 
 					'hour_end',
 				)
+		
+	def clean(self):
+		#here we have the username and the id
+		clean = super().clean()
+		hour_chance 	= self.cleaned_data.get("hour_chance")
+		hour_lesson 	= self.cleaned_data.get("hour_lesson")
+		hour_end 	= self.cleaned_data.get("hour_end")
+
+		
+		if not(hour_chance != hour_lesson and hour_lesson != hour_end and hour_chance != hour_end):
+			raise forms.ValidationError("Las horas no pueden ser iguales")
+		
+
+		if not (hour_chance < hour_lesson and hour_lesson < hour_end):
+			raise forms.ValidationError("Hora de chance tiene que ser menor a la hora de la clase y la hora de la clase menor a la hora de finalización.")
+		return clean

@@ -33,6 +33,7 @@ urlpatterns = [
     path('lesson/', include('apps.lesson_det.urls')),
     path('history/', include('apps.history_det.urls')),
     path('devolution/', include('apps.devolution.urls')),
+    path('systempilates/', include('apps.system.urls')),
 
     path('user_site/login/', include('apps.user_site.user_login.urls')),
     path('user_site/home/', include('apps.user_site.user_home.urls')),

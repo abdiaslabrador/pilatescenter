@@ -103,7 +103,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 		return self.first_name
 
 	def __str__(self):
-		return self.username
+		return  self.username
 
 	def has_module_perms(self, app_label):
 		return True

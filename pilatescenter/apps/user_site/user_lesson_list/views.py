@@ -9,7 +9,7 @@ from .forms import SearchLessonForm
 from django.contrib import messages
 from datetime import datetime ,timedelta
 from django.db.models import F
-
+from apps.system.models import SystemPilates
 
 
 class UserLessonListView(View):
@@ -144,8 +144,12 @@ class UserBagView(View):
 			
 			#Aqui se asigna la cantidad de día que se van a sumar al día actual. Luego se le muestra al usuario
 			#la cantidad de días disponible diacuerdo a este intervalo.
+			system = SystemPilates.objects.order_by('id').first()
+			if system == None:
+				system = SystemPilates.objects.create()
+
 			today = datetime.today()
-			today_delta = timedelta(days = 5)
+			today_delta = timedelta(days = system.delta_day)
 			plus_days = today + today_delta
 
 			try:

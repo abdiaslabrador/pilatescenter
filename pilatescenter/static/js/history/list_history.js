@@ -3,6 +3,17 @@ let contenido = document.querySelector('#contenido')
 
 let clase_id     = document.querySelector('#exercise_id')
 
+function toggle(source) {
+  checkboxes = document.getElementsByName('deleteButton');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = source.checked;
+  }
+}
+
+function enviar() {
+  document.getElementById("form_lesssons").submit();
+}
+
 function Lesson(id, day_lesson, hour_lesson, type, cant_max)
 {   
   this.id = id; 
@@ -20,8 +31,8 @@ function Main()
     this.llenar = function(){
       var rows =document.getElementsByTagName("tbody")[0].rows;
       for(var i=0;i<rows.length;i++){
-        console.log(rows[i].getElementsByTagName("td")[0].innerHTML)
-          lesson = new Lesson(rows[i].getElementsByTagName("td")[0].innerHTML, rows[i].getElementsByTagName("td")[1].innerHTML, rows[i].getElementsByTagName("td")[2].innerHTML, rows[i].getElementsByTagName("td")[3].innerHTML, rows[i].getElementsByTagName("td")[4].innerHTML  )
+        console.log(rows[i].getElementsByTagName("td")[1].innerHTML, rows[i].getElementsByTagName("td")[2].innerHTML, rows[i].getElementsByTagName("td")[3].innerHTML, rows[i].getElementsByTagName("td")[4].innerHTML, rows[i].getElementsByTagName("td")[5].innerHTML)
+          lesson = new Lesson(rows[i].getElementsByTagName("td")[1].innerHTML, rows[i].getElementsByTagName("td")[2].innerHTML, rows[i].getElementsByTagName("td")[3].innerHTML, rows[i].getElementsByTagName("td")[4].innerHTML, rows[i].getElementsByTagName("td")[5].innerHTML  )
           this.lessonsBK.push(lesson)  
         }
     },
@@ -32,6 +43,7 @@ function Main()
 
             contenido.innerHTML +=`
             <tr>
+            <td><input type="checkbox" name="deleteButton" value="${lesson.id}"></td>
             <td>${lesson.id}</td>
             <td>${lesson.day_lesson}</td>
             <td>${lesson.hour_lesson}</td>
@@ -39,10 +51,10 @@ function Main()
             <td>${lesson.cant_max}</td>
 
             <td> 
-                <button type="button" class="btn btn-primary" data-toggle="modal"data-target="#return{{history.id}}">Devolver
+                <button type="button" class="btn btn-primary" data-toggle="modal"data-target="#return${lesson.id}">Devolver
                 </button>
                 <!-- Modal -->
-                <div class="modal fade" id=return{{history.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal fade" id=return${lesson.id} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
                       <div class="modal-header">
