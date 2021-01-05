@@ -6,8 +6,8 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib import messages
 #models
-from .models import SystemPilates
-from .forms import SystemPilatesForm
+from .models import SystemPilates, Contact
+from .forms import SystemPilatesForm, SystemContactForm
 
 # Create your views here.
 class SystemConfigurationView(View):
@@ -44,6 +44,48 @@ class SystemConfigurationView(View):
 			system = SystemPilates.objects.create()
 
 		form = SystemPilatesForm(instance = system)
+
+		context = {
+					'form':form
+				}
+		return render(request, self.template_name, context)
+
+
+# Create your views here.s
+class SystemContactView(View):
+	template_name= 'systempilates/contact.html'
+
+	def post(self, request, *args, **kwargs):
+		
+		contact = Contact.objects.order_by('id').first()
+		if contact == None:
+			contact = Contact.objects.create()
+
+		form = SystemContactForm(request.POST, instance=contact)
+
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Se han echo los cambios con éxito', extra_tags='alert-success')
+
+			context = {
+						'form':form
+					}
+					
+			return render(request, self.template_name, context)
+		else:
+
+			context = {
+						'form':form
+					}
+			return render(request, self.template_name, context)
+
+	def get(self, request, *args, **kwargs):
+		
+		contact = Contact.objects.order_by('id').first()
+		if contact == None:
+			contact = Contact.objects.create()
+
+		form = SystemContactForm(instance = contact)
 
 		context = {
 					'form':form

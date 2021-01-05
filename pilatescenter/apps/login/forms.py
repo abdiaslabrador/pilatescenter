@@ -23,9 +23,9 @@ class LoginForm(forms.Form):
 			user=CustomUser.objects.get(username=username)
 		except CustomUser.DoesNotExist:
 			raise forms.ValidationError("El username no existe.")
-		else:
-			if user.check_password(password) is not True:
-				raise forms.ValidationError("Contraseña inválida.")
+		
+		if user.check_password(password) is not True:
+			raise forms.ValidationError("Contraseña inválida.")
 
 		cleaned_data['username'] = username
 		return cleaned_data

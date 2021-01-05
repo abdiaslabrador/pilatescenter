@@ -96,7 +96,7 @@
             {% if lessons %}
             
               {% for lesson in lessons%}
-                  <tr>
+                  <tr >
                   <td><input type="checkbox" name="deleteButton" value="{{lesson.id}}"></td>
                   <td >{{lesson.id}}</td>
                       <td>{{lesson.day_lesson|date:"l. M d, Y"}}</td>

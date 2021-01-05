@@ -1,0 +1,24 @@
+{% extends "user_site/base_template/base_template.html" %}
+{% load static %}
+
+{% block title %}Reglas{% endblock %}
+
+
+      {% block content %}
+      <div class="container ">
+      <div class="card panding">
+        <div class="card-header" >
+          <h5 class="card-title"><center>Reglas</center></h5>
+        </div>
+        
+
+        <div class="card-body">
+          <div class="container">
+
+            <p>{{ systempilates.reglas |linebreaks }}</p>
+            
+          </div>
+        </div>
+    </div>
+    </div>
+    {% endblock %}
