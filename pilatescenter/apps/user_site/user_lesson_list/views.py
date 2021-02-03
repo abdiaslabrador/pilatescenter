@@ -22,7 +22,7 @@ class UserLessonListView(View):
 
 	def get(self, request, *args, **kwargs):
 		if request.user.is_anonymous:
-			return redirect('user_login:user_login_form')
+			return redirect('login:login')
 		else:
 			
 			try:
@@ -64,7 +64,7 @@ class UserResumenView(View):
 
 	def get(self, request, *args, **kwargs):
 		if request.user.is_anonymous:
-			return redirect('user_login:user_login_form')
+			return redirect('login:login')
 		else:
 			
 			try:
@@ -101,7 +101,7 @@ class UserInBagView(View):
 	def get(self, request, *args, **kwargs):
 
 		if request.user.is_anonymous:
-			return redirect('user_login:user_login_form')
+			return redirect('login:login')
 		else:
 			try:
 				self.exercise_det = Exercise_det.objects.get(id=self.kwargs['id_exercise_det'])
@@ -139,7 +139,7 @@ class UserBagView(View):
 
 	def get(self, request, *args, **kwargs):
 		if request.user.is_anonymous:
-			return redirect('user_login:user_login_form')
+			return redirect('login:login')
 		else:
 			
 			#Aqui se asigna la cantidad de día que se van a sumar al día actual. Luego se le muestra al usuario
@@ -217,7 +217,7 @@ class UserBagDaySelectedView(View):
 
 	def get(self, request, *args, **kwargs):
 		if request.user.is_anonymous:
-			return redirect('user_login:user_login_form')
+			return redirect('login:login')
 		else:
 
 			user = CustomUser.objects.get(id=request.user.id)

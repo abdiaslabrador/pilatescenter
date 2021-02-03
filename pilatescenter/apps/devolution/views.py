@@ -19,7 +19,7 @@ class DevolutionDecideView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		return render(request, self.template_name, {})
 
@@ -30,7 +30,7 @@ class DevolutionNotReturnedUsersView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		devolutions = Devolution.objects.filter(	
 													returned = False,
@@ -50,7 +50,7 @@ class NotReturnedListView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		devolutions = Devolution.objects.filter(	
 													returned = False,
@@ -70,7 +70,7 @@ class DevolutionReturnedUsersView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		devolutions = Devolution.objects.filter(	
 													returned = True,
@@ -90,7 +90,7 @@ class ReturnedListView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		devolutions = Devolution.objects.filter(	
 													returned = True,
@@ -112,7 +112,7 @@ class DevolutionSeeView(View):
 		
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			devolution = Devolution.objects.get(id=self.kwargs['id_devolution'])
@@ -131,7 +131,7 @@ class DevolutionDeleteView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			devolution = Devolution.objects.get(id=self.kwargs['id_devolution'])
@@ -155,7 +155,7 @@ class UpdateDevolutionView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
@@ -213,7 +213,7 @@ class AddToDevolutionView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		#validación de que la lección exista	
 		try:
@@ -287,7 +287,7 @@ class TakeOutToDevolutionView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
@@ -325,7 +325,7 @@ class TakeOutToUsersLessonView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])

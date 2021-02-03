@@ -50,7 +50,7 @@ class ListUserView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		users = CustomUser.objects.filter(is_active=True).order_by("username")
 		context={
@@ -66,7 +66,7 @@ class ListLockedUserView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		users = CustomUser.objects.filter(is_active=False).order_by("username")
 		context={
@@ -82,7 +82,7 @@ class LockUserView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			user = CustomUser.objects.get(id = self.kwargs['pk'])
@@ -104,7 +104,7 @@ class  UnlockUserView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			user = CustomUser.objects.get(id = self.kwargs['pk'])
@@ -131,7 +131,7 @@ def create_user(request):
 	else:
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 		form = UserCreationForm()
 
 	return render(request,'users/create_user.html', {'form':form})
@@ -153,7 +153,7 @@ def modific_user(request, pk):
 	if request.method == 'GET':
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		form = UserUpdateForm(instance=user, initial={'primarykey': user.pk})#i use the primary key to validate the username modificated whit the other usernames registered
 
@@ -195,7 +195,7 @@ def change_password_user(request, pk):
 	else:
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		form = ChangePasswordForm()
 		context = {
@@ -215,7 +215,7 @@ class DeleteUserView(View):
 
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			user = CustomUser.objects.get(pk=self.kwargs['pk'])
@@ -242,7 +242,7 @@ class ResetUsersView(View):
 
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 		
 		try:
 			exercise = Exercise.objects.get(pk=self.kwargs['pk'])
@@ -364,7 +364,7 @@ class UserConfigurationClassView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		form = SearchClassesForm()
 
@@ -412,7 +412,7 @@ class UserConfigurationSawLessonView(View):
 
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
@@ -438,7 +438,7 @@ class DeleteLessonView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
@@ -540,7 +540,7 @@ class UserConfigurationResumenView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 
 		try:
@@ -610,7 +610,7 @@ class UserConfigurationChangePlanView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
@@ -721,7 +721,7 @@ class UserConfigurationHistoryView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])
@@ -800,7 +800,7 @@ class UserConfigurationResetView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 		
 		try:
 			exercise_det = Exercise_det.objects.get(pk=self.kwargs['pk'])

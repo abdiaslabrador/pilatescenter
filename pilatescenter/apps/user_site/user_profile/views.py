@@ -21,7 +21,7 @@ class UserConfigurationProfileView(View):
 		try:
 			user=CustomUser.objects.get(pk=request.user.id)
 		except CustomUser.DoesNotExist:
-			return redirect('user_login:user_login_form')
+			return redirect('login:login')
 
 		form = UserUpdateForm(request.POST, instance=user)
 		if form.is_valid():
@@ -38,12 +38,12 @@ class UserConfigurationProfileView(View):
 	def get(self, request, *args, **kwargs):
 		
 		if request.user.is_anonymous:
-			return redirect('user_login:user_login_form')
+			return redirect('login:login')
 		else:
 			try:
 				user=CustomUser.objects.get(pk=request.user.id)
 			except CustomUser.DoesNotExist:
-				return redirect('user_login:user_login_form')
+				return redirect('login:login')
 					
 			form = UserUpdateForm(instance=user)
 			self.context={
@@ -62,7 +62,7 @@ class UserChangePasswordView(View):
 		try:
 			user=CustomUser.objects.get(pk=request.user.id)
 		except CustomUser.DoesNotExist:
-			return redirect('user_login:user_login_form')
+			return redirect('login:login')
 
 		form = ChangePasswordForm(request.POST)
 		if form.is_valid():
@@ -77,7 +77,7 @@ class UserChangePasswordView(View):
 
 	def get(self, request, *args, **kwargs):
 		if request.user.is_anonymous:
-			return redirect('user_login:user_login_form')
+			return redirect('login:login')
 			
 		form = ChangePasswordForm()
 		return render(request,'user_site/profile/change_password_user.html', {'form':form})

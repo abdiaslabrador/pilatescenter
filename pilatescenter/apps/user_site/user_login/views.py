@@ -33,4 +33,4 @@ class UserLogoutView(View):
 	
 	def get(self, request, *args, **kwargs):
 		logout(request)
-		return redirect('user_login:user_login_form')
+		return redirect('login:login')

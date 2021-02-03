@@ -15,6 +15,10 @@ class SystemConfigurationView(View):
 
 	def post(self, request, *args, **kwargs):
 		
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('login:login')
+
 		system = SystemPilates.objects.order_by('id').first()
 		if system == None:
 			system = SystemPilates.objects.create()
@@ -39,6 +43,10 @@ class SystemConfigurationView(View):
 
 	def get(self, request, *args, **kwargs):
 		
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('login:login')
+
 		system = SystemPilates.objects.order_by('id').first()
 		if system == None:
 			system = SystemPilates.objects.create()
@@ -56,7 +64,11 @@ class SystemContactView(View):
 	template_name= 'systempilates/contact.html'
 
 	def post(self, request, *args, **kwargs):
-		
+
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('login:login')
+
 		contact = Contact.objects.order_by('id').first()
 		if contact == None:
 			contact = Contact.objects.create()
@@ -81,6 +93,10 @@ class SystemContactView(View):
 
 	def get(self, request, *args, **kwargs):
 		
+		#validacion de que sea un superusuario
+		if not request.user.is_superuser:
+			return redirect('login:login')
+
 		contact = Contact.objects.order_by('id').first()
 		if contact == None:
 			contact = Contact.objects.create()

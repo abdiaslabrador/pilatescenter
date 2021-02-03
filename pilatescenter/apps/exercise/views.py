@@ -34,7 +34,7 @@ class ListExerciseView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		exercises = Exercise.objects.all().order_by("name")
 
@@ -66,7 +66,7 @@ class CreateExerciseView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		# form =  CreatePlanForm(initial={'name': 'Pepe'})
 		form =  CreateExerciseForm()
@@ -103,7 +103,7 @@ class UpdateExerciseView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			exercise=Exercise.objects.get(id = self.kwargs['pk'])
@@ -123,7 +123,7 @@ class DeleteExerciseView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			exercise=Exercise.objects.get(id = self.kwargs['pk'])
@@ -140,7 +140,7 @@ class See(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			exercise = Exercise.objects.get(pk=self.kwargs['pk'])
@@ -161,7 +161,7 @@ class ListDayView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
@@ -213,7 +213,7 @@ class CreateDayView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
@@ -235,7 +235,7 @@ class DeleteDayView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		# day = Day.objects.get(name__iexact = self.kwargs['name_day'])
 		all_hours = Hour.objects.filter(id_exercise_fk = self.kwargs['id_exercise'], id_day_fk = self.kwargs['id_day'])
@@ -252,7 +252,7 @@ class ListHourView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
@@ -320,7 +320,7 @@ class CreateHourView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
@@ -366,7 +366,7 @@ class UpdateHourView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			hour = Hour.objects.get(id=self.kwargs['id_hour'])
@@ -388,7 +388,7 @@ class DeleteHourView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			hour = Hour.objects.get(id=self.kwargs['id_hour'])

@@ -52,7 +52,7 @@ class CreatePlanView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			exercise = Exercise.objects.get(id =self.kwargs["id_exercise"])
@@ -82,7 +82,7 @@ class ListPlanView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			exercise = Exercise.objects.get(id =self.kwargs["id_exercise"])
@@ -138,7 +138,7 @@ class UpdatePlanView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		
 		try:
@@ -166,7 +166,7 @@ class DeletePlanView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			plan = Plan.objects.get(id=self.kwargs['pk'])
@@ -206,7 +206,7 @@ class See(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 			
 		try:
 			plan = Plan.objects.get(id=self.kwargs['pk'])

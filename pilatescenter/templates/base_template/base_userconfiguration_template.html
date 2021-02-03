@@ -66,9 +66,12 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a  class="dropdown-item" href="{% url 'exercise:list_exercise' %}">Ejercicio</a>
                         <a  class="dropdown-item" href="{% url 'systempilates:main_system' %}">Sistema</a>
+                        {%if user.is_superuser%}
+                        <a  class="dropdown-item" href="{% url 'user_home:user_home' %}">Modo cliente</a>
+                        {%endif%}
                     </div>
               </li>
-                <a  class="nav-item nav-link"  href="{% url 'admin_login:login_admin' %}">Salir</a>
+                <a  class="nav-item nav-link"  href="{% url login:login %}">Salir</a>
               </li>
             </ul>
         </div>

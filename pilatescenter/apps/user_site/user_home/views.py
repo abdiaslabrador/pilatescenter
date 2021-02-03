@@ -14,7 +14,7 @@ class UserHomeView(View):
 
 	def get(self, request, *args, **kwargs):
 		if request.user.is_anonymous:
-			return redirect('user_login:user_login_form')
+			return redirect('login:login')
 		else:
 			exercises = Exercise.objects.all().order_by("name")
 			self.context = {
@@ -29,7 +29,7 @@ class UserContactView(View):
 
 	def get(self, request, *args, **kwargs):
 		if request.user.is_anonymous:
-			return redirect('user_login:user_login_form')
+			return redirect('login:login')
 		else:
 			contact = Contact.objects.order_by('id').first()
 			if contact == None:
@@ -47,7 +47,7 @@ class UserRulesView(View):
 
 	def get(self, request, *args, **kwargs):
 		if request.user.is_anonymous:
-			return redirect('user_login:user_login_form')
+			return redirect('login:login')
 		else:
 			systempilates = SystemPilates.objects.order_by('id').first()
 			if systempilates == None:

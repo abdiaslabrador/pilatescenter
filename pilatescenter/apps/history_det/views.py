@@ -27,7 +27,7 @@ class ListLessonExerciseHistoryView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		exercises = Exercise.objects.all().order_by('name')	
 		context = {
@@ -105,7 +105,7 @@ class ListHistoryView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		form = SearchClassesForm()
 		try:
@@ -136,7 +136,7 @@ class GeneralSeeHistoryView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			history_det = Lesson_det.objects.get(pk=self.kwargs['id_history'])
@@ -162,7 +162,7 @@ class GeneralDeleteHistoryView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			history_det = Lesson_det.objects.get(pk=self.kwargs['id_history'])
@@ -184,7 +184,7 @@ class UserConfigurationSeeHistoryView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			history_det = Lesson_det.objects.get(pk=self.kwargs['id_history'])
@@ -210,7 +210,7 @@ class UserConfigurationDeleteHistoryView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 			
 		try:
 			history_det = Lesson_det.objects.get(pk=self.kwargs['id_history'])

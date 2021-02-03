@@ -52,6 +52,9 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a  class="dropdown-item" href="{% url 'user_profile:configuration_profile' %}">Datos</a>
+                        {%if user.is_superuser%}
+                        <a  class="dropdown-item" href="{% url 'content_user:list_user' %}">Modo admin</a>
+                        {%endif%}
                     </div>
               </li>
                 <a  class="nav-item nav-link"  href="{% url 'user_login:user_logout' %}">Salir</a>

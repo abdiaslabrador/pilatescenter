@@ -59,7 +59,7 @@ class CreateLessonView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		id_exercise = self.kwargs['id_exercise']
 		form = CreateLessonForm()
@@ -173,7 +173,7 @@ class CreateLessonSearchView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			exercise=Exercise.objects.get(id = self.kwargs['id_exercise'])
@@ -201,7 +201,7 @@ class ListLessonExerciseActionView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		exercises = Exercise.objects.all().order_by('name')	
 		context = {
@@ -276,7 +276,7 @@ class ListLessonView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		form = SearchClassesForm()
 
@@ -361,7 +361,7 @@ class UpdateLessonView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['pk'])
@@ -490,7 +490,7 @@ class TakeOutToLessonView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
@@ -523,7 +523,7 @@ class TakeOutToUsersDevolutionView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
@@ -561,7 +561,7 @@ class SawLessonView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
@@ -593,7 +593,7 @@ class DeleteLessonView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 			
 		try:
 			lesson = Lesson_det.objects.get(id=self.kwargs['id_lesson'])
@@ -620,7 +620,7 @@ class DevolutionLessonView(View):
 	def get(self, request, *args, **kwargs):
 		#validacion de que sea un superusuario
 		if not request.user.is_superuser:
-			return redirect('admin_login:login_admin')
+			return redirect('login:login')
 
 		lesson = None
 		

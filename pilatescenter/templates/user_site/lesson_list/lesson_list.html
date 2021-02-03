@@ -22,14 +22,14 @@
 
       <div class="d-flex">
         <a class="btn btn-warning panding mr-auto" href="{% url 'user_lesson:resumen' exercise_det.id %}">Resumen</a>
-        <a class="btn btn-primary panding " href="{% url 'user_lesson:bag' exercise_det.id %}">Reservas {{exercise_det.bag}}</a>
+        <a class="btn btn-primary panding " href="{% url 'user_lesson:bag' exercise_det.id %}">Canceladas {{exercise_det.bag}}</a>
       </div>
 
 
       {% if exercise_det.oportunities > 0 %}
       <div class = "_oportunities_bar">Oportunidades para reprogramar: {{exercise_det.oportunities}}</div>
       {%else%}
-      <div class = "_oportunities_bar">Ya no tienes oportunidades para reservar</div>
+      <div class = "_oportunities_bar">Ya no tienes oportunidades para cancelar</div>
       {%endif%}
       
       {% if devolutions %}
@@ -95,14 +95,14 @@
                        <!-- Boton de que permite eliminar la leccion-->
                        {% if exercise_det.oportunities > 0 and lesson.lesson_status == lesson.ENABLE%}
                       <td> 
-                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#bolsa{{lesson.id}}">Reservar
+                        <button type="button" class="btn btn-danger" data-toggle="modal"data-target="#bolsa{{lesson.id}}">Cancelar
                         </button>
                         <!-- Modal -->
                         <div class="modal fade" id=bolsa{{lesson.id}} tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                           <div class="modal-dialog" role="document">
                             <div class="modal-content">
                               <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">¿Está seguro que quiere reservar esta lección?</h5>
+                                <h5 class="modal-title" id="exampleModalLabel">¿Está seguro que quiere cancelar esta lección?</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                   <span aria-hidden="true">&times;</span>
                                 </button>
