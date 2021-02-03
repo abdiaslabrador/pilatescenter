@@ -305,32 +305,29 @@ def preDevolutionDelete(sender, instance, *args, **kwargs):
 
 signals.pre_delete.connect(preDevolutionDelete, sender=Devolution)
 
-def postDevolutionDelete(sender, instance, *args, **kwargs):
-	""" 
-		Esto hace que al eliminar un plan no elimine el Exercise_det asociado,
-		asignandole el plan ninguno.
-	"""
+# def postDevolutionDelete(sender, instance, *args, **kwargs):
+	
 		
-	user_exercise_det = Exercise_det.objects.get(
-											   id_user_fk= instance.id_user_fk,
-											   id_exercise_fk= instance.id_exercise_fk
-											)
+# 	user_exercise_det = Exercise_det.objects.get(
+# 											   id_user_fk= instance.id_user_fk,
+# 											   id_exercise_fk= instance.id_exercise_fk
+# 											)
 		
 		
-	user_exercise_det.devolutions = Devolution.objects.filter(
-															id_lesson_fk = None,
-															returned = False,
-															id_user_fk = instance.id_user_fk,
-															id_exercise_fk= instance.id_exercise_fk,
-												).count()
+# 	user_exercise_det.devolutions = Devolution.objects.filter(
+# 															id_lesson_fk = None,
+# 															returned = False,
+# 															id_user_fk = instance.id_user_fk,
+# 															id_exercise_fk= instance.id_exercise_fk,
+# 												).count()
 
-	user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= instance.id_user_fk).exclude( lesson_status = Lesson_det.FINISHED).count()
-	user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= instance.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
-	user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
-	user_exercise_det.save()
+# 	user_exercise_det.scheduled_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk.id, id_user_fk= instance.id_user_fk).exclude( lesson_status = Lesson_det.FINISHED).count()
+# 	user_exercise_det.saw_lessons = Lesson_det.objects.filter(reset= False, id_exercise_fk= instance.id_exercise_fk, id_user_fk= instance.id_user_fk, lesson_status = Lesson_det.FINISHED).count()
+# 	user_exercise_det.enable_lessons = user_exercise_det.total_days - (user_exercise_det.saw_lessons + user_exercise_det.bag  + user_exercise_det.scheduled_lessons)
+# 	user_exercise_det.save()
 
 
-signals.post_delete.connect(postDevolutionDelete, sender=Devolution)
+# signals.post_delete.connect(postDevolutionDelete, sender=Devolution)
 
 def postDevolutionSave(sender, instance, *args, **kwargs):
 	""" 
