@@ -35,6 +35,7 @@ urlpatterns = [
     path('devolution/', include('apps.devolution.urls')),
     path('systempilates/', include('apps.system.urls')),
 
+
     path('user_site/home/', include('apps.user_site.user_home.urls')),
     path('user_site/lessons/', include('apps.user_site.user_lesson_list.urls')),
     path('user_site/profile/', include('apps.user_site.user_profile.urls')),
@@ -50,3 +51,4 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
     # path('user_site/', include('apps.history_det.urls')),
+    
