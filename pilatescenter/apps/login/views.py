@@ -28,6 +28,11 @@ class LoginView(View): #class based view
 		return render(request, self.template_name, {'form':form})
 
 	def get(self, request, *args, **kwargs):
+		if request.user.is_authenticated:
+			if request.user.is_superuser:
+				return redirect("lesson:list_lesson_exercise_action")
+			else:
+				return redirect("user_home:user_home")
 		form = LoginForm()
 		return render(request, self.template_name, {'form':form})
 
@@ -36,4 +41,4 @@ class LogoutView(View):
 	
 	def get(self, request, *args, **kwargs):
 		logout(request)
-		return redirect('admin_login:login_admin')
+		return redirect('login:login')
