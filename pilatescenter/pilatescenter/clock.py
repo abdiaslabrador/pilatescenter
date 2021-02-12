@@ -41,6 +41,7 @@ def updateTable():
                                        end
                                 WHERE reset= False
                                       and day_lesson = %s
+                                      AND lesson_status != %s
                                       AND
                                       case
                                        when  EXTRACT(HOUR FROM hour_chance) = %s and EXTRACT(MINUTE FROM hour_chance) = %s 
@@ -50,16 +51,14 @@ def updateTable():
                                        when  EXTRACT(HOUR FROM hour_end) = %s and EXTRACT(MINUTE FROM hour_end) = %s 
                                             then %s
                                        end is not null
-
+                              
                                        RETURNING id, lesson_status
-
                           """
-    
-
         cursor.execute(sql_select_query, (my_date.hour, my_date.minute, NOTCHANCE,
                                           my_date.hour, my_date.minute, INPROCESS,
                                           my_date.hour, my_date.minute, FINISHED,
                                           my_date.date(),
+                                          FINISHED,
                                           my_date.hour, my_date.minute, NOTCHANCE,
                                           my_date.hour, my_date.minute, INPROCESS,
                                           my_date.hour, my_date.minute, FINISHED,
