@@ -156,8 +156,8 @@ TIME_INPUT_FORMATS= ['%I:%M:%p']
 EMAIL_HOST= 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS= True
-EMAIL_HOST_USER= 'projects.testing.email@gmail.com'
-EMAIL_HOST_PASSWORD= 'Dani1993?3'
+EMAIL_HOST_USER= '****'
+EMAIL_HOST_PASSWORD= '***'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 #/static/ es el directorio de principal para archivos css y javascript, que trabaja con
