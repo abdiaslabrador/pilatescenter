@@ -1,5 +1,5 @@
-Instrucciones de instalación:
-	1- Make clone
+Installation instructions:
+	1- Clone the project
 
 	2- You have to have the version of python3.8
 
